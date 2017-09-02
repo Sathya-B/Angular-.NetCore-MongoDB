@@ -19,6 +19,7 @@ import { MockBackend } from '@angular/http/testing';
 import { AppState } from '../app.service';
 import { HomeComponent } from './home.component';
 import { Title } from './title';
+import { DataServ } from '../../services/data.service';
 
 describe(`Home`, () => {
   let comp: HomeComponent;
@@ -34,6 +35,7 @@ describe(`Home`, () => {
       providers: [
         BaseRequestOptions,
         MockBackend,
+        DataServ,
         {
           provide: Http,
           useFactory: (backend: ConnectionBackend, defaultOptions: BaseRequestOptions) => {
@@ -72,12 +74,9 @@ describe(`Home`, () => {
     expect(!!comp.title).toEqual(true);
   });
 
-  it('should log ngOnInit', () => {
-    spyOn(console, 'log');
-    expect(console.log).not.toHaveBeenCalled();
-
+  it('should get Categories', () => {
     comp.ngOnInit();
-    expect(console.log).toHaveBeenCalled();
+    expect(comp.category.length).toEqual(0);
   });
 
 });

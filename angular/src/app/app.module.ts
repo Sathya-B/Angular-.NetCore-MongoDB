@@ -28,8 +28,18 @@ import { HomeComponent } from './home';
 import { HeaderComponent } from './header';
 import { FooterComponent } from './footer';
 import { AboutComponent } from './about';
+import {LoginRegisterComponent} from './auth/loginregister/loginregister.component';
+import {ProductsComponent} from './products/products.component';
+import {ProductItemComponent} from './products/productitem/productitem.component';
+import {ColorSizeStockComponent} from './variants/colorsizestock/colorsizestock.component';
+import {VariantsComponent} from './variants/variants.component';
+import { DataServ } from '../services/data.service';
+import { ApiService } from '../services/api.service';
+import {FilterPipe} from '../pipes/filterpipe.component'
+import {CategoryComponent} from './home/category';
 import { NoContentComponent } from './no-content';
 import { XLargeDirective } from './home/x-large';
+import { CarouselModule } from 'angular4-carousel';
 
 import '../styles/styles.scss';
 import '../styles/headings.css';
@@ -55,9 +65,16 @@ type StoreType = {
     AppComponent,
     AboutComponent,
     HomeComponent,
+    ProductsComponent,
+    ProductItemComponent,
+    VariantsComponent,
+    CategoryComponent,
+    LoginRegisterComponent, 
+    ColorSizeStockComponent,       
     HeaderComponent,
     FooterComponent,
     NoContentComponent,
+    FilterPipe,
     XLargeDirective
   ],
   /**
@@ -67,6 +84,7 @@ type StoreType = {
     BrowserModule,
     FormsModule,
     HttpModule,
+    CarouselModule,
     RouterModule.forRoot(ROUTES, { useHash: true, preloadingStrategy: PreloadAllModules })
   ],
   /**
@@ -74,7 +92,9 @@ type StoreType = {
    */
   providers: [
     ENV_PROVIDERS,
-    APP_PROVIDERS
+    APP_PROVIDERS,
+    DataServ,
+    ApiService
   ]
 })
 export class AppModule {

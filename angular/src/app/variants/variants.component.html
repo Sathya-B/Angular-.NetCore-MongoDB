@@ -1,0 +1,84 @@
+<div class="commonPageWrap">
+    <div class="wrapper">
+        <div class="wrapInner">
+            <div class="pageBgWhite">
+                <div class="productMainWrap clearfix">
+                    <div class="productImgwrap"><img [src]="variants.topItem.minioObject_Url" alt=""></div>
+                    <div class="productBasicInfoWrap">
+                        <h1>{{variants.topItem.product_Design}}</h1>
+                        <!-- <div class="reviewTab">
+								<span class="review"></span>
+								<a href="" class="reviewLinkBtn"></a>
+							</div> -->
+                        <div class="priceTab"><span>INR</span> {{variants.topItem.product_Price}}</div>
+                        <!-- <div class="productShortDescription">
+							    <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. </p>
+							</div> -->
+                        <div class="colourTab">
+                            <div class="colourHeading">Colour</div>
+                            <div class="colourBoxWrap clearfix">
+                                <div *ngFor="let variant of variants.variants | filter:'product_Colour'"><input type="radio" [id]="variant.product_Colour" name="selectedColour" [checked]="isChecked(variant.product_Colour)"
+                                        (change)="checked($event, variant)"><label [for]="variant.product_Colour" [ngStyle]="{'background-color': variant.product_Colour, 'border':'1px solid #cecece'}">{{variant.product_Colour}}</label></div>
+                            </div>
+                        </div>
+                        <colorsizestock [selectedVariant]="selectedVariant"></colorsizestock>
+                        <div class="singlePageBtnsWrap">
+                            <button type="submit" class="">Add to Shopping Bag <span class="iconShopBtn-Bag fa fa-shopping-bag"></span></button>
+                            <a href="#prdDetails" class="viewProductDetailsCustom">Product Details</a>
+                        </div>
+                        <div class="productMetaWrap">
+                            <span class="sku_wrapper">SKU: <span class="sku">N/A</span></span>
+                            <span class="posted_in">Categories: <a href="" rel="tag">Clothing</a>, <a href="" rel="tag">Hoodies</a></span>
+                        </div>
+
+                    </div>
+                </div>
+                <span id="prdDetails"></span>
+                <div class="productDescription">
+                    <h2>Description</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla at consequat orci. Donec fermentum tristique
+                        erat et tincidunt. Maecenas interdum fringilla dui sit amet sodales.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                </div>
+                <div class="productAdditionalInfo">
+                    <h2>Additional information</h2>
+                </div>
+                <div class="productAdditionalInfo">
+                    <h2>Product Review </h2>
+                </div>
+                <!-- <div class="reviewCommentsWrap">
+						<h2>Product Review </h2>
+
+					</div> -->
+                <!-- <div style="height:200px;"></div> -->
+            </div>
+            <h1 class="titleCommon2">Related Products<span>Authentic Art Wear For Men</span></h1>
+            <div class="itemsWrapOuter clearfix">
+                <div class="itemsWrapInner">
+                    <a href="" class="itemAnchor">
+							<img src="images/mens/mens-img.jpg" alt="">
+							<h2>The Unicorn <br></h2>
+							<span class="itemPrice">INR 895</span>
+						</a>
+                    <a href="" class="addToBagBtn">Add to Bag <span class="iconShopBtn-Bag fa fa-shopping-bag"></span></a>
+                </div>
+                <div class="itemsWrapInner">
+                    <a href="" class="itemAnchor">
+							<img src="images/mens/mens-img.jpg" alt="">
+							<h2>The Unicorn <br></h2>
+							<span class="itemPrice">INR 895</span>
+						</a>
+                    <a href="" class="addToBagBtn">Add to Bag <span class="iconShopBtn-Bag fa fa-shopping-bag"></span></a>
+                </div>
+                <div class="itemsWrapInner">
+                    <a href="" class="itemAnchor">
+							<img src="images/mens/mens-img.jpg" alt="">
+							<h2>The Unicorn <br></h2>
+							<span class="itemPrice">INR 895</span>
+						</a>
+                    <a href="" class="addToBagBtn">Add to Bag <span class="iconShopBtn-Bag fa fa-shopping-bag"></span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

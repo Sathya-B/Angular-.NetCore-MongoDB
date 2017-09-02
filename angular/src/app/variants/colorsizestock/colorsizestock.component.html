@@ -1,0 +1,28 @@
+<div class="sizeTab">
+    <div class="clearfix">
+        <div class="selectedSizeWrap">Size <span class="selectedSize"></span></div>
+    </div>
+    <div class="sizeBoxWrap clearfix">
+        <div><input type="radio" id="option-S" name="selector" value="S" [disabled]="isAvailable('S')" [checked]="(selectedSize == 'S')" (change)="checked('S')"><label for="option-S">S</label></div>
+        <div><input type="radio" id="option-M" name="selector" value="M" [disabled]="isAvailable('M')" [checked]="(selectedSize == 'M')" (change)="checked('M')"><label for="option-M">M</label></div>
+        <div><input type="radio" id="option-L" name="selector" value="L" [disabled]="isAvailable('L')"  [checked]="(selectedSize == 'L')" (change)="checked('L')"><label for="option-L">L</label></div>
+        <div><input type="radio" id="option-XL" name="selector" value="XL" [disabled]="isAvailable('XL')" [checked]="(selectedSize == 'XL')" (change)="checked('XL')"><label for="option-XL">XL</label></div>
+        <div><input type="radio" id="option-XXL" name="selector" value="XXL" [disabled]="isAvailable('XXL')" [checked]="(selectedSize == 'XXL')" (change)="checked('XXL')"><label for="option-XXL">XXL</label></div>
+        <!-- <div><input type="radio" id="option-XXXL" name="selector" value="XXL"><label for="option-XXL">XXXL</label></div> -->
+    </div>
+    <div class="sizeGUideBtnWrap"><a href=""><img src="../assets/img/size-guide.png" alt=""><span>Size Guide</span></a></div>
+</div>
+<div class="quantityCustomWrap">
+    <span class="quantityHeading">Quantity</span>
+    <div class="quantityInputWrap">
+        <!-- <input type="button" value="-" class="minus button">
+									<!-- <input type="button" value="+" class="plus button"> -->
+        <span class="plus button">+</span>
+        <span class="minus button">-</span>
+        <input type="number" class="" step="1" min="1" max="" name="quantity" value="1" title="Qty" size="4" pattern="[1-9]*" inputmode="numeric">
+    </div>
+    <div>Remaining: {{remainingQty}}</div>
+    <div class="addToWishListWrap">
+        <a href="" class="wishLIstBtn"><span class="fa fa-heart-o"></span> Add to Wish List</a>
+    </div>
+</div>

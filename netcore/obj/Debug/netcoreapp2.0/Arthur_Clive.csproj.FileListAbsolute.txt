@@ -1,0 +1,22 @@
+C:\Users\User\Documents\Visual Studio 2017\Projects\Arthur Clive\Arthur Clive\obj\Debug\netcoreapp2.0\Arthur_Clive.csproj.CoreCompileInputs.cache
+C:\Users\User\Documents\Visual Studio 2017\Projects\Arthur Clive\Arthur Clive\obj\Debug\netcoreapp2.0\Arthur_Clive.AssemblyInfoInputs.cache
+C:\Users\User\Documents\Visual Studio 2017\Projects\Arthur Clive\Arthur Clive\obj\Debug\netcoreapp2.0\Arthur_Clive.AssemblyInfo.cs
+C:\Users\User\Documents\Visual Studio 2017\Projects\Arthur Clive\Arthur Clive\bin\Debug\netcoreapp2.0\Arthur_Clive.deps.json
+C:\Users\User\Documents\Visual Studio 2017\Projects\Arthur Clive\Arthur Clive\bin\Debug\netcoreapp2.0\Arthur_Clive.runtimeconfig.json
+C:\Users\User\Documents\Visual Studio 2017\Projects\Arthur Clive\Arthur Clive\bin\Debug\netcoreapp2.0\Arthur_Clive.runtimeconfig.dev.json
+C:\Users\User\Documents\Visual Studio 2017\Projects\Arthur Clive\Arthur Clive\bin\Debug\netcoreapp2.0\Arthur_Clive.dll
+C:\Users\User\Documents\Visual Studio 2017\Projects\Arthur Clive\Arthur Clive\bin\Debug\netcoreapp2.0\Arthur_Clive.pdb
+C:\Users\User\Documents\Visual Studio 2017\Projects\Arthur Clive\Arthur Clive\obj\Debug\netcoreapp2.0\Arthur_Clive.dll
+C:\Users\User\Documents\Visual Studio 2017\Projects\Arthur Clive\Arthur Clive\obj\Debug\netcoreapp2.0\Arthur_Clive.pdb
+C:\Users\User\Documents\Visual Studio 2017\Projects\Arthur Clive\Arthur Clive\obj\Debug\netcoreapp2.0\Arthur_Clive.csprojResolveAssemblyReference.cache
+E:\Sathya\ArthurClive\Server\Arthur Clive\bin\Debug\netcoreapp2.0\Arthur_Clive.deps.json
+E:\Sathya\ArthurClive\Server\Arthur Clive\bin\Debug\netcoreapp2.0\Arthur_Clive.runtimeconfig.json
+E:\Sathya\ArthurClive\Server\Arthur Clive\bin\Debug\netcoreapp2.0\Arthur_Clive.runtimeconfig.dev.json
+E:\Sathya\ArthurClive\Server\Arthur Clive\bin\Debug\netcoreapp2.0\Arthur_Clive.dll
+E:\Sathya\ArthurClive\Server\Arthur Clive\bin\Debug\netcoreapp2.0\Arthur_Clive.pdb
+E:\Sathya\ArthurClive\Server\Arthur Clive\obj\Debug\netcoreapp2.0\Arthur_Clive.csprojResolveAssemblyReference.cache
+E:\Sathya\ArthurClive\Server\Arthur Clive\obj\Debug\netcoreapp2.0\Arthur_Clive.csproj.CoreCompileInputs.cache
+E:\Sathya\ArthurClive\Server\Arthur Clive\obj\Debug\netcoreapp2.0\Arthur_Clive.AssemblyInfoInputs.cache
+E:\Sathya\ArthurClive\Server\Arthur Clive\obj\Debug\netcoreapp2.0\Arthur_Clive.AssemblyInfo.cs
+E:\Sathya\ArthurClive\Server\Arthur Clive\obj\Debug\netcoreapp2.0\Arthur_Clive.dll
+E:\Sathya\ArthurClive\Server\Arthur Clive\obj\Debug\netcoreapp2.0\Arthur_Clive.pdb

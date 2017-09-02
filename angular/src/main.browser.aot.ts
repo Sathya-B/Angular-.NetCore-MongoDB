@@ -1,3 +1,4 @@
+import './polyfills.browser';
 /**
  * Angular bootstrapping
  */

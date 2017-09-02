@@ -1,11 +1,12 @@
-import {
-  Component,
-  OnInit
-} from '@angular/core';
-
+import { Component, OnInit } from '@angular/core';
 import { AppState } from '../app.service';
 import { Title } from './title';
+import { DataServ } from '../../services/data.service';
+import {ApiService} from '../../services/api.service';
+import { Category } from '../../models/category.model';
 import { XLargeDirective } from './x-large';
+import { CategoryComponent } from './category';
+import { ICarouselConfig, AnimationConfig } from 'angular4-carousel';
 
 @Component({
   /**
@@ -23,7 +24,7 @@ import { XLargeDirective } from './x-large';
   /**
    * Our list of styles in our component. We may add more to compose many styles together.
    */
-  styleUrls: [ './home.component.css' ],
+  styleUrls: ['./home.component.css'],
   /**
    * Every Angular template is first compiled by the browser before Angular runs it's compiler.
    */
@@ -34,24 +35,44 @@ export class HomeComponent implements OnInit {
    * Set our default values
    */
   public localState = { value: '' };
+
+  public imageSources: string[] = [
+    "../assets/img/sliderhome/desktop/1200-X-450_B_01.jpg",
+    "../assets/img/sliderhome/desktop/1200-X-450_B_02.jpg",
+    "../assets/img/sliderhome/desktop/1200-X-450_B_03.jpg",
+    "../assets/img/sliderhome/desktop/1200-X-450_B_04.jpg"
+  ];
+
+  public config: ICarouselConfig = {
+    verifyBeforeLoad: false,
+    log: false,
+    animation: true,
+    animationType: AnimationConfig.SLIDE,
+    autoplay: false,
+    autoplayDelay: 2000,
+    stopAutoplayMinWidth: 1200
+  };
+
+  public category: any[] = [];
+
   /**
    * TypeScript public modifiers
    */
-  constructor(
-    public appState: AppState,
-    public title: Title
-  ) {}
-
-  public ngOnInit() {
-    console.log('hello `Home` component');
-    /**
-     * this.title.getData().subscribe(data => this.data = data);
-     */
+  constructor(public appState: AppState, public title: Title, private dataServ: DataServ, private apiService: ApiService) {
+  }
+  ngOnInit() {
+    this.GetCategories();
   }
 
-  public submitState(value: string) {
-    console.log('submitState', value);
-    this.appState.set('value', value);
-    this.localState.value = '';
+  GetCategories(){
+    this.apiService.get('category').subscribe(
+      (response: any) => {
+        console.log(response);
+        this.category = response.result;
+      },
+      (error: any) => {
+        console.log(error);
+      }
+    )
   }
 }

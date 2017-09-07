@@ -37,7 +37,8 @@ namespace Arthur_Clive.DataAccess
                 foreach (var product in products)
                 {
                     var minioObjName = product.Product_SKU + ".jpg";
-                    product.MinioObject_Url = WH.GetMinioObject(minio, "products", minioObjName).Result;
+                    //product.MinioObject_Url = WH.GetMinioObject(minio, "products", minioObjName).Result;
+                    product.MinioObject_Url = WH.GetS3Object("arthurclive-products", minioObjName);
                 }
                 return products;
             }

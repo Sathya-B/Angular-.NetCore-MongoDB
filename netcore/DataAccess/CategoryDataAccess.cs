@@ -36,7 +36,8 @@ namespace Arthur_Clive.DataAccess
                 foreach (var category in categories)
                 {
                     var minioObjName = category.Product_For + "-" + category.Product_Type + ".jpg";
-                    category.MinioObject_URL = WH.GetMinioObject(minio, "product-category", minioObjName).Result;
+                   // category.MinioObject_URL = WH.GetMinioObject(minio, "product-category", minioObjName).Result;
+                   category.MinioObject_URL = WH.GetS3Object("product-category", minioObjName);
                 }
                 return categories;
             }

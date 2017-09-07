@@ -22,5 +22,11 @@ namespace Arthur_Clive.Helper
             string presignedUrl = await minio.PresignedGetObjectAsync(bucketName, objectName, 1000);
             return presignedUrl;
         }
+        public static string GetS3Object(string bucketName, string objectName)
+        {   
+            string s3 = "https://s3.ap-south-1.amazonaws.com/";
+            string presignedUrl = s3+ bucketName + "/" + objectName;
+            return presignedUrl;
+        }
     }
 }

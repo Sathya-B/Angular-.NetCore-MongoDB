@@ -15,8 +15,6 @@ namespace Arthur_Clive.Controllers
     public class ProductController : Controller
     {
         public ProductDataAccess productDataAccess;
-        public MinioClient minio = WH.GetMinioClient();
-        public string minioObjName;
 
         public ProductController(ProductDataAccess data)
         {
@@ -33,15 +31,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                ApplicationLogger logger =
-                    new ApplicationLogger
-                    {
-                        Controller = "Product",
-                        MethodName = "Get",
-                        Method = "Get",
-                        Description = ex.Message
-                    };
-                productDataAccess.CreateLog(logger);
+                WH.CreateLog("Product", "Get", "Get",ex.Message);
                 return Json(new Product());
             }
         }
@@ -58,15 +48,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                ApplicationLogger logger =
-                    new ApplicationLogger
-                    {
-                        Controller = "Product",
-                        MethodName = "Post",
-                        Method = "Post",
-                        Description = ex.Message
-                    };
-                productDataAccess.CreateLog(logger);
+                WH.CreateLog("Product", "Post", "Post", ex.Message);
                 return "Failed";
             }
         }
@@ -78,21 +60,13 @@ namespace Arthur_Clive.Controllers
             {
                 var stream = file.OpenReadStream();
                 var name = file.FileName;
-                minioObjName = productSKU + ".jpg";
-                minio.PutObjectAsync("student-maarklist", minioObjName, stream, file.Length);
+                string objectName = productSKU + ".jpg";
+                WH.GetMinioClient().PutObjectAsync("student-maarklist", objectName, stream, file.Length);
                 return "Success";
             }
             catch (Exception ex)
             {
-                ApplicationLogger logger =
-                   new ApplicationLogger
-                   {
-                       Controller = "Product",
-                       MethodName = "Post",
-                       Method = "Post file to minio",
-                       Description = ex.Message
-                   };
-                productDataAccess.CreateLog(logger);
+                WH.CreateLog("Product", "Post", "Post file to minio", ex.Message);
                 return "Failed";
             }
         }
@@ -109,15 +83,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                ApplicationLogger logger =
-                   new ApplicationLogger
-                   {
-                       Controller = "Product",
-                       MethodName = "Put",
-                       Method = "Put",
-                       Description = ex.Message
-                   };
-                productDataAccess.CreateLog(logger);
+                WH.CreateLog("Product", "Put", "Put", ex.Message);
                 return "Failed";
             }
         }
@@ -140,7 +106,7 @@ namespace Arthur_Clive.Controllers
                        Method = "Delete",
                        Description = ex.Message
                    };
-                productDataAccess.CreateLog(logger);
+                WH.CreateLog("Product", "Delete", "Delete", ex.Message);
                 return "Failed";
             }
         }

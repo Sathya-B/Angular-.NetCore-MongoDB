@@ -12,7 +12,6 @@ namespace Arthur_Clive.Controllers
     public class SubCategoryController : Controller
     {
         ProductDataAccess productDataAccess;
-        public MinioClient minio = WH.GetMinioClient();
 
         public SubCategoryController(ProductDataAccess dataAccess)
         {
@@ -36,19 +35,12 @@ namespace Arthur_Clive.Controllers
             }
             catch(Exception ex)
             {
-                ApplicationLogger logger =
-                    new ApplicationLogger
-                    {
-                        Controller = "SubCategory",
-                        MethodName = "Get",
-                        Method = "Get with product_For and product_Type",
-                        Description = ex.Message
-                    };
-                productDataAccess.CreateLog(logger);
+                WH.CreateLog("SubCategory", "Get", "Get with product_For and product_Type", ex.Message);
                 return Json(new Product());
             }
         }
 
+        #region Unused Get method for subcategories
         [HttpGet("{productFor}/{productType}/{productDesign}")]
         public JsonResult Get(string productFor, string productType,string productDesign)
         {
@@ -66,15 +58,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                ApplicationLogger logger =
-                    new ApplicationLogger
-                    {
-                        Controller = "SubCategory",
-                        MethodName = "Get",
-                        Method = "Get with product_For and product_Type",
-                        Description = ex.Message
-                    };
-                productDataAccess.CreateLog(logger);
+                WH.CreateLog("SubCategory", "Get", "Get with product_For, product_Type and product_Design", ex.Message);
                 return Json(new Product());
             }
         }
@@ -96,15 +80,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                ApplicationLogger logger =
-                    new ApplicationLogger
-                    {
-                        Controller = "SubCategory",
-                        MethodName = "Get",
-                        Method = "Get with product_For and product_Type",
-                        Description = ex.Message
-                    };
-                productDataAccess.CreateLog(logger);
+                WH.CreateLog("SubCategory", "Get", "Get with product_For, product_Type,product_Design and product_Colour", ex.Message);
                 return Json(new Product());
             }
         }
@@ -126,17 +102,10 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                ApplicationLogger logger =
-                    new ApplicationLogger
-                    {
-                        Controller = "SubCategory",
-                        MethodName = "Get",
-                        Method = "Get with product_For and product_Type",
-                        Description = ex.Message
-                    };
-                productDataAccess.CreateLog(logger);
+                WH.CreateLog("SubCategory", "Get", "Get with product_For, product_Type,product_Design,product_Colour and product_Size", ex.Message);
                 return Json(new Product());
             }
         }
+        #endregion
     }
 }

@@ -28,15 +28,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                ApplicationLogger logger =
-                    new ApplicationLogger
-                    {
-                        Controller = "Category",
-                        MethodName = "Get",
-                        Method = "Get",
-                        Description = ex.Message
-                    };
-                categoryDataAccess.CreateLog(logger);
+                WH.CreateLog("Category", "Get", "Get", ex.Message);
                 return Json(new Category());
             }
         }

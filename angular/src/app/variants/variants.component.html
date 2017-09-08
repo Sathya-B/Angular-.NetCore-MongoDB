@@ -54,30 +54,7 @@
             </div>
             <h1 class="titleCommon2">Related Products<span>Authentic Art Wear For Men</span></h1>
             <div class="itemsWrapOuter clearfix">
-                <div class="itemsWrapInner">
-                    <a href="" class="itemAnchor">
-							<img src="images/mens/mens-img.jpg" alt="">
-							<h2>The Unicorn <br></h2>
-							<span class="itemPrice">INR 895</span>
-						</a>
-                    <a href="" class="addToBagBtn">Add to Bag <span class="iconShopBtn-Bag fa fa-shopping-bag"></span></a>
-                </div>
-                <div class="itemsWrapInner">
-                    <a href="" class="itemAnchor">
-							<img src="images/mens/mens-img.jpg" alt="">
-							<h2>The Unicorn <br></h2>
-							<span class="itemPrice">INR 895</span>
-						</a>
-                    <a href="" class="addToBagBtn">Add to Bag <span class="iconShopBtn-Bag fa fa-shopping-bag"></span></a>
-                </div>
-                <div class="itemsWrapInner">
-                    <a href="" class="itemAnchor">
-							<img src="images/mens/mens-img.jpg" alt="">
-							<h2>The Unicorn <br></h2>
-							<span class="itemPrice">INR 895</span>
-						</a>
-                    <a href="" class="addToBagBtn">Add to Bag <span class="iconShopBtn-Bag fa fa-shopping-bag"></span></a>
-                </div>
+                <relateditem *ngFor="let relatedItem of relatedItems" [productitem]="relatedItem.val" (variantItemClicked)="variantItemClicked($event)"  ></relateditem>
             </div>
         </div>
     </div>

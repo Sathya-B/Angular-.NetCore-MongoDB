@@ -1,10 +1,12 @@
-import { Component, OnInit, Output } from '@angular/core';
+import { Component, OnInit, Output, ViewChild } from '@angular/core';
 import { AppState } from '../app.service';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { ParamMap } from '@angular/router';
 import { DataServ} from '../../services/data.service';
 import { EventEmitter } from '@angular/core';
+import {RelatedComponent} from './related/related.component';
+import {ColorSizeStockComponent} from './colorsizestock/colorsizestock.component';
 
 @Component({
   selector: 'variants',  
@@ -41,9 +43,15 @@ export class VariantsComponent implements OnInit{
 
   public selectedVariant: string;
 
+  public relatedItems: any;
+
   /**
    * TypeScript public modifiers
    */
+
+  @ViewChild(ColorSizeStockComponent) css: ColorSizeStockComponent;
+
+
   constructor(private dataServ: DataServ, private route: ActivatedRoute) {
     this.for = route.snapshot.paramMap.get('productFor');
     this.type = route.snapshot.paramMap.get('productType');
@@ -52,7 +60,7 @@ export class VariantsComponent implements OnInit{
 
 ngOnInit(){
 this.variants = JSON.parse(localStorage.getItem(this.for + "-" + this.type + "-" + this.design));
- console.log(this.variants);
+this.relatedItems = findLocalItems(this.for);
 }
 
 checked(event: any, svariant?: any){
@@ -68,4 +76,24 @@ isChecked(color: string){
     return false;
   }  
 }
+
+variantItemClicked(variantItem: any){
+this.variants = variantItem;
+this.selectedVariant = null;
+this.selectedColor = null;
+this.css.selectedSize = null;
+}
+
+}
+
+function findLocalItems (query) {
+  var i, results = [];
+  for (i in localStorage) {
+    if (localStorage.hasOwnProperty(i)) {
+      if (i.match(query) || (!query && typeof i === 'string')) {
+        results.push({key:i,val:JSON.parse(localStorage.getItem(i))});
+      }
+    }
+  }
+  return results;
 }

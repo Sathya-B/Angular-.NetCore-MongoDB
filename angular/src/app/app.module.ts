@@ -29,10 +29,12 @@ import { HeaderComponent } from './header';
 import { FooterComponent } from './footer';
 import { AboutComponent } from './about';
 import {LoginRegisterComponent} from './auth/loginregister/loginregister.component';
+import {CreateAccountComponent} from './auth/createaccount/createaccount.component';
 import {ProductsComponent} from './products/products.component';
 import {ProductItemComponent} from './products/productitem/productitem.component';
 import {ColorSizeStockComponent} from './variants/colorsizestock/colorsizestock.component';
 import {VariantsComponent} from './variants/variants.component';
+import {RelatedComponent} from './variants/related/related.component';
 import { DataServ } from '../services/data.service';
 import { ApiService } from '../services/api.service';
 import {FilterPipe} from '../pipes/filterpipe.component'
@@ -69,8 +71,10 @@ type StoreType = {
     ProductItemComponent,
     VariantsComponent,
     CategoryComponent,
-    LoginRegisterComponent, 
-    ColorSizeStockComponent,       
+    LoginRegisterComponent,
+    CreateAccountComponent, 
+    ColorSizeStockComponent,
+    RelatedComponent,       
     HeaderComponent,
     FooterComponent,
     NoContentComponent,

@@ -13,15 +13,7 @@ namespace Arthur_Clive.DataAccess
 {
     public class ProductDataAccess
     {
-        public MongoClient _client;
-        public MongoServer _server;
-        public IMongoDatabase _db;
-
-        public ProductDataAccess()
-        {
-            _client = WH.GetClient();
-            _db = _client.GetDatabase("ProductDB");
-        }
+        public IMongoDatabase _db = WH._client.GetDatabase("ProductDB");
 
         public async Task<IEnumerable<Product>> GetProducts()
         {
@@ -42,7 +34,7 @@ namespace Arthur_Clive.DataAccess
             }
             catch (Exception ex)
             {
-                WH.CreateLog("ProductDataAccess", "GetProducts", "GetProducts", ex.Message);
+                LoggerDataAccess.CreateLog("ProductDataAccess", "GetProducts", "GetProducts", ex.Message);
                 List<Product> productList = new List<Product>();
                 return productList;
             }
@@ -58,7 +50,7 @@ namespace Arthur_Clive.DataAccess
             }
             catch (Exception ex)
             {
-                WH.CreateLog("ProductDataAccess", "Create", "Create", ex.Message);
+                LoggerDataAccess.CreateLog("ProductDataAccess", "Create", "Create", ex.Message);
                 return "Failed";
             }
         }
@@ -79,7 +71,7 @@ namespace Arthur_Clive.DataAccess
             }
             catch (Exception ex)
             {
-                WH.CreateLog("ProductDataAccess", "Update", "Update", ex.Message);
+                LoggerDataAccess.CreateLog("ProductDataAccess", "Update", "Update", ex.Message);
                 return "Updated";
             }
         }
@@ -102,7 +94,7 @@ namespace Arthur_Clive.DataAccess
                       Method = "Failed",
                       Description = ex.Message
                   };
-                WH.CreateLog("ProductDataAccess", "Remove", "Remove", ex.Message);
+                LoggerDataAccess.CreateLog("ProductDataAccess", "Remove", "Remove", ex.Message);
                 return "Failed";
             }
         }
@@ -111,7 +103,7 @@ namespace Arthur_Clive.DataAccess
         {
             try
             {
-                var filter = "{ Product_For: '"+ productFor + "' , Product_Type: '" + productType + "'}";
+                var filter = "{ Product_For: '" + productFor + "' , Product_Type: '" + productType + "'}";
                 var collection = _db.GetCollection<Product>("Product");
                 IAsyncCursor<Product> cursor = await collection.FindAsync(filter);
                 var products = cursor.ToList();
@@ -124,16 +116,16 @@ namespace Arthur_Clive.DataAccess
                 }
                 return products.ToList();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                WH.CreateLog("ProductDataAccess", "GetProductsForSubCategoryAsync", "GetProductsForSubCategoryAsync", ex.Message);
+                LoggerDataAccess.CreateLog("ProductDataAccess", "GetProductsForSubCategoryAsync", "GetProductsForSubCategoryAsync", ex.Message);
                 List<Product> productList = new List<Product>();
                 return productList;
             }
         }
 
         #region Unused Get SubCategories
-        public async Task<IEnumerable<Product>> GetProductsForSubDivisionByDesignAsync(string productFor, string productType,string productDesign)
+        public async Task<IEnumerable<Product>> GetProductsForSubDivisionByDesignAsync(string productFor, string productType, string productDesign)
         {
             try
             {
@@ -153,13 +145,13 @@ namespace Arthur_Clive.DataAccess
             }
             catch (Exception ex)
             {
-                WH.CreateLog("ProductDataAccess", "GetProductsForSubDivisionByDesignAsync", "GetProductsForSubDivisionByDesignAsync", ex.Message);
+                LoggerDataAccess.CreateLog("ProductDataAccess", "GetProductsForSubDivisionByDesignAsync", "GetProductsForSubDivisionByDesignAsync", ex.Message);
                 List<Product> productList = new List<Product>();
                 return productList;
             }
         }
 
-        public async Task<IEnumerable<Product>> GetProductsForSubDivisionByColourAsync(string productFor, string productType, string productDesign,string productColour)
+        public async Task<IEnumerable<Product>> GetProductsForSubDivisionByColourAsync(string productFor, string productType, string productDesign, string productColour)
         {
             try
             {
@@ -179,13 +171,13 @@ namespace Arthur_Clive.DataAccess
             }
             catch (Exception ex)
             {
-                WH.CreateLog("ProductDataAccess", "GetProductsForSubDivisionByColourAsync", "GetProductsForSubDivisionByColourAsync", ex.Message);
+                LoggerDataAccess.CreateLog("ProductDataAccess", "GetProductsForSubDivisionByColourAsync", "GetProductsForSubDivisionByColourAsync", ex.Message);
                 List<Product> productList = new List<Product>();
                 return productList;
             }
         }
 
-        public async Task<IEnumerable<Product>> GetProductsForSubDivisionBySizeAsync(string productFor, string productType, string productDesign, string productColour,string productSize)
+        public async Task<IEnumerable<Product>> GetProductsForSubDivisionBySizeAsync(string productFor, string productType, string productDesign, string productColour, string productSize)
         {
             try
             {
@@ -205,7 +197,7 @@ namespace Arthur_Clive.DataAccess
             }
             catch (Exception ex)
             {
-                WH.CreateLog("ProductDataAccess", "GetProductsForSubDivisionBySizeAsync", "GetProductsForSubDivisionBySizeAsync", ex.Message);
+                LoggerDataAccess.CreateLog("ProductDataAccess", "GetProductsForSubDivisionBySizeAsync", "GetProductsForSubDivisionBySizeAsync", ex.Message);
                 List<Product> productList = new List<Product>();
                 return productList;
             }

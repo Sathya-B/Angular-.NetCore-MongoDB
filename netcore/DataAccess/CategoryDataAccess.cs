@@ -11,16 +11,8 @@ namespace Arthur_Clive.DataAccess
 {
     public class CategoryDataAccess
     {
-        public MongoClient _client;
-        public MongoServer _server;
-        public IMongoDatabase _db;
-
-        public CategoryDataAccess()
-        {
-            _client = WH.GetClient();
-            _db = _client.GetDatabase("ProductDB");
-        }
-
+        public IMongoDatabase _db = WH._client.GetDatabase("ProductDB");
+        
         public async Task<IEnumerable<Category>> GetCategories()
         {
             try
@@ -40,7 +32,7 @@ namespace Arthur_Clive.DataAccess
             }
             catch (Exception ex)
             {
-                WH.CreateLog("CategoryDataAccess", "GetCategories", "GetCategories", ex.Message);
+                Logger.LoggerDataAccess.CreateLog("CategoryDataAccess", "GetCategories", "GetCategories", ex.Message);
                 List<Category> categoryList = new List<Category>();
                 return categoryList;
             }
@@ -60,7 +52,7 @@ namespace Arthur_Clive.DataAccess
             }
             catch (Exception ex)
             {
-                WH.CreateLog("CategoryDataAccess", "CreateCategory", "CreateCategory", ex.Message);
+                Logger.LoggerDataAccess.CreateLog("CategoryDataAccess", "CreateCategory", "CreateCategory", ex.Message);
                 return "Failed";
             }
         }

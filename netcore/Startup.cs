@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Arthur_Clive.Data;
 using Arthur_Clive.DataAccess;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +14,7 @@ using Microsoft.Extensions.Options;
 
 namespace Arthur_Clive
 {
-    public class Startup
+    public partial class Startup
     {
         public Startup(IHostingEnvironment env)
         {
@@ -33,6 +34,7 @@ namespace Arthur_Clive
             services.AddTransient<ProductDataAccess>();
             services.AddTransient<CategoryDataAccess>();
 
+            ConfigureJwtAuthService(services);
             services.AddMvc();
 
                         // "Cors!!!"
@@ -53,6 +55,7 @@ namespace Arthur_Clive
             loggerFactory.AddDebug();
 
             app.UseCors("CorsPolicy");
+            app.UseAuthentication();
             app.UseMvc();
         }
     }

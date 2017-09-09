@@ -2,6 +2,7 @@
 using Arthur_Clive.Data;
 using Arthur_Clive.DataAccess;
 using Arthur_Clive.Logger;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using WH = Arthur_Clive.Helper.WebApiHelper;
@@ -19,6 +20,7 @@ namespace Arthur_Clive.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public JsonResult Get()
         {
             try
@@ -28,11 +30,12 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                WH.CreateLog("Category", "Get", "Get", ex.Message);
+                LoggerDataAccess.CreateLog("Category", "Get", "Get", ex.Message);
                 return Json(new Category());
             }
         }
 
+        #region Unused Post,Put and Delete 
         //[HttpPost]
         //public string Post([FromBody]Category product)
         //{
@@ -51,7 +54,7 @@ namespace Arthur_Clive.Controllers
         //                Method = "Post",
         //                Description = ex.ToString()
         //            };
-        //        loggerDataAccess.CreateLog(logger);
+        //        LoggerDataAccess.CreateLog(logger);
         //        return "Failed";
         //    }
         //}
@@ -65,5 +68,6 @@ namespace Arthur_Clive.Controllers
         //public void Delete(int id)
         //{
         //} 
+        #endregion
     }
 }

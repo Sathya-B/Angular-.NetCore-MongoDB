@@ -31,7 +31,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                WH.CreateLog("Product", "Get", "Get",ex.Message);
+                LoggerDataAccess.CreateLog("Product", "Get", "Get",ex.Message);
                 return Json(new Product());
             }
         }
@@ -48,7 +48,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                WH.CreateLog("Product", "Post", "Post", ex.Message);
+                LoggerDataAccess.CreateLog("Product", "Post", "Post", ex.Message);
                 return "Failed";
             }
         }
@@ -66,7 +66,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                WH.CreateLog("Product", "Post", "Post file to minio", ex.Message);
+                LoggerDataAccess.CreateLog("Product", "Post", "Post file to minio", ex.Message);
                 return "Failed";
             }
         }
@@ -83,7 +83,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                WH.CreateLog("Product", "Put", "Put", ex.Message);
+                LoggerDataAccess.CreateLog("Product", "Put", "Put", ex.Message);
                 return "Failed";
             }
         }
@@ -106,7 +106,7 @@ namespace Arthur_Clive.Controllers
                        Method = "Delete",
                        Description = ex.Message
                    };
-                WH.CreateLog("Product", "Delete", "Delete", ex.Message);
+                LoggerDataAccess.CreateLog("Product", "Delete", "Delete", ex.Message);
                 return "Failed";
             }
         }

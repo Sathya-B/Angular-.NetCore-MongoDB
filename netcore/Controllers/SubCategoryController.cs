@@ -35,7 +35,7 @@ namespace Arthur_Clive.Controllers
             }
             catch(Exception ex)
             {
-                WH.CreateLog("SubCategory", "Get", "Get with product_For and product_Type", ex.Message);
+                LoggerDataAccess.CreateLog("SubCategory", "Get", "Get with product_For and product_Type", ex.Message);
                 return Json(new Product());
             }
         }
@@ -58,7 +58,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                WH.CreateLog("SubCategory", "Get", "Get with product_For, product_Type and product_Design", ex.Message);
+                LoggerDataAccess.CreateLog("SubCategory", "Get", "Get with product_For, product_Type and product_Design", ex.Message);
                 return Json(new Product());
             }
         }
@@ -80,7 +80,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                WH.CreateLog("SubCategory", "Get", "Get with product_For, product_Type,product_Design and product_Colour", ex.Message);
+                LoggerDataAccess.CreateLog("SubCategory", "Get", "Get with product_For, product_Type,product_Design and product_Colour", ex.Message);
                 return Json(new Product());
             }
         }
@@ -102,7 +102,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                WH.CreateLog("SubCategory", "Get", "Get with product_For, product_Type,product_Design,product_Colour and product_Size", ex.Message);
+                LoggerDataAccess.CreateLog("SubCategory", "Get", "Get with product_For, product_Type,product_Design,product_Colour and product_Size", ex.Message);
                 return Json(new Product());
             }
         }

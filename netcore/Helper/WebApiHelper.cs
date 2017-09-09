@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
-using Arthur_Clive.Logger;
 using Minio;
 using MongoDB.Driver;
 
@@ -11,8 +10,6 @@ namespace Arthur_Clive.Helper
     public class WebApiHelper
     {
         public static MongoClient _client = GetClient();
-        public static MongoServer _server;
-        public static IMongoDatabase _db = _client.GetDatabase("ArthurCliveLogDB");
         
         #region Mongo
         public static MongoClient GetClient()
@@ -36,7 +33,7 @@ namespace Arthur_Clive.Helper
             }
             catch(Exception ex)
             {
-                CreateLog("WebApiHelper", "GetMinioObject", "GetMinioObject", ex.Message);
+                Logger.LoggerDataAccess.CreateLog("WebApiHelper", "GetMinioObject", "GetMinioObject", ex.Message);
                 return null;
             }
         }
@@ -55,7 +52,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                CreateLog("WebApiHelper", "GetAmazonS3Client", "GetAmazonS3Client",ex.Message);
+                Logger.LoggerDataAccess.CreateLog("WebApiHelper", "GetAmazonS3Client", "GetAmazonS3Client",ex.Message);
             }
         }
 
@@ -76,7 +73,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                CreateLog("WebApiHelper", "GetAmazonS3Object", "GetAmazonS3Object", ex.Message);
+                Logger.LoggerDataAccess.CreateLog("WebApiHelper", "GetAmazonS3Object", "GetAmazonS3Object", ex.Message);
                 return "";
             }
         }
@@ -86,22 +83,6 @@ namespace Arthur_Clive.Helper
             string s3 = "https://s3.ap-south-1.amazonaws.com/";
             string presignedUrl = s3 + bucketName + "/" + objectName;
             return presignedUrl;
-        }
-        #endregion
-
-        #region Server Side Logger
-        public static void CreateLog(string controllerName,string methodName,string method,string errorDescription)
-        {
-            ApplicationLogger logger =
-                new ApplicationLogger
-                {
-                    Controller = controllerName,
-                    MethodName = methodName,
-                    Method = method,
-                    Description = errorDescription
-                };
-            var collection = _db.GetCollection<ApplicationLogger>("ServerLog");
-            collection.InsertOneAsync(logger);
         }
         #endregion
     }

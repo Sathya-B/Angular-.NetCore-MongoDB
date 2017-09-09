@@ -1,0 +1,14 @@
+C:\Users\User\Downloads\JwtTokenDemo2\AuthorizedServer\bin\Release\netcoreapp2.0\x86\e_sqlite3.dll
+C:\Users\User\Downloads\JwtTokenDemo2\AuthorizedServer\bin\Release\netcoreapp2.0\x64\e_sqlite3.dll
+C:\Users\User\Downloads\JwtTokenDemo2\AuthorizedServer\bin\Release\netcoreapp2.0\AuthorizedServer.deps.json
+C:\Users\User\Downloads\JwtTokenDemo2\AuthorizedServer\bin\Release\netcoreapp2.0\AuthorizedServer.runtimeconfig.json
+C:\Users\User\Downloads\JwtTokenDemo2\AuthorizedServer\bin\Release\netcoreapp2.0\AuthorizedServer.runtimeconfig.dev.json
+C:\Users\User\Downloads\JwtTokenDemo2\AuthorizedServer\bin\Release\netcoreapp2.0\AuthorizedServer.dll
+C:\Users\User\Downloads\JwtTokenDemo2\AuthorizedServer\bin\Release\netcoreapp2.0\AuthorizedServer.pdb
+C:\Users\User\Downloads\JwtTokenDemo2\AuthorizedServer\obj\Release\netcoreapp2.0\AuthorizedServer.csprojResolveAssemblyReference.cache
+C:\Users\User\Downloads\JwtTokenDemo2\AuthorizedServer\obj\Release\netcoreapp2.0\AuthorizedServer.csproj.CoreCompileInputs.cache
+C:\Users\User\Downloads\JwtTokenDemo2\AuthorizedServer\obj\Release\netcoreapp2.0\UserSecretsAssemblyInfo.cs
+C:\Users\User\Downloads\JwtTokenDemo2\AuthorizedServer\obj\Release\netcoreapp2.0\AuthorizedServer.AssemblyInfoInputs.cache
+C:\Users\User\Downloads\JwtTokenDemo2\AuthorizedServer\obj\Release\netcoreapp2.0\AuthorizedServer.AssemblyInfo.cs
+C:\Users\User\Downloads\JwtTokenDemo2\AuthorizedServer\obj\Release\netcoreapp2.0\AuthorizedServer.dll
+C:\Users\User\Downloads\JwtTokenDemo2\AuthorizedServer\obj\Release\netcoreapp2.0\AuthorizedServer.pdb

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Arthur_Clive.Data;
-using Arthur_Clive.Logger;
 using Minio;
 using MongoDB.Driver;
 using WH = Arthur_Clive.Helper.WebApiHelper;
@@ -12,19 +11,8 @@ namespace Arthur_Clive.DataAccess
 {
     public class CategoryDataAccess
     {
-        public MongoClient _client;
-        public MongoServer _server;
-        public IMongoDatabase _db;
-        public MinioClient minio = WH.GetMinioClient();
-        public string presignedUrl;
-        public string minioObjName;
-
-        public CategoryDataAccess()
-        {
-            _client = WH.GetClient();
-            _db = _client.GetDatabase("ProductDB");
-        }
-
+        public IMongoDatabase _db = WH._client.GetDatabase("ProductDB");
+        
         public async Task<IEnumerable<Category>> GetCategories()
         {
             try
@@ -32,26 +20,19 @@ namespace Arthur_Clive.DataAccess
                 var collection = _db.GetCollection<Category>("Category");
                 var filter = FilterDefinition<Category>.Empty;
                 IAsyncCursor<Category> cursor = await collection.FindAsync(filter);
-                    var categories = cursor.ToList();
+                var categories = cursor.ToList();
                 foreach (var category in categories)
                 {
-                    var minioObjName = category.Product_For + "-" + category.Product_Type + ".jpg";
-                   // category.MinioObject_URL = WH.GetMinioObject(minio, "product-category", minioObjName).Result;
-                   category.MinioObject_URL = WH.GetS3Object("product-category", minioObjName);
+                    string objectName = category.Product_For + "-" + category.Product_Type + ".jpg";
+                    //category.MinioObject_URL = WH.GetMinioObject("product-category", objectName).Result;
+                    //category.MinioObject_URL = WH.GetAmazonS3Object("product-category", objectName);
+                    category.MinioObject_URL = WH.GetS3Object("product-category", objectName);
                 }
                 return categories;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                ApplicationLogger logger =
-                     new ApplicationLogger
-                     {
-                         Controller = "CategoryDataAccess",
-                         MethodName = "GetCategories",
-                         Method = "GetCategories",
-                         Description = ex.Message
-                     };
-                CreateLog(logger);
+                Logger.LoggerDataAccess.CreateLog("CategoryDataAccess", "GetCategories", "GetCategories", ex.Message);
                 List<Category> categoryList = new List<Category>();
                 return categoryList;
             }
@@ -61,27 +42,22 @@ namespace Arthur_Clive.DataAccess
         {
             try
             {
-                minioObjName = product.Product_For + "-" + product.Product_Type + ".jpg";
-                product.MinioObject_URL = WH.GetMinioObject(minio, "product-category", minioObjName).Result;
+                string objectName = product.Product_For + "-" + product.Product_Type + ".jpg";
+                //product.MinioObject_URL = WH.GetMinioObject("product-category", objectName).Result;
+                //product.MinioObject_URL = WH.GetAmazonS3Object("product-category", objectName);
+                product.MinioObject_URL = WH.GetS3Object("product-category", objectName);
                 var collection = _db.GetCollection<Category>("Category");
                 collection.InsertOneAsync(product);
                 return "Created";
             }
             catch (Exception ex)
             {
-                ApplicationLogger logger =
-                    new ApplicationLogger
-                    {
-                        Controller = "CategoryDataAccess",
-                        MethodName = "CreateCategory",
-                        Method = "CreateCategory",
-                        Description = ex.Message
-                    };
-                CreateLog(logger);
+                Logger.LoggerDataAccess.CreateLog("CategoryDataAccess", "CreateCategory", "CreateCategory", ex.Message);
                 return "Failed";
             }
         }
 
+        #region Update , Delete
         //public void Update(ObjectId id, Product p)
         //{
         //    try
@@ -109,28 +85,6 @@ namespace Arthur_Clive.DataAccess
 
         //    }
         //}
-
-        public string CreateLog(ApplicationLogger log)
-        {
-            try
-            {
-                var collection = _db.GetCollection<ApplicationLogger>("ServerLog");
-                collection.InsertOneAsync(log);
-                return "Success";
-            }
-            catch (Exception ex)
-            {
-                ApplicationLogger logger =
-                    new ApplicationLogger
-                    {
-                        Controller = "CategoryDataAccess",
-                        MethodName = "CreateLog",
-                        Method = "CreateLog",
-                        Description = ex.Message
-                    };
-                CreateLog(logger);
-                return "Failed";
-            }
-        }
+        #endregion
     }
 }

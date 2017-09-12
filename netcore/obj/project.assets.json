@@ -2,6 +2,34 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v2.0": {
+      "AWSSDK.Core/3.3.17": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.CSharp": "4.0.1",
+          "System.Net.Requests": "4.0.11",
+          "System.Reflection.TypeExtensions": "4.1.0",
+          "System.Security.Cryptography.Csp": "4.0.0",
+          "System.Threading.Thread": "4.0.0"
+        },
+        "compile": {
+          "lib/netstandard1.3/AWSSDK.Core.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/AWSSDK.Core.dll": {}
+        }
+      },
+      "AWSSDK.S3/3.3.10.4": {
+        "type": "package",
+        "dependencies": {
+          "AWSSDK.Core": "[3.3.17, 3.4.0)"
+        },
+        "compile": {
+          "lib/netstandard1.3/AWSSDK.S3.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/AWSSDK.S3.dll": {}
+        }
+      },
       "Libuv/1.10.0": {
         "type": "package",
         "dependencies": {
@@ -4572,7 +4600,7 @@
           "System.Threading": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/_._": {}
+          "ref/netstandard1.3/System.Security.Cryptography.Csp.dll": {}
         },
         "runtimeTargets": {
           "runtimes/unix/lib/netstandard1.3/System.Security.Cryptography.Csp.dll": {
@@ -5128,6 +5156,80 @@
     }
   },
   "libraries": {
+    "AWSSDK.Core/3.3.17": {
+      "sha512": "NTE47l/BVjbelMxYKCAMaPM+OsnDY3t5nTFXYHEJeV+EFvSHsFNLCt2pbu4YBKWRhgvYmGCJzykdngkfwgjeog==",
+      "type": "package",
+      "path": "awssdk.core/3.3.17",
+      "files": [
+        "awssdk.core.3.3.17.nupkg.sha512",
+        "awssdk.core.nuspec",
+        "lib/MonoAndroid10/AWSSDK.Core.XML",
+        "lib/MonoAndroid10/AWSSDK.Core.dll",
+        "lib/MonoAndroid10/AWSSDK.Core.pdb",
+        "lib/MonoTouch10/AWSSDK.Core.XML",
+        "lib/MonoTouch10/AWSSDK.Core.dll",
+        "lib/Xamarin.Mac20/AWSSDK.Core.XML",
+        "lib/Xamarin.Mac20/AWSSDK.Core.dll",
+        "lib/Xamarin.iOS10/AWSSDK.Core.XML",
+        "lib/Xamarin.iOS10/AWSSDK.Core.dll",
+        "lib/net35/AWSSDK.Core.dll",
+        "lib/net35/AWSSDK.Core.pdb",
+        "lib/net35/AWSSDK.Core.xml",
+        "lib/net45/AWSSDK.Core.dll",
+        "lib/net45/AWSSDK.Core.pdb",
+        "lib/net45/AWSSDK.Core.xml",
+        "lib/netstandard1.3/AWSSDK.Core.dll",
+        "lib/netstandard1.3/AWSSDK.Core.pdb",
+        "lib/netstandard1.3/AWSSDK.Core.xml",
+        "lib/portable-net45+win8+wpa81+wp8/AWSSDK.Core.XML",
+        "lib/portable-net45+win8+wpa81+wp8/AWSSDK.Core.dll",
+        "lib/portable-net45+win8+wpa81+wp8/AWSSDK.Core.pdb",
+        "lib/uap/AWSSDK.Core.XML",
+        "lib/uap/AWSSDK.Core.dll",
+        "lib/uap/AWSSDK.Core.pdb",
+        "lib/win8/AWSSDK.Core.XML",
+        "lib/win8/AWSSDK.Core.dll",
+        "lib/win8/AWSSDK.Core.pdb",
+        "lib/wp8/AWSSDK.Core.XML",
+        "lib/wp8/AWSSDK.Core.dll",
+        "lib/wp8/AWSSDK.Core.pdb",
+        "lib/wpa81/AWSSDK.Core.XML",
+        "lib/wpa81/AWSSDK.Core.dll",
+        "lib/wpa81/AWSSDK.Core.pdb",
+        "tools/account-management.ps1"
+      ]
+    },
+    "AWSSDK.S3/3.3.10.4": {
+      "sha512": "ISU+332T9lBfgKeP03ZZSQ69+immhHYklSMhSy7zp5oxEKZI0RGkVuuTRrnzhu8Y2vIBv3tUSVollQnLQHs84g==",
+      "type": "package",
+      "path": "awssdk.s3/3.3.10.4",
+      "files": [
+        "analyzers/dotnet/cs/AWSSDK.S3.CodeAnalysis.dll",
+        "awssdk.s3.3.3.10.4.nupkg.sha512",
+        "awssdk.s3.nuspec",
+        "lib/MonoAndroid10/AWSSDK.S3.XML",
+        "lib/MonoAndroid10/AWSSDK.S3.dll",
+        "lib/MonoTouch10/AWSSDK.S3.XML",
+        "lib/MonoTouch10/AWSSDK.S3.dll",
+        "lib/MonoTouch10/AWSSDK.S3.pdb",
+        "lib/Xamarin.iOS10/AWSSDK.S3.XML",
+        "lib/Xamarin.iOS10/AWSSDK.S3.dll",
+        "lib/net35/AWSSDK.S3.dll",
+        "lib/net35/AWSSDK.S3.pdb",
+        "lib/net35/AWSSDK.S3.xml",
+        "lib/net45/AWSSDK.S3.dll",
+        "lib/net45/AWSSDK.S3.pdb",
+        "lib/net45/AWSSDK.S3.xml",
+        "lib/netstandard1.3/AWSSDK.S3.dll",
+        "lib/netstandard1.3/AWSSDK.S3.pdb",
+        "lib/netstandard1.3/AWSSDK.S3.xml",
+        "lib/portable-net45+win8+wpa81+wp8/AWSSDK.S3.XML",
+        "lib/portable-net45+win8+wpa81+wp8/AWSSDK.S3.dll",
+        "lib/portable-net45+win8+wpa81+wp8/AWSSDK.S3.pdb",
+        "tools/install.ps1",
+        "tools/uninstall.ps1"
+      ]
+    },
     "Libuv/1.10.0": {
       "sha512": "GsCf4q+eyaI49rCPlgYxdxa1SQCysXFFdSJWdstrwxytg4+VPYLYrXD4AT2rjHVJ+UF7SSWX9CapWEYaU4ejVQ==",
       "type": "package",
@@ -5250,7 +5352,7 @@
       ]
     },
     "Microsoft.AspNetCore.Authentication/2.0.0": {
-      "sha512": "QmgG+EkJg+lObB7XffZGrbj1E8JE74ZePyVsuywhXrvPDObrjUwyvsbkOQvdtjiULhkh+8fgfhBcDTTiMr56Eg==",
+      "sha512": "lNOzTUuR05KSPZ34wxnAJt/w7DVmRGS8VmyJOb6jhbBs9QDY6tKec8slvgMT+fqaneBDNQKnM2P/Ddb5AUN1fg==",
       "type": "package",
       "path": "microsoft.aspnetcore.authentication/2.0.0",
       "files": [
@@ -5272,7 +5374,7 @@
       ]
     },
     "Microsoft.AspNetCore.Authentication.Cookies/2.0.0": {
-      "sha512": "330xWVaI3isU9h0oaZB7CByB93F60CSstbSm4XnPObpJHXkBrW3gth+ujn0oHGyRoP7Fo1UK/kROc8gvymFGTw==",
+      "sha512": "PBRjzT0fmAaur+wDNUczhsxr+J8FtQ858KqG8Ijrc2NYHNX1w+aPnbBkvqTQvD08i1JRrvCpPmQ4JSw0O0WI8Q==",
       "type": "package",
       "path": "microsoft.aspnetcore.authentication.cookies/2.0.0",
       "files": [
@@ -5294,7 +5396,7 @@
       ]
     },
     "Microsoft.AspNetCore.Authentication.Facebook/2.0.0": {
-      "sha512": "5jkm/lj+QXWIMqPZ7YuBDdGcoJMQHxnsfoOYH/OyR+3g9FzeLjWi/QoSsMtcIc/YsHtjiO1YW2X0aWMPjslfhA==",
+      "sha512": "4XpfJdFCzwXJRSntKF8+c4iU9igy0EOtdUrm9FfC5WLKlcs9ZOibHpWv4Vn9Gy1vDSU/FT8Z0+5jybXTqJpGUA==",
       "type": "package",
       "path": "microsoft.aspnetcore.authentication.facebook/2.0.0",
       "files": [
@@ -5305,7 +5407,7 @@
       ]
     },
     "Microsoft.AspNetCore.Authentication.Google/2.0.0": {
-      "sha512": "gm1DgImu2IscOySJIXYqgPz1FK6c7wI70mQTO+lCQiqU9FEAQhdiUJmfBCmQvCenQGRe7gMvWnfNSdzjsgo/rA==",
+      "sha512": "qh19mzPAOA8SHqBIQ7p26xCM6xm/VhvG/vGFS69on7Mw0JV1LpgILoOBGl8qaPlHv5//O2+/APIcAs6XNqOUZg==",
       "type": "package",
       "path": "microsoft.aspnetcore.authentication.google/2.0.0",
       "files": [
@@ -5316,7 +5418,7 @@
       ]
     },
     "Microsoft.AspNetCore.Authentication.JwtBearer/2.0.0": {
-      "sha512": "67ae/cGmfB5q61HfkwHD+gZvdpcsWA743wEZo2hAcgX/TQwo3U7nhtpnyLaSR8FfzOgPMpHUAp3O0sCFgkS90g==",
+      "sha512": "r6u7UvIjpr7obU9ZUN08Yyon9Kbrn9AoLxYnw+PydUuJjgbr1v+BXnsR6IsjX1KU3K4g+rcG5a4IJrS27atlEw==",
       "type": "package",
       "path": "microsoft.aspnetcore.authentication.jwtbearer/2.0.0",
       "files": [
@@ -5360,7 +5462,7 @@
       ]
     },
     "Microsoft.AspNetCore.Authentication.Twitter/2.0.0": {
-      "sha512": "S+ynWnPxidpm+haqUTsBA4rOX781enW4MMFNmXw0xMJZl28Tu9P47JONEf8C+73jTp9Y55jk2hPPUbbiqPKp7Q==",
+      "sha512": "ziDH/bK8mSilwcbX6IodgG6wGgycXyJNkeh0Kj1TQz2iODwC80pPuNFzixpCWtyRMht1rT8KCrqgw295qdMxmg==",
       "type": "package",
       "path": "microsoft.aspnetcore.authentication.twitter/2.0.0",
       "files": [
@@ -5371,7 +5473,7 @@
       ]
     },
     "Microsoft.AspNetCore.Authorization/2.0.0": {
-      "sha512": "jyU6UjcqHmuzuzqUsmpgMXHbnybaPcNYKDEHHaCJ1YhIiSlStb1bGy7L0IDViqdZWmiRi3UPjdIMkaU6FbuDag==",
+      "sha512": "NBHavyzjJE7tt9Lyy79L5IwG2Cq9kgcXIWQGGc/60WyVWN2KyqlXnCiAj0pQCiGz0NMu0BC21X9SoeU37B4nKw==",
       "type": "package",
       "path": "microsoft.aspnetcore.authorization/2.0.0",
       "files": [
@@ -5494,7 +5596,7 @@
       ]
     },
     "Microsoft.AspNetCore.DataProtection.Extensions/2.0.0": {
-      "sha512": "IjqBp/eZYGQiUWxXZ/eUCtf9if6hkMojAV9hqcB24Ct+drkMgTna1lcp3RmLfFqbHtlDATCgLfdW0qilgYg4Jw==",
+      "sha512": "M70YrYeKtTKIRxgDGsP5vFxCPxVyxc/LUUxkf0FL+9iX7kbtppjJvlzzDJaGjLzePV7nUderyF4SOYlZ07U8gQ==",
       "type": "package",
       "path": "microsoft.aspnetcore.dataprotection.extensions/2.0.0",
       "files": [
@@ -5505,7 +5607,7 @@
       ]
     },
     "Microsoft.AspNetCore.Diagnostics/2.0.0": {
-      "sha512": "3+Iw82NqOIi5OXlNu9NHZEkQzOkqpCxCkgKogo5H2/5cU9GEE4cwM4BKfY9hq9jVJwWDPsRJOC+Ot0f9gEcQsg==",
+      "sha512": "+pGybJyb1p+wO3PWEaLu8DunP9ljsBMdcGVmffsESAQraIyOuUBC/pmuThzD/Dq4hzviJCtWe54qqtLawqREIg==",
       "type": "package",
       "path": "microsoft.aspnetcore.diagnostics/2.0.0",
       "files": [
@@ -5637,7 +5739,7 @@
       ]
     },
     "Microsoft.AspNetCore.Identity/2.0.0": {
-      "sha512": "Ax5mfrcZRI/1nGvHsi3mA9EvxCkleFnlmhd+ZMJ4PYHTHtL1o51vCMInYCd5oGuSCkRgXHn0U9bAfuQPpaCdvg==",
+      "sha512": "bFdPsexwm90j2Cj1Fh0V99+hz8gNXaeygwbzj3Vu/Ajo1YyMO9Fqt6CGUg8ZORHn3L9WwJcyBW7r9kDhKHAjWA==",
       "type": "package",
       "path": "microsoft.aspnetcore.identity/2.0.0",
       "files": [
@@ -5648,7 +5750,7 @@
       ]
     },
     "Microsoft.AspNetCore.Identity.EntityFrameworkCore/2.0.0": {
-      "sha512": "9h86cTjfLhNl8dh50to4sv9aVcJXDN/uaJrPsRmYl2eBzogrseERUKYAaUvMjvTGbpnv4NuTIZMnwEEU/J9AKw==",
+      "sha512": "J8o7xblga3AuqqD8Z0PoLK2P7UuN1Xj66sdWMDYO938FEjAx+bT+3r5IBkBxGT4/mPAvagkhUHUm4z+/ivDo4Q==",
       "type": "package",
       "path": "microsoft.aspnetcore.identity.entityframeworkcore/2.0.0",
       "files": [
@@ -5736,7 +5838,7 @@
       ]
     },
     "Microsoft.AspNetCore.Mvc.Core/2.0.0": {
-      "sha512": "VQTTuotnhiLwE6CJHldwIm2UgVEy6BEijdHv09P8VpCv7bokds260bH74RA2Pjp975zqCd2BqVgXM0KSu+K1sw==",
+      "sha512": "5tbL3MX4QhQv+tE3sojuzmAGPgJhWzz1ayWBzXka4c62VanyDUE5jsoa1vIIivGHbNQmj+B5Kcxk51GeR522mg==",
       "type": "package",
       "path": "microsoft.aspnetcore.mvc.core/2.0.0",
       "files": [
@@ -5851,7 +5953,7 @@
       ]
     },
     "Microsoft.AspNetCore.Mvc.TagHelpers/2.0.0": {
-      "sha512": "ca69I4LI7Myg7Pl7k1oocHSwoCqkuItapqjTZZQHaV+SE1R6pzzTEcCVtGLxoL95SGIC9/Y9Zx10PYtsGCQGYQ==",
+      "sha512": "lw29MBXe0ib40I30czs2M3KpBC0Ojt4WSOth36aZfAsR3Hjc/sXFBN00PQbcOkcurR4VqFIHXcPgRmDUeQsU1w==",
       "type": "package",
       "path": "microsoft.aspnetcore.mvc.taghelpers/2.0.0",
       "files": [
@@ -6009,7 +6111,7 @@
       ]
     },
     "Microsoft.AspNetCore.Server.IISIntegration/2.0.0": {
-      "sha512": "2ucubupqXkVxzOOsXVpc0YOm8SQuja467tXWk9ox5tDvbVCa5koI3XQxol1QF3hFOlVbpJIjZ/MMtCVoSohBqw==",
+      "sha512": "50O6yABkHSdqCNvL9XUzKb93XNwCA9y3xxYQ0CMd/3/D+ZgTgbwlSYNGQLz3reGxOZrYvOndPUfzEQShVHHsMA==",
       "type": "package",
       "path": "microsoft.aspnetcore.server.iisintegration/2.0.0",
       "files": [
@@ -6020,7 +6122,7 @@
       ]
     },
     "Microsoft.AspNetCore.Server.Kestrel/2.0.0": {
-      "sha512": "cDbsUQXVOlOCt9cWKsE9Ge9dH5Dwl50TJzU6HdSZV0vgvL/AFEn5U610C0oQQdblWn/GTHqL2uCXY1gFyN0DUw==",
+      "sha512": "H1RW+U8zPRVWv7TWHXh1dQ/aIpn98Ku7kXUL1gpI1adRsRy9m4G3Vuf3BbKZZvKLWWdmiZYLbFVcxPF3dTqcRQ==",
       "type": "package",
       "path": "microsoft.aspnetcore.server.kestrel/2.0.0",
       "files": [
@@ -6097,7 +6199,7 @@
       ]
     },
     "Microsoft.AspNetCore.StaticFiles/2.0.0": {
-      "sha512": "HBMJQ1WPdHO0thltwi7agvfis3c1Kd5HFQDgyy0nV3X4mJvhVGUnymT0+QQU+GGNK9FG/uEQNE3YDSrrBamP7w==",
+      "sha512": "woLlFjvi1VM+q/lvyq07jHjBHPPC17YaGtXelN0OoKQ8sg5LNB26IWpMbgDbZYcd+RrTvpZMkUCHY8M+Ny94cA==",
       "type": "package",
       "path": "microsoft.aspnetcore.staticfiles/2.0.0",
       "files": [
@@ -6528,7 +6630,7 @@
       ]
     },
     "Microsoft.EntityFrameworkCore.SqlServer/2.0.0": {
-      "sha512": "mr+S07kAKXsdu9207w1ek4O1/0+y5925kMYy7gCqu15QpvfVXOLdAR0b9RQfBxmtAJPrYx6/KtfvAg70jm5zUA==",
+      "sha512": "M+1VjNt8fWqiN+VwPLSEgzXZBj8kMHtM+2hf0kf+75iHGzTsaKN00UZeTk9CUFlci+lEBT03NpSpSY8SbhbD+w==",
       "type": "package",
       "path": "microsoft.entityframeworkcore.sqlserver/2.0.0",
       "files": [
@@ -6539,7 +6641,7 @@
       ]
     },
     "Microsoft.EntityFrameworkCore.Tools/2.0.0": {
-      "sha512": "ILVI7sbnD0Pgf6B90AL3RiRdq+XRXEG4VnvuD75Fluv6p5PbYfU2tQP2VlL0oAFCVhihSgSWIQHtDjUFEE0+nw==",
+      "sha512": "iOLuw+R16cUNu29D9e1JroQW4epCpEF7R/dIgTkBsWqElUrsUyaJWrG38pDusqvv2dT9D9qDQtiry3y9ND3pZA==",
       "type": "package",
       "path": "microsoft.entityframeworkcore.tools/2.0.0",
       "files": [
@@ -6606,7 +6708,7 @@
       ]
     },
     "Microsoft.Extensions.Configuration/2.0.0": {
-      "sha512": "SsI4RqI8EH00+cYO96tbftlh87sNUv1eeyuBU1XZdQkG0RrHAOjWgl7P0FoLeTSMXJpOnfweeOWj2d1/5H3FxA==",
+      "sha512": "tk/goVY0A8hV9Ob627dL6G+Si3MZ/aon5Jp2FntokQMThP7D1y/tQZkPkYen/lLR0K5xCljMDzY2Y3QZMxt5Bg==",
       "type": "package",
       "path": "microsoft.extensions.configuration/2.0.0",
       "files": [
@@ -6661,7 +6763,7 @@
       ]
     },
     "Microsoft.Extensions.Configuration.EnvironmentVariables/2.0.0": {
-      "sha512": "islcwe05LWFtAxGaJxoDbl4pj2nmG8nuW6dqYMZkPWIuHK7/46YELCbL+3Frl6X89qzDh5sj2PHgyWXTOAmwdA==",
+      "sha512": "nEPiQOVvUwlK/fRUpka8ZeyC8uGuGHCrsu7aq+xj0zX+ny+8x2lg8SSf/IogZ+APy0a2D+PV4TxQvS6NA812Og==",
       "type": "package",
       "path": "microsoft.extensions.configuration.environmentvariables/2.0.0",
       "files": [
@@ -6694,7 +6796,7 @@
       ]
     },
     "Microsoft.Extensions.Configuration.Json/2.0.0": {
-      "sha512": "thPz4SckRGNqeLbdvJ619YxRFSkWuL1K5QqTMb3TVdEwjQj4O39yfUtjtI/XlWJiY7JKK4MUKAiQZVYc8ohKKg==",
+      "sha512": "eq/OLT+TBVYtgRMYfJ5Lh7hmGttiMrU77I01v1E5KdtaGc0axliVBfz+in12V83uNscZD/qrOKFI1rmvPctyEQ==",
       "type": "package",
       "path": "microsoft.extensions.configuration.json/2.0.0",
       "files": [
@@ -6705,7 +6807,7 @@
       ]
     },
     "Microsoft.Extensions.Configuration.UserSecrets/2.0.0": {
-      "sha512": "Nn9Gd4MsMKAzIwXhoz/pzPlngbgZDPlbWKWLSyL4nMFAnlQ8EubbealF69JvGBcK7DwdsMV5pz7a9EZFZQF6ww==",
+      "sha512": "0mJ2iC2UaRlDIm1Y8ct09Ur0hpH1yBQUgFeqUnYJc/GBxstjzqFGqwNJx2SCdfjZS9+Nt71IVj1FzTEDGAuJLw==",
       "type": "package",
       "path": "microsoft.extensions.configuration.usersecrets/2.0.0",
       "files": [
@@ -6931,7 +7033,7 @@
       ]
     },
     "Microsoft.Extensions.Logging.Console/2.0.0": {
-      "sha512": "NBjNp899FW7byDsex2ch/CkwNd2GbuHQIXCbvUVqOzSbnIsYrxOaR//BY2h2apJhnqm10IPLGkcjXxUyfAcIKA==",
+      "sha512": "SLocfJSOH4OPdU5GQzLd3hWlySNXsxfcAvGMeSLYtH/JtouzNMiavzaxFP/CSkypo7S2UiAZQnZb+gPI/j6Tcw==",
       "type": "package",
       "path": "microsoft.extensions.logging.console/2.0.0",
       "files": [
@@ -6997,7 +7099,7 @@
       ]
     },
     "Microsoft.Extensions.Options.ConfigurationExtensions/2.0.0": {
-      "sha512": "Y/lGICwO27fCkQRK3tZseVzFjZaxfGmui990E67sB4MuiPzdJHnJDS/BeYWrHShSSBgCl4KyKRx4ux686fftPg==",
+      "sha512": "TBxzkW6dRJbOnPZ/nErHx9YxMDOqcpsRoY5rfTy86f7FvTCo+AB8g2RmLBZ0Htm0CClwS3AmSvAe2PbS+FoUdA==",
       "type": "package",
       "path": "microsoft.extensions.options.configurationextensions/2.0.0",
       "files": [
@@ -7712,7 +7814,7 @@
       ]
     },
     "Microsoft.VisualStudio.Web.BrowserLink/2.0.0": {
-      "sha512": "+iLi1BBW/52xtKPYITk1jJSD0sJCHYy5dbOjSQZiZjnqPGjuo2LAfhz//rYAzYbyKq+kH1CO763ViGcdsMvFbA==",
+      "sha512": "o6beTB64YQpIeSVwpOzboYgnLmV76E3tTP2atcaL6BegBy1JVu9xINS3nz30gdF5i+7n6v/w85HHAX96L2WsYw==",
       "type": "package",
       "path": "microsoft.visualstudio.web.browserlink/2.0.0",
       "files": [
@@ -11731,7 +11833,7 @@
       ]
     },
     "System.Runtime.Serialization.Json/4.0.2": {
-      "sha512": "+7DIJhnKYgCzUgcLbVTtRQb2l1M0FP549XFlFkQM5lmNiUBl44AfNbx4bz61xA8PzLtlYwfmif4JJJW7MPPnjg==",
+      "sha512": "g7ji+qzauhWhkcho7sqs2H/QghsvmpWC7ZfQIeugpR1KIte2eyW+mS9mySHvmYjW4UILndUl/NphRAWghDwLzw==",
       "type": "package",
       "path": "system.runtime.serialization.json/4.0.2",
       "files": [
@@ -13452,6 +13554,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
+      "AWSSDK.S3 >= 3.3.10.4",
       "Microsoft.AspNetCore.All >= 2.0.0",
       "Microsoft.NETCore.App >= 2.0.0",
       "Minio.NetCore >= 1.0.1",
@@ -13459,30 +13562,35 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\welcome\\.nuget\\packages\\": {},
+    "C:\\Users\\User\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
+    "restoreSettings": {
+      "hideWarningsAndErrors": true
+    },
     "restore": {
-      "projectUniqueName": "E:\\Sathya\\ArthurClive\\Server\\Arthur Clive\\Arthur_Clive.csproj",
+      "projectUniqueName": "E:\\Ragu\\Projects\\Angular-.NetCore-MongoDB\\netcore\\Arthur_Clive.csproj",
       "projectName": "Arthur_Clive",
-      "projectPath": "E:\\Sathya\\ArthurClive\\Server\\Arthur Clive\\Arthur_Clive.csproj",
-      "packagesPath": "C:\\Users\\welcome\\.nuget\\packages\\",
-      "outputPath": "E:\\Sathya\\ArthurClive\\Server\\Arthur Clive\\obj\\",
+      "projectPath": "E:\\Ragu\\Projects\\Angular-.NetCore-MongoDB\\netcore\\Arthur_Clive.csproj",
+      "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
+      "outputPath": "E:\\Ragu\\Projects\\Angular-.NetCore-MongoDB\\netcore\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\welcome\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp2.0"
       ],
       "sources": {
-        "D:\\Journals - Crossover .NET trial\\Journals - Crossover .NET trial\\Source\\packages\\WebMatrix.WebData.2.0.20505.0": {},
-        "https://api.nuget.org/v3/index.json": {}
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {},
+        "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json": {}
       },
       "frameworks": {
         "netcoreapp2.0": {
@@ -13498,6 +13606,10 @@
     "frameworks": {
       "netcoreapp2.0": {
         "dependencies": {
+          "mongocsharpdriver": {
+            "target": "Package",
+            "version": "2.4.4"
+          },
           "Microsoft.NETCore.App": {
             "target": "Package",
             "version": "2.0.0",
@@ -13511,9 +13623,9 @@
             "target": "Package",
             "version": "1.0.1"
           },
-          "mongocsharpdriver": {
+          "AWSSDK.S3": {
             "target": "Package",
-            "version": "2.4.4"
+            "version": "3.3.10.4"
           }
         },
         "imports": [
@@ -13523,17 +13635,5 @@
         "warn": true
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "RestSharp.NetCore 105.2.3 depends on System.Runtime.Serialization.Formatters (>= 4.0.0-rc4-24217-03) but System.Runtime.Serialization.Formatters 4.0.0-rc4-24217-03 was not found. An approximate best match of System.Runtime.Serialization.Formatters 4.3.0-preview1-24530-04 was resolved.",
-      "libraryId": "System.Runtime.Serialization.Formatters",
-      "targetGraphs": [
-        ".NETCoreApp,Version=v2.0"
-      ]
-    }
-  ]
+  }
 }

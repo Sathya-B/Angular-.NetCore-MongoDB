@@ -1,0 +1,5 @@
+C:\Users\User\Downloads\JwtTokenDemo2\AuthorizedServer
+--output-path=obj\Release\netcoreapp2.0\
+--application-name=AuthorizedServer
+--content-root=C:\Users\User\Downloads\JwtTokenDemo2\AuthorizedServer
+--file=

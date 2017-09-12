@@ -62,7 +62,7 @@ export class ApiService {
                 return this.handleError(err, options);
             });
     }
-    post(url: string, data: any, options?: any) {
+    post(url: string, data: any, options?: any, serverUrl?: string) {
 
         let body: any = data;
         return this.http.post(serverUrl + url, body, {

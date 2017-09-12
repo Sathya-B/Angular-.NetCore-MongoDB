@@ -17,9 +17,10 @@
     <div class="quantityInputWrap">
         <!-- <input type="button" value="-" class="minus button">
 									<!-- <input type="button" value="+" class="plus button"> -->
-        <span class="plus button">+</span>
-        <span class="minus button">-</span>
-        <input type="number" class="" step="1" min="1" max="" name="quantity" value="1" title="Qty" size="4" pattern="[1-9]*" inputmode="numeric">
+        <span class="plus button" (click)="addOne()">+</span>
+        <span class="minus button"(click)="reduceOne()">-</span>
+        <input type="number" class="" name="quantity" min=1 [(ngModel)]="quantity" required pattern="^([1-9])$">
+        <!--<input type="number" class="" step="1" min="1" max="" name="quantity" value="1" title="Qty" size="4" pattern="[1-9]*" inputmode="numeric">-->
     </div>
     <div>Remaining: {{remainingQty}}</div>
     <div class="addToWishListWrap">

@@ -16,6 +16,8 @@ export class ColorSizeStockComponent implements OnInit, OnChanges {
 
   private selectColor: string = "Select a Colour";
   private selectSize: string = "Select a Size";
+
+  public quantity: number = 1;
   
   @Input() selectedVariant: any;
 
@@ -29,6 +31,7 @@ export class ColorSizeStockComponent implements OnInit, OnChanges {
     if (this.remainingQty == this.selectColor  && this.selectedVariant) {
       this.checked(this.selectedSize);
     }
+    this.quantity =1;
   }
   isAvailable(size: any) {
     if (this.selectedVariant) {
@@ -56,5 +59,14 @@ export class ColorSizeStockComponent implements OnInit, OnChanges {
     else {
       this.remainingQty = this.selectColor;
     }
+    this.quantity = 1;
+  }
+  addOne(){
+    if(this.quantity < 10 && this.quantity < Number(this.remainingQty))
+    this.quantity++;
+  }
+    reduceOne(){
+    if(this.quantity > 1) 
+    this.quantity--;
   }
 }

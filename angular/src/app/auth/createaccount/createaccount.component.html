@@ -3,13 +3,13 @@
         <div class="wrapInner">
 
             <h1 class="titleCommon">CREATE AN ACCOUNT</h1>
-
-            <div class="acccountBg">
-                <div class="regBox">
-                    <div class="formWrap">
-                        <div class="formRow singleRow">
-                            <!-- <span class="error">Please select your title</span> -->
-                            <select name="customer_title">
+                <form (ngSubmit)="onSubmit(f)" #f="ngForm">
+                <div class="acccountBg">
+                    <div class="regBox">
+                        <div class="formWrap">
+                            <div class="formRow singleRow">
+                                <!-- <span class="error">Please select your title</span> -->
+                    <select name="Title" required ngModel>                        
                       <option value="">Title</option>
                       <option value="Mr">Mr</option>
                       <option value="Mrs">Mrs</option>
@@ -17,44 +17,47 @@
                       <option value="Ms">Ms</option>
                       <option value="Other">Other</option>
                     </select>
-                        </div>
-                        <div class="formRow">
-                            <span class="error">Please enter your full name</span>
-                            <input type="text" name="" placeholder="Full Name*" class="error">
-                        </div>
-                        <div class="formRow mobileRow">
-                            <div class="mobileNumberError"><span class="error">Please enter your mobile number</span></div>
-                            <div class="mobileNumberWrap">
-                                <div class="cCode">
-                                    <input type="text" name="Countrycode" placeholder="+91" disabled="true">
-                                </div>
-                                <div class="cMobile">
-                                    <input type="text" name="" placeholder="Mobile Number*" class="error">
-                                </div>
+                    <div class="error" *ngIf="f.controls.Title?.errors && f.controls.Title?.touched"><span class="error">Please select a Title</span></div>
                             </div>
-                        </div>
-                        <div class="formRow">
-                            <!-- <span class="error">Please enter your email address</span> -->
-                            <input type="email" name="" placeholder="Email Address(optional)">
-                        </div>
-                        <div class="formRow">
-                            <!-- <span class="error">Please enter your password</span> -->
-                            <input type="password" name="" placeholder="Create Password*">
-                        </div>
-                        <div class="formRow singleRow">
-                            <div class="textMsg">We will send you a SMS to verify your phone.</div>
-                        </div>
-                        <div class="formRow termsRow">
-                            <input type="checkbox" id="termsandConditions">
-                            <label for="termsandConditions">I agree with</label>
-                            <a href="">Terms & Conditions</a>
-                        </div>
-                        <div class="formRow">
-                            <button type="submit" class="createAccount">CREATE AN ACCOUNT</button>
+                            <div class="formRow">                               
+                                <input type="text" name="FullName" placeholder="Full Name*" class="error" ngModel required>
+                                <div class="error" *ngIf="f.controls.FullName?.errors && f.controls.FullName?.touched"><span class="error">Please enter your Full Name</span></div>
+                            </div>
+                            <div class="formRow mobileRow">                               
+                                <div class="mobileNumberWrap">
+                                    <div class="cCode">
+                                        <input type="text" name="countryCode" placeholder="+91" disabled="true">
+                                    </div>
+                                    <div class="cMobile">
+                                        <input type="text" name="PhoneNumber" placeholder="Mobile Number*" ngModel required pattern="^([0-9]{10})$">
+                                    </div>
+                                </div>
+                                <div class="mobileNumberError" *ngIf="f.controls.PhoneNumber?.errors && f.controls.PhoneNumber?.touched"><span class="error">Please enter a valid Mobile Number</span></div>
+                            </div>
+                            <div class="formRow">                                
+                                <input type="email" name="Email" placeholder="Email Address(optional)" ngModel pattern="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?">
+                                <div class="error" *ngIf="f.controls.Email?.errors && f.controls.Email?.touched"><span class="error">Please enter a valid Email</span></div>
+                            </div>
+                            <div class="formRow">
+                                <input type="password" name="Password" placeholder="Create Password*" ngModel required>
+                                <div class="error" *ngIf="f.controls.Password?.errors && f.controls.Password?.touched"><span class="error">Please enter a Password</span></div>
+                            </div>
+                            <div class="formRow singleRow">
+                                <div class="textMsg">We will send you a SMS to verify your phone.</div>
+                            </div>
+                            <div class="formRow termsRow">
+                                <input type="checkbox" name="termsAndConditions" id="termsandConditions" required ngModel>
+                                <label for="termsandConditions">I agree with</label>
+                                <a href="">Terms & Conditions</a>
+                                <div class="error" *ngIf="f.controls.termsAndConditions?.errors && f.controls.termsAndConditions?.touched"><span class="error">Please check and confirm that you agree to the Terms & Conditions</span></div>
+                            </div>
+                            <div class="formRow">
+                            <button type="submit"   [disabled]="!f.valid" class="createAccount">CREATE AN ACCOUNT</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </div>

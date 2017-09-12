@@ -1,34 +1,12 @@
-<!--<nav>
-      <a [routerLink]=" ['./'] "
-        routerLinkActive="active" [routerLinkActiveOptions]= "{exact: true}">
-        Index
-      </a>
-      <a [routerLink]=" ['./home'] "
-        routerLinkActive="active" [routerLinkActiveOptions]= "{exact: true}">
-        Home
-      </a>
-      <a [routerLink]=" ['./detail'] "
-        routerLinkActive="active" [routerLinkActiveOptions]= "{exact: true}">
-        Detail
-      </a>
-      <a [routerLink]=" ['./barrel'] "
-        routerLinkActive="active" [routerLinkActiveOptions]= "{exact: true}">
-        Barrel
-      </a>
-      <a [routerLink]=" ['./about'] "
-        routerLinkActive="active" [routerLinkActiveOptions]= "{exact: true}">
-        About
-      </a>
-    </nav>-->
-
-<div id="mainHeader" class="headertop">
+<div id="mainHeader" class="headertop" [ngClass]="{hideMainHeader: scrolled}">
 	<div class="wrapper">
 		<div class="navBtn" [ngClass]="{activeNav: menuOpened == true}" (click)="openMenu()"><span></span></div>
 
 		<div class="logo"><a href="#"><img src="../assets/img/logo-caption.png" alt="Artur Clive"></a></div>
 		<div class="logoMobile"><a href="#"><img src="../assets/img/logo-arthur-clive-mobile.png" alt="Artur Clive"></a></div>
 		<div class="headerBtnWrap">
-			<div class="commonIconBtnHeader userIcon" (click)="LoginRegister()">
+			<div class="commonIconBtnHeader userIcon popupHoverElement" (click)="LoginRegister()">
+				<div id="two" class="popupBox" [hidden]="!this.appState.get('loggedIn')"><a (click)="ChangePassword()">Change Password</a><br><hr><a (click)="SignOutClicked()">Signout</a></div>
 			</div>
 			<div class="commonIconBtnHeader wishListBtn"><span class="wishlistCount">3</span></div>
 			<div class="commonIconBtnHeader shoppingBagBtn">
@@ -36,19 +14,21 @@
 		</div>
 	</div>
 </div>
-<div id="fixedHeader" class="headertop fixedHeader">
+<div id="fixedHeader" class="headertop"  *ngIf="scrolled" [ngClass]="{fixedHeaderActive: scrolled, fixedHeader: scrolled}">
 	<div class="wrapper">
-		<div class="navBtn"><span></span></div>
+		<div class="navBtn" [ngClass]="{activeNav: menuOpened == true}" (click)="openMenu()"><span></span></div>
 		<div class="logoMobile"><a href="#"><img src="../assets/img/logo-arthur-clive-mobile.png" alt="Artur Clive"></a></div>
 		<div class="headerBtnWrap">
-			<div class="commonIconBtnHeader userIcon" (mouseenter)="mouseEnter('entered')" (mouseleave)="mouseLeave('left')"><span></span></div>
+			<div class="commonIconBtnHeader userIcon popupHoverElement" (click)="LoginRegister()">
+				<div id="two" class="popupBox" [hidden]="!this.appState.get('loggedIn')"><a (click)="ChangePassword()">Change Password</a><hr><a (click)="SignOutClicked()">Signout</a></div>
+			</div>
 			<div class="commonIconBtnHeader wishListBtn"><span class="wishlistCount">2</span></div>
 			<div class="commonIconBtnHeader shoppingBagBtn">
 				<!-- View Bag --><span class="shoppingbagCountItem">5</span></div>
 		</div>
 	</div>
 </div>
-<div class="navWrapperOuter" [ngClass]="{navOpened: menuOpened == true}">
+<div class="navWrapperOuter" *ngIf="menuOpened"  [ngStyle]="{'z-index' : 10, 'position': 'fixed'}" [ngClass]="{navOpened: menuOpened == true, fixednavWrapperOuter: scrolled}">
 	<div class="wrapper">
 		<div class="wrapInner">
 			<nav class="mainNav">

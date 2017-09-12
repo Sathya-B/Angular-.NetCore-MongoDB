@@ -1,15 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import {
-  NgModule,
-  ApplicationRef
-} from '@angular/core';
-import {
-  removeNgStyles,
-  createNewHosts,
-  createInputTransfer
-} from '@angularclass/hmr';
+import { NgModule, ApplicationRef } from '@angular/core';
+import { removeNgStyles, createNewHosts, createInputTransfer } from '@angularclass/hmr';
 import {
   RouterModule,
   PreloadAllModules
@@ -28,17 +21,21 @@ import { HomeComponent } from './home';
 import { HeaderComponent } from './header';
 import { FooterComponent } from './footer';
 import { AboutComponent } from './about';
-import {LoginRegisterComponent} from './auth/loginregister/loginregister.component';
-import {CreateAccountComponent} from './auth/createaccount/createaccount.component';
-import {ProductsComponent} from './products/products.component';
-import {ProductItemComponent} from './products/productitem/productitem.component';
-import {ColorSizeStockComponent} from './variants/colorsizestock/colorsizestock.component';
-import {VariantsComponent} from './variants/variants.component';
-import {RelatedComponent} from './variants/related/related.component';
+import { LoginRegisterComponent } from './auth/loginregister/loginregister.component';
+import { CreateAccountComponent } from './auth/createaccount/createaccount.component';
+import { VerificationComponent } from './auth/verification/verification.component';
+import { ForgotPasswordComponent } from './auth/forgotpassword/forgotpassword.component';
+import {UpdatePasswordComponent } from './auth/updatepassword/updatepassword.component';
+import {ChangePasswordComponent } from './auth/changepassword/changepassword.component';
+import { ProductsComponent } from './products/products.component';
+import { ProductItemComponent } from './products/productitem/productitem.component';
+import { ColorSizeStockComponent } from './variants/colorsizestock/colorsizestock.component';
+import { VariantsComponent } from './variants/variants.component';
+import { RelatedComponent } from './variants/related/related.component';
 import { DataServ } from '../services/data.service';
 import { ApiService } from '../services/api.service';
-import {FilterPipe} from '../pipes/filterpipe.component'
-import {CategoryComponent} from './home/category';
+import { FilterPipe } from '../pipes/filterpipe.component'
+import { CategoryComponent } from './home/category';
 import { NoContentComponent } from './no-content';
 import { XLargeDirective } from './home/x-large';
 import { CarouselModule } from 'angular4-carousel';
@@ -62,7 +59,7 @@ type StoreType = {
  * `AppModule` is the main entry point into Angular2's bootstraping process
  */
 @NgModule({
-  bootstrap: [ AppComponent ],
+  bootstrap: [AppComponent],
   declarations: [
     AppComponent,
     AboutComponent,
@@ -72,9 +69,13 @@ type StoreType = {
     VariantsComponent,
     CategoryComponent,
     LoginRegisterComponent,
-    CreateAccountComponent, 
+    CreateAccountComponent,
+    VerificationComponent,
+    ForgotPasswordComponent,
+    UpdatePasswordComponent,
+    ChangePasswordComponent,
     ColorSizeStockComponent,
-    RelatedComponent,       
+    RelatedComponent,
     HeaderComponent,
     FooterComponent,
     NoContentComponent,
@@ -106,7 +107,7 @@ export class AppModule {
   constructor(
     public appRef: ApplicationRef,
     public appState: AppState
-  ) {}
+  ) { }
 
   public hmrOnInit(store: StoreType) {
     if (!store || !store.state) {
@@ -144,7 +145,7 @@ export class AppModule {
     /**
      * Save input values
      */
-    store.restoreInputValues  = createInputTransfer();
+    store.restoreInputValues = createInputTransfer();
     /**
      * Remove styles
      */

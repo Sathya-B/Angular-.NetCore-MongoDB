@@ -7,6 +7,7 @@ import {
   ViewEncapsulation
 } from '@angular/core';
 import { AppState } from './app.service';
+import { Router, NavigationEnd } from '@angular/router';
 
 /**
  * App Component
@@ -24,11 +25,24 @@ export class AppComponent implements OnInit {
   public angularclassLogo = 'assets/img/angularclass-avatar.png';
   public name = 'Angular 2 Webpack Starter';
   public url = 'https://twitter.com/AngularClass';
-  constructor(public appState: AppState) {
+  constructor(public appState: AppState, private router: Router) {
   }
 
   public ngOnInit() {
+    if(localStorage.getItem('JWT')!= null)
+    {
+    this.appState.set('loggedIn', true);
+    }else{
+      this.appState.set('loggedIn', false);
+    }
     console.log('Initial App State', this.appState.state);
+
+    this.router.events.subscribe((evt) => {
+            if (!(evt instanceof NavigationEnd)) {
+                return;
+            }
+            window.scrollTo(0, 0)
+        });
   }
 
 }

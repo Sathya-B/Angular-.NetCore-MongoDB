@@ -9,6 +9,7 @@ using AH = Arthur_Clive.Helper.AmazonHelper;
 using WH = Arthur_Clive.Helper.MinioHelper;
 using MH = Arthur_Clive.Helper.MongoHelper;
 using MongoDB.Bson;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Arthur_Clive.Controllers
 {
@@ -19,6 +20,7 @@ namespace Arthur_Clive.Controllers
         public MongoHelper mongoHelper = new MongoHelper();
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult> Get()
         {
             try

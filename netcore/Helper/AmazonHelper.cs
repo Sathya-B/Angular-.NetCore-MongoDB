@@ -7,6 +7,7 @@ namespace Arthur_Clive.Helper
     public class AmazonHelper
     {
         public static IAmazonS3 s3Client;
+        public static string s3PrefixUrl = "https://s3.ap-south-1.amazonaws.com/";
 
         public static void GetAmazonS3Client()
         {
@@ -46,8 +47,7 @@ namespace Arthur_Clive.Helper
 
         public static string GetS3Object(string bucketName, string objectName)
         {
-            string s3 = "https://s3.ap-south-1.amazonaws.com/";
-            string presignedUrl = s3 + bucketName + "/" + objectName;
+            string presignedUrl = s3PrefixUrl + bucketName + "/" + objectName;
             return presignedUrl;
         }
     }

@@ -1,0 +1,16 @@
+D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll
+D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll
+D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
+D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\UnitTest_ArthurClive.deps.json
+D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\UnitTest_ArthurClive.runtimeconfig.json
+D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\UnitTest_ArthurClive.runtimeconfig.dev.json
+D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\UnitTest_ArthurClive.dll
+D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\Arthur_Clive.dll
+D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\Arthur_Clive.pdb
+D:\Arthur_Clive\UnitTest_ArthurClive\obj\Debug\netcoreapp2.0\UnitTest_ArthurClive.csprojResolveAssemblyReference.cache
+D:\Arthur_Clive\UnitTest_ArthurClive\obj\Debug\netcoreapp2.0\UnitTest_ArthurClive.csproj.CoreCompileInputs.cache
+D:\Arthur_Clive\UnitTest_ArthurClive\obj\Debug\netcoreapp2.0\UnitTest_ArthurClive.AssemblyInfoInputs.cache
+D:\Arthur_Clive\UnitTest_ArthurClive\obj\Debug\netcoreapp2.0\UnitTest_ArthurClive.AssemblyInfo.cs
+D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\UnitTest_ArthurClive.pdb
+D:\Arthur_Clive\UnitTest_ArthurClive\obj\Debug\netcoreapp2.0\UnitTest_ArthurClive.dll
+D:\Arthur_Clive\UnitTest_ArthurClive\obj\Debug\netcoreapp2.0\UnitTest_ArthurClive.pdb

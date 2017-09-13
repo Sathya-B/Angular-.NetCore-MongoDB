@@ -1,73 +1,130 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Arthur_Clive.Data;
-using Arthur_Clive.DataAccess;
+using Arthur_Clive.Helper;
 using Arthur_Clive.Logger;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
+using AH = Arthur_Clive.Helper.AmazonHelper;
+using WH = Arthur_Clive.Helper.MinioHelper;
+using MH = Arthur_Clive.Helper.MongoHelper;
 using MongoDB.Bson;
-using WH = Arthur_Clive.Helper.WebApiHelper;
 
 namespace Arthur_Clive.Controllers
 {
     [Route("api/[controller]")]
     public class CategoryController : Controller
     {
-        public CategoryDataAccess categoryDataAccess;
-
-        public CategoryController(CategoryDataAccess dataAccess)
-        {
-            categoryDataAccess = dataAccess;
-        }
+        public IMongoDatabase _db = MH._client.GetDatabase("ProductDB");
+        public MongoHelper mongoHelper = new MongoHelper();
 
         [HttpGet]
-        [Authorize]
-        public JsonResult Get()
+        public async Task<ActionResult> Get()
         {
             try
             {
-                var product = categoryDataAccess.GetCategories();
-                return Json(product);
+                var collection = _db.GetCollection<Category>("Category");
+                var filter = FilterDefinition<Category>.Empty;
+                IAsyncCursor<Category> cursor = await collection.FindAsync(filter);
+                var categories = cursor.ToList();
+                foreach (var category in categories)
+                {
+                    string objectName = category.Product_For + "-" + category.Product_Type + ".jpg";
+                    //category.ObjectUrl = WH.GetMinioObject("products", objectName).Result;
+                    //category.ObjectUrl = AH.GetAmazonS3Object("arthurclive-products", objectName);
+                    category.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
+                }
+                return Ok(new ResponseData
+                {
+                    Code = "200",
+                    Message = null,
+                    Data = categories
+                });
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("Category", "Get", "Get", ex.Message);
-                return Json(new Category());
+                LoggerDataAccess.CreateLog("CategoryController", "Get", "Get", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
             }
         }
 
-        #region Unused Post,Put and Delete 
-        //[HttpPost]
-        //public string Post([FromBody]Category product)
-        //{
-        //    try
-        //    {
-        //        categoryDataAccess.CreateCategory(product);
-        //        return "Success";
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ApplicationLogger logger =
-        //            new ApplicationLogger
-        //            {
-        //                Controller = "Category",
-        //                MethodName = "Post",
-        //                Method = "Post",
-        //                Description = ex.ToString()
-        //            };
-        //        LoggerDataAccess.CreateLog(logger);
-        //        return "Failed";
-        //    }
-        //}
+        #region Unused Post and Delete 
 
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody]string value)
-        //{
-        //}
+        [HttpPost]
+        public async Task<ActionResult> Post([FromBody]Category product)
+        {
+            try
+            {
+                string objectName = product.Product_For + "-" + product.Product_Type + ".jpg";
+                //product.MinioObject_URL = WH.GetMinioObject("product-category", objectName).Result;
+                //product.MinioObject_URL = AH.GetAmazonS3Object("product-category", objectName);
+                product.MinioObject_URL = AH.GetS3Object("product-category", objectName);
+                var collection = _db.GetCollection<Category>("Category");
+                await collection.InsertOneAsync(product);
+                return Ok(new ResponseData
+                {
+                    Code = "200",
+                    Message = "Inserted",
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("CategoryController", "Post", "Post", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
+            }
+        }
 
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //} 
+        [HttpDelete("{productFor}/{productType}")]
+        public ActionResult Delete(string productFor, string productType)
+        {
+            try
+            {
+                var filter = Builders<BsonDocument>.Filter.Eq("Product_For", productFor) & Builders<BsonDocument>.Filter.Eq("Product_Type", productType);
+                var product = mongoHelper.GetSingleObject(filter, "ProductDB", "Category").Result;
+                if (product != null)
+                {
+                    var authCollection = _db.GetCollection<Category>("Category");
+                    var response = authCollection.DeleteOneAsync(product);
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Deleted",
+                        Data = null
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "400",
+                        Message = "User Not Found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("CategoryController", "Delete", "Delete", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
+            }
+        }
+
         #endregion
     }
 }

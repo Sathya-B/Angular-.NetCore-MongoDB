@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
+using AuthorizedServer.Logger;
 
 namespace AuthorizedServer.Helper
 {
@@ -25,7 +25,7 @@ namespace AuthorizedServer.Helper
 
                 MessageAttributeValue sMSType = new MessageAttributeValue();
                 sMSType.DataType = "String";
-                sMSType.StringValue = "Promotional";
+                sMSType.StringValue = "Transactional";
 
                 MessageAttributeValue maxPrice = new MessageAttributeValue();
                 maxPrice.DataType = "Number";
@@ -43,13 +43,14 @@ namespace AuthorizedServer.Helper
                 PublishRequest publishRequest = new PublishRequest();
                 publishRequest.Message = message;
                 publishRequest.MessageAttributes = smsAttributes;
-                publishRequest.PhoneNumber = phoneNumber;
+                publishRequest.PhoneNumber = "+91" + phoneNumber;
 
                 Task<PublishResponse> result = smsClient.PublishAsync(publishRequest, token);
                 return "Success";
             }
             catch (Exception ex)
             {
+                LoggerDataAccess.CreateLog("SMSHelper", "SendSMS", "SendSMS", ex.Message);
                 return "Failed";
             }
         }

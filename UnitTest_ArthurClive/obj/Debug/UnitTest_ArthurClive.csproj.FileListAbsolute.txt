@@ -1,0 +1,2 @@
+D:\Arthur_Clive\UnitTest_ArthurClive\obj\Debug\UnitTest_ArthurClive.csprojResolveAssemblyReference.cache
+D:\Arthur_Clive\UnitTest_ArthurClive\obj\Debug\UnitTest_ArthurClive.csproj.CoreCompileInputs.cache

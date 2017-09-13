@@ -14,9 +14,7 @@ namespace AuthorizedServer.Controllers
     [Route("api/token")]
     public class TokenController : Controller
     {
-        //some config in the appsettings.json
         private IOptions<Audience> _settings;
-        //repository to handler the sqlite database
         private IRTokenRepository _repo;
 
         public TokenController(IOptions<Audience> settings, IRTokenRepository repo)
@@ -60,12 +58,11 @@ namespace AuthorizedServer.Controllers
         //scenario 1 ： get the access-token by username and password
         private ResponseData DoPassword(Parameters parameters)
         {
-            //validate the client_id/client_secret/username/password                                          
+            
             var isValidated = UserInfo.GetAllUsers().Any(x => x.ClientId == parameters.client_id
                                     && x.ClientSecret == parameters.client_secret
                                     && x.UserName == parameters.username
                                     && x.Password == parameters.password);
-
             if (!isValidated)
             {
                 return new ResponseData
@@ -75,9 +72,7 @@ namespace AuthorizedServer.Controllers
                     Data = null
                 };
             }
-
             var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
-
             var rToken = new RToken
             {
                 ClientId = parameters.client_id,
@@ -85,8 +80,6 @@ namespace AuthorizedServer.Controllers
                 Id = Guid.NewGuid().ToString(),
                 IsStop = 0
             };
-
-            //store the refresh_token 
             if (_repo.AddToken(rToken).Result)
             {
                 return new ResponseData
@@ -111,7 +104,6 @@ namespace AuthorizedServer.Controllers
         private ResponseData DoRefreshToken(Parameters parameters)
         {
             var token = _repo.GetToken(parameters.refresh_token, parameters.client_id).Result;
-
             if (token == null)
             {
                 return new ResponseData
@@ -121,7 +113,6 @@ namespace AuthorizedServer.Controllers
                     Data = null
                 };
             }
-
             if (token.IsStop == 1)
             {
                 return new ResponseData
@@ -131,13 +122,9 @@ namespace AuthorizedServer.Controllers
                     Data = null
                 };
             }
-
             var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
-
             token.IsStop = 1;
-            //expire the old refresh_token and add a new refresh_token
             var updateFlag = _repo.ExpireToken(token).Result;
-
             var addFlag = _repo.AddToken(new RToken
             {
                 ClientId = parameters.client_id,
@@ -145,7 +132,6 @@ namespace AuthorizedServer.Controllers
                 Id = Guid.NewGuid().ToString(),
                 IsStop = 0
             });
-
             if (updateFlag && addFlag.Result)
             {
                 return new ResponseData
@@ -169,18 +155,15 @@ namespace AuthorizedServer.Controllers
         private string GetJwt(string client_id, string refresh_token)
         {
             var now = DateTime.UtcNow;
-
             var claims = new Claim[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, client_id),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, now.ToUniversalTime().ToString(), ClaimValueTypes.Integer64)
             };
-
             var symmetricKeyAsBase64 = _settings.Value.Secret;
             var keyByteArray = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyByteArray);
-
             var jwt = new JwtSecurityToken(
                 issuer: _settings.Value.Iss,
                 audience: _settings.Value.Aud,
@@ -189,14 +172,12 @@ namespace AuthorizedServer.Controllers
                 expires: now.Add(TimeSpan.FromMinutes(2)),
                 signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256));
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
             var response = new
             {
                 access_token = encodedJwt,
                 expires_in = (int)TimeSpan.FromMinutes(2).TotalSeconds,
                 refresh_token = refresh_token,
             };
-
             return JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented });
         }
     }

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using WH = AuthorizedServer.Helper.MongoHelper;
 
 namespace AuthorizedServer.Helper
 {
@@ -19,7 +16,7 @@ namespace AuthorizedServer.Helper
             return new MongoClient("mongodb://localhost:27017");
         }
 
-        public async Task<BsonDocument> GetSingleObject(FilterDefinition<BsonDocument> filter, string collectionName, string dbName)
+        public async Task<BsonDocument> GetSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName)
         {
             _mongodb = _client.GetDatabase(dbName);
             var collection = _mongodb.GetCollection<BsonDocument>(collectionName);
@@ -27,7 +24,7 @@ namespace AuthorizedServer.Helper
             return cursor.FirstOrDefault();
         }
 
-        public async Task<bool> UpdateSingleObject(FilterDefinition<BsonDocument> filter, string collectionName, string dbName, UpdateDefinition<BsonDocument> data)
+        public async Task<bool> UpdateSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName, UpdateDefinition<BsonDocument> data)
         {
             _mongodb = _client.GetDatabase(dbName);
             var collection = _mongodb.GetCollection<BsonDocument>(collectionName);

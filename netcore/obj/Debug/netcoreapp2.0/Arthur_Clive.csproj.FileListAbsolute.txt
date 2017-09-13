@@ -42,3 +42,13 @@ E:\Ragu\Projects\Angular-.NetCore-MongoDB\netcore\obj\Debug\netcoreapp2.0\Arthur
 E:\Ragu\Projects\Angular-.NetCore-MongoDB\netcore\obj\Debug\netcoreapp2.0\Arthur_Clive.dll
 E:\Ragu\Projects\Angular-.NetCore-MongoDB\netcore\obj\Debug\netcoreapp2.0\Arthur_Clive.pdb
 E:\Ragu\Projects\Angular-.NetCore-MongoDB\netcore\obj\Debug\netcoreapp2.0\Arthur_Clive.csprojResolveAssemblyReference.cache
+D:\Arthur_Clive\netcore\bin\Debug\netcoreapp2.0\Arthur_Clive.deps.json
+D:\Arthur_Clive\netcore\bin\Debug\netcoreapp2.0\Arthur_Clive.runtimeconfig.json
+D:\Arthur_Clive\netcore\bin\Debug\netcoreapp2.0\Arthur_Clive.runtimeconfig.dev.json
+D:\Arthur_Clive\netcore\bin\Debug\netcoreapp2.0\Arthur_Clive.dll
+D:\Arthur_Clive\netcore\bin\Debug\netcoreapp2.0\Arthur_Clive.pdb
+D:\Arthur_Clive\netcore\obj\Debug\netcoreapp2.0\Arthur_Clive.csproj.CoreCompileInputs.cache
+D:\Arthur_Clive\netcore\obj\Debug\netcoreapp2.0\Arthur_Clive.AssemblyInfoInputs.cache
+D:\Arthur_Clive\netcore\obj\Debug\netcoreapp2.0\Arthur_Clive.AssemblyInfo.cs
+D:\Arthur_Clive\netcore\obj\Debug\netcoreapp2.0\Arthur_Clive.dll
+D:\Arthur_Clive\netcore\obj\Debug\netcoreapp2.0\Arthur_Clive.pdb

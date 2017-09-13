@@ -25,6 +25,7 @@
         "dependencies": {
           "AWSSDK.S3": "3.3.10.4",
           "Microsoft.AspNetCore.All": "2.0.0",
+          "Microsoft.AspNetCore.Mvc.Core": "2.0.0",
           "Microsoft.NETCore.App": "2.0.0",
           "Minio.NetCore": "1.0.1",
           "mongocsharpdriver": "2.4.4"

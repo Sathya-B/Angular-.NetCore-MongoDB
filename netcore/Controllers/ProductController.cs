@@ -2,113 +2,132 @@
 using MongoDB.Bson;
 using Minio;
 using System;
-using Microsoft.AspNetCore.Http;
 using Arthur_Clive.Data;
-using Arthur_Clive.DataAccess;
-using WH = Arthur_Clive.Helper.WebApiHelper;
 using Arthur_Clive.Logger;
 using System.Threading.Tasks;
+using MongoDB.Driver;
+using Arthur_Clive.Helper;
+using WH = Arthur_Clive.Helper.MinioHelper;
+using AH = Arthur_Clive.Helper.AmazonHelper;
+using MH = Arthur_Clive.Helper.MongoHelper;
 
 namespace Arthur_Clive.Controllers
 {
     [Route("api/[controller]")]
     public class ProductController : Controller
     {
-        public ProductDataAccess productDataAccess;
-
-        public ProductController(ProductDataAccess data)
-        {
-            productDataAccess = data;
-        }
+        public IMongoDatabase _db = MH._client.GetDatabase("ProductDB");
+        public MongoHelper mongoHelper = new MongoHelper();
 
         [HttpGet]
-        public JsonResult Get()
+        public async Task<ActionResult> Get()
         {
             try
             {
-                var products = productDataAccess.GetProducts();
-                return Json(products);
+                var collection = _db.GetCollection<Product>("Product");
+                var filter = FilterDefinition<Product>.Empty;
+                IAsyncCursor<Product> cursor = await collection.FindAsync(filter);
+                var products = cursor.ToList();
+                foreach (var data in products)
+                {
+                    string objectName = data.Product_SKU + ".jpg";
+                    //data.ObjectUrl = WH.GetMinioObject("products", objectName).Result;
+                    //data.ObjectUrl = AH.GetAmazonS3Object("arthurclive-products", objectName);
+                    data.MinioObject_Url = AH.GetS3Object("arthurclive-products", objectName);
+                }
+                return Ok(new ResponseData
+                {
+                    Code = "200",
+                    Message = null,
+                    Data = products
+                });
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("Product", "Get", "Get",ex.Message);
-                return Json(new Product());
+                LoggerDataAccess.CreateLog("ProductController", "Get", "Get", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
             }
         }
 
+        #region Unused Post and Delete
+
         [HttpPost]
-        public string Post([FromBody]Product product)
+        public async Task<ActionResult> Post([FromBody]Product product)
         {
             try
             {
                 product.Product_Discount_Price = (product.Product_Price - (product.Product_Price * (product.Product_Discount / 100)));
                 product.Product_SKU = product.Product_For + "-" + product.Product_Type + "-" + product.Product_Design + "-" + product.Product_Colour + "-" + product.Product_Size;
-                var response = productDataAccess.Create(product);
-                return response;
+                string objectName = product.Product_SKU + ".jpg";
+                //product.MinioObject_URL = WH.GetMinioObject("arthurclive-products", objectName).Result;
+                //product.MinioObject_URL = AH.GetAmazonS3Object("arthurclive-products", objectName);
+                product.MinioObject_Url = AH.GetS3Object("arthurclive-products", objectName);
+                var collection = _db.GetCollection<Product>("Product");
+                await collection.InsertOneAsync(product);
+                return Ok(new ResponseData
+                {
+                    Code = "200",
+                    Message = "Inserted",
+                    Data = null
+                });
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("Product", "Post", "Post", ex.Message);
-                return "Failed";
+                LoggerDataAccess.CreateLog("ProductController", "Post", "Post", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
             }
         }
 
-        [HttpPost("{productSKU}")]
-        public string Post(string productSKU, IFormFile file)
+        [HttpDelete("{productSKU}")]
+        public ActionResult Delete(string productSKU)
         {
             try
             {
-                var stream = file.OpenReadStream();
-                var name = file.FileName;
-                string objectName = productSKU + ".jpg";
-                WH.GetMinioClient().PutObjectAsync("student-maarklist", objectName, stream, file.Length);
-                return "Success";
+                var filter = Builders<BsonDocument>.Filter.Eq("Product_SKU", productSKU);
+                var product = mongoHelper.GetSingleObject(filter, "ProductDB", "Product").Result;
+                if (product != null)
+                {
+                    var authCollection = _db.GetCollection<Product>("Product");
+                    var response = authCollection.DeleteOneAsync(product);
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Deleted",
+                        Data = null
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "400",
+                        Message = "User Not Found",
+                        Data = null
+                    });
+                }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("Product", "Post", "Post file to minio", ex.Message);
-                return "Failed";
+                LoggerDataAccess.CreateLog("ProductController", "Delete", "Delete", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
             }
         }
 
-        [HttpPut("{id:length(24)}")]
-        public async Task<string> Put(string id, [FromBody]Product product)
-        {
-            try
-            {
-                product.Product_Discount_Price = (product.Product_Price - (product.Product_Price * (product.Product_Discount / 100)));
-                var recId = new ObjectId(id);
-                var response = await productDataAccess.Update(recId, product);
-                return response;
-            }
-            catch (Exception ex)
-            {
-                LoggerDataAccess.CreateLog("Product", "Put", "Put", ex.Message);
-                return "Failed";
-            }
-        }
-
-        [HttpDelete("{id:length(24)}")]
-        public async Task<string> Delete(string id)
-        {
-            try
-            {
-                var response = await productDataAccess.Remove(new ObjectId(id));
-                return response;
-            }
-            catch (Exception ex)
-            {
-                ApplicationLogger logger =
-                   new ApplicationLogger
-                   {
-                       Controller = "Product",
-                       MethodName = "Delete",
-                       Method = "Delete",
-                       Description = ex.Message
-                   };
-                LoggerDataAccess.CreateLog("Product", "Delete", "Delete", ex.Message);
-                return "Failed";
-            }
-        }
+        #endregion
     }
 }

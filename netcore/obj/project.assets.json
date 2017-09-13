@@ -13556,6 +13556,7 @@
     ".NETCoreApp,Version=v2.0": [
       "AWSSDK.S3 >= 3.3.10.4",
       "Microsoft.AspNetCore.All >= 2.0.0",
+      "Microsoft.AspNetCore.Mvc.Core >= 2.0.0",
       "Microsoft.NETCore.App >= 2.0.0",
       "Minio.NetCore >= 1.0.1",
       "mongocsharpdriver >= 2.4.4"
@@ -13571,11 +13572,11 @@
       "hideWarningsAndErrors": true
     },
     "restore": {
-      "projectUniqueName": "E:\\Ragu\\Projects\\Angular-.NetCore-MongoDB\\netcore\\Arthur_Clive.csproj",
+      "projectUniqueName": "D:\\Arthur_Clive\\netcore\\Arthur_Clive.csproj",
       "projectName": "Arthur_Clive",
-      "projectPath": "E:\\Ragu\\Projects\\Angular-.NetCore-MongoDB\\netcore\\Arthur_Clive.csproj",
+      "projectPath": "D:\\Arthur_Clive\\netcore\\Arthur_Clive.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "E:\\Ragu\\Projects\\Angular-.NetCore-MongoDB\\netcore\\obj\\",
+      "outputPath": "D:\\Arthur_Clive\\netcore\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -13609,6 +13610,10 @@
           "mongocsharpdriver": {
             "target": "Package",
             "version": "2.4.4"
+          },
+          "Microsoft.AspNetCore.Mvc.Core": {
+            "target": "Package",
+            "version": "2.0.0"
           },
           "Microsoft.NETCore.App": {
             "target": "Package",

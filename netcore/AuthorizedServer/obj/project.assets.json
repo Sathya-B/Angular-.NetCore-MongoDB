@@ -13491,11 +13491,11 @@
       "hideWarningsAndErrors": true
     },
     "restore": {
-      "projectUniqueName": "E:\\Ragu\\Projects\\Angular-.NetCore-MongoDB\\netcore\\AuthorizedServer\\AuthorizedServer.csproj",
+      "projectUniqueName": "D:\\Arthur_Clive\\netcore\\AuthorizedServer\\AuthorizedServer.csproj",
       "projectName": "AuthorizedServer",
-      "projectPath": "E:\\Ragu\\Projects\\Angular-.NetCore-MongoDB\\netcore\\AuthorizedServer\\AuthorizedServer.csproj",
+      "projectPath": "D:\\Arthur_Clive\\netcore\\AuthorizedServer\\AuthorizedServer.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "E:\\Ragu\\Projects\\Angular-.NetCore-MongoDB\\netcore\\AuthorizedServer\\obj\\",
+      "outputPath": "D:\\Arthur_Clive\\netcore\\AuthorizedServer\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

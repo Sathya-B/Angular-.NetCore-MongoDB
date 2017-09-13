@@ -12,7 +12,7 @@ namespace AuthorizedServer
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>().UseUrls("http://localhost:5001")
+                .UseStartup<Startup>().UseUrls("http://0.0.0.0:5001")
                 .Build();
     }
 }

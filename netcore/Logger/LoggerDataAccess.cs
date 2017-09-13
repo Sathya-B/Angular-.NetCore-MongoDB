@@ -1,11 +1,12 @@
 ﻿using MongoDB.Driver;
-using WH = Arthur_Clive.Helper.WebApiHelper;
+using WH = Arthur_Clive.Helper.MinioHelper;
+using MH = Arthur_Clive.Helper.MongoHelper;
 
 namespace Arthur_Clive.Logger
 {
     public class LoggerDataAccess
     {
-        public static IMongoDatabase _db = WH._client.GetDatabase("ArthurCliveLogDB");
+        public static IMongoDatabase _db = MH._client.GetDatabase("ArthurCliveLogDB");
 
         public static void CreateLog(string controllerName, string methodName, string method, string errorDescription)
         {

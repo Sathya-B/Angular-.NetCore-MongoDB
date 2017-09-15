@@ -47,10 +47,10 @@ ngOnInit(){
  this.GetProducts();
 }
 GetProducts(){
-    this.apiService.get('SubCategory/'+this.for + "s/" + this.type ).subscribe(
+    this.apiService.get('SubCategory/'+this.for + "s/" + this.type ).then(
       (response: any) => {
-        console.log(response);
-        this.products = response.result;
+//        console.log(response);
+        this.products = response.data;
         
       },
       (error: any) => {

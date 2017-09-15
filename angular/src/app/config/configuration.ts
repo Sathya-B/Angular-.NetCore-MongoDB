@@ -1,6 +1,7 @@
 import { OpaqueToken } from '@angular/core';
 
-export const serverUrl = "http://13.126.223.92/api/";
+export const serverUrl = "http://localhost:5000/api/";
+export const authServer = "http://localhost:5001/api/auth";
 
 export class Configuration {
     apiKey: string;

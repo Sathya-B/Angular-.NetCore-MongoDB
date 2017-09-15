@@ -1,13 +1,15 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
+import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import { NgModule, ApplicationRef } from '@angular/core';
 import { removeNgStyles, createNewHosts, createInputTransfer } from '@angularclass/hmr';
 import {
   RouterModule,
   PreloadAllModules
 } from '@angular/router';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 /*
  * Platform and Environment providers/directives/pipes
  */
@@ -34,11 +36,15 @@ import { VariantsComponent } from './variants/variants.component';
 import { RelatedComponent } from './variants/related/related.component';
 import { DataServ } from '../services/data.service';
 import { ApiService } from '../services/api.service';
+import { TokenService} from '../services/token.service';
+import { AuthInterceptor } from '../shared/auth.interceptor';
+import { ToastMsgService } from '../services/toastmsg.service';
 import { FilterPipe } from '../pipes/filterpipe.component'
 import { CategoryComponent } from './home/category';
 import { NoContentComponent } from './no-content';
 import { XLargeDirective } from './home/x-large';
 import { CarouselModule } from 'angular4-carousel';
+import {ToasterModule, ToasterService, ToasterConfig} from 'angular2-toaster';
 
 import '../styles/styles.scss';
 import '../styles/headings.css';
@@ -89,7 +95,10 @@ type StoreType = {
     BrowserModule,
     FormsModule,
     HttpModule,
+    HttpClientModule,
     CarouselModule,
+    ToasterModule,
+    BrowserAnimationsModule,
     RouterModule.forRoot(ROUTES, { useHash: true, preloadingStrategy: PreloadAllModules })
   ],
   /**
@@ -99,7 +108,10 @@ type StoreType = {
     ENV_PROVIDERS,
     APP_PROVIDERS,
     DataServ,
-    ApiService
+    ApiService,
+    TokenService,
+    ToastMsgService,
+    {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}
   ]
 })
 export class AppModule {

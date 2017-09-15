@@ -65,14 +65,14 @@ export class HomeComponent implements OnInit {
   }
 
   GetCategories(){
-    this.apiService.get('category').subscribe(
+    this.apiService.get('category', {useAuth : true}).then(
+      
       (response: any) => {
-        console.log(response);
-        this.category = response.result;
-      },
-      (error: any) => {
+//        console.log(response);
+        this.category = response.data;
+      })
+      .catch((error: any) => {
         console.log(error);
-      }
-    )
+      })    
   }
 }

@@ -17,10 +17,8 @@ export class FilterPipe implements PipeTransform {
             } else {
                 var topofgroup = {[conditions]: keyVal, topItem: items[i], variants: [items[i]]};
                 newValue.push(topofgroup);
-             //   newValue.push({design: keyVal, Price: items[i].product_Price, ImgUrl: items[i].minioObject_Url, variants: [items[i]]});
             }
         }
-        console.log(newValue);
         return newValue;
 
     }

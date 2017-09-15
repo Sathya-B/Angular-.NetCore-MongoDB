@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppState } from '../app.service';
 import { NgZone } from '@angular/core';
+import {ToastMsgService} from '../../services/toastmsg.service';
 
 @Component({
   selector: 'header',  // <header></header>
@@ -15,7 +16,7 @@ export class HeaderComponent {
   public menuOpened: boolean = false;
   public scrolled: boolean = false;
   public loggedIn: { "loggedIn": boolean } = { loggedIn: false};
-  constructor(private router: Router, public appState: AppState, zone: NgZone) {
+  constructor(private router: Router, public appState: AppState, zone: NgZone, private toastmsg: ToastMsgService) {
     this.loggedIn = this.appState.get('loggedIn');
     window.onscroll = () => {
       zone.run(() => {
@@ -46,7 +47,7 @@ export class HeaderComponent {
     localStorage.removeItem("JWT");
     this.appState.set('loggedIn', false);
     this.loggedIn.loggedIn = false;
-    window.alert('Logged out');
+    this.toastmsg.popToast("success","Success","Logged Out");      
     this.router.navigate(['/']);    
   }
 

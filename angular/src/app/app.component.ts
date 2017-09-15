@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { AppState } from './app.service';
 import { Router, NavigationEnd } from '@angular/router';
+import {ToastMsgService} from '../services/toastmsg.service';
 
 /**
  * App Component
@@ -25,11 +26,13 @@ export class AppComponent implements OnInit {
   public angularclassLogo = 'assets/img/angularclass-avatar.png';
   public name = 'Angular 2 Webpack Starter';
   public url = 'https://twitter.com/AngularClass';
-  constructor(public appState: AppState, private router: Router) {
+  public config: any;
+  constructor(public appState: AppState, private router: Router, private toastmsg: ToastMsgService) {
+    this.config = toastmsg.config;
   }
 
   public ngOnInit() {
-    if(localStorage.getItem('JWT')!= null)
+    if(localStorage.getItem('UserName')!= null && localStorage.getItem('JWT')!= null)
     {
     this.appState.set('loggedIn', true);
     }else{

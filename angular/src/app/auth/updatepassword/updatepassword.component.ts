@@ -4,6 +4,8 @@ import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
 import {ApiService} from '../../../services/api.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import { AppState } from '../../app.service';
+import {ToastMsgService} from '../../../services/toastmsg.service';
+import { authServer } from '../../config/configuration';
 
 @Component({
   selector: 'updatepassword',
@@ -14,7 +16,7 @@ export class UpdatePasswordComponent {
 public password: string;
 public newPassword: { PhoneNumber: string, Password: string} = { PhoneNumber: "", Password:""};
 public phoneNumber: string;
-constructor(private apiService: ApiService, private activatedRoute: ActivatedRoute, private router: Router,  public appState: AppState){
+constructor(private apiService: ApiService, private toastmsg: ToastMsgService, private activatedRoute: ActivatedRoute, private router: Router,  public appState: AppState){
     this.phoneNumber = activatedRoute.snapshot.paramMap.get('PhoneNumber');
 }
 
@@ -22,16 +24,17 @@ onSubmit(form: NgForm){
     this.newPassword.Password = form.value.Password;
     this.newPassword.PhoneNumber = this.phoneNumber;  
     console.log(this.newPassword);
-    this.apiService.post('forgotpassword/changepassword',this.newPassword,undefined,"http://192.168.0.111:5001/api/auth/").subscribe(
+    this.apiService.post('/forgotpassword/changepassword',this.newPassword,undefined, authServer).then(
       (response: any) => {
           console.log(response);
         if(response.code == "200")
         {
-         window.alert('Password Changed');
+        this.toastmsg.popToast("success","Success","Password Changed");        
          this.appState.set('loggedIn', true);
          this.router.navigate(['/']);
         }
-      },
+      })
+      .catch(
       (error: any) => {
         console.log(error);
       }

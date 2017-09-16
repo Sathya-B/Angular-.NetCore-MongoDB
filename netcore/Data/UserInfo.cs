@@ -26,6 +26,11 @@ namespace Arthur_Clive.Data
         public string Landmark { get; set; }
     }
 
+    public class CartList
+    {
+        public List<Cart> ListOfProducts { get; set; }
+    }
+
     public class Cart
     {
         public ObjectId Id { get; set; }

@@ -9,6 +9,7 @@ using AH = Arthur_Clive.Helper.AmazonHelper;
 using MH = Arthur_Clive.Helper.MongoHelper;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson;
+using System.Threading.Tasks;
 
 namespace Arthur_Clive.Controllers
 {
@@ -19,17 +20,26 @@ namespace Arthur_Clive.Controllers
         public MongoHelper mongoHelper = new MongoHelper();
 
         [HttpGet("{productFor}/{productType}")]
-        public ActionResult Get(string productFor, string productType)
+        public async Task<ActionResult> Get(string productFor, string productType)
         {
             try
             {
-                var filter = Builders<BsonDocument>.Filter.Eq("Product_For", productFor) & Builders<BsonDocument>.Filter.Eq("Product_Type", productType);
-                var userInfo = BsonSerializer.Deserialize<UserInfo>(mongoHelper.GetSingleObject(filter, "ProductDB", "Product").Result);
+                var collection = _db.GetCollection<Product>("Product");
+                var filter = Builders<Product>.Filter.Eq("ProductFor", productFor) & Builders<Product>.Filter.Eq("ProductType", productType);
+                IAsyncCursor<Product> cursor = await collection.FindAsync(filter);
+                var products = cursor.ToList();
+                foreach (var product in products)
+                {
+                    string objectName = product.ProductSKU + ".jpg";
+                    //product.MinioObject_URL = WH.GetMinioObject("arthurclive-products", objectName).Result;
+                    //product.MinioObject_URL = AH.GetAmazonS3Object("arthurclive-products", objectName);
+                    product.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
+                }
                 return Ok(new ResponseData
                 {
                     Code = "200",
                     Message = "Success",
-                    Data = userInfo
+                    Data = products
                 });
             }
             catch (Exception ex)

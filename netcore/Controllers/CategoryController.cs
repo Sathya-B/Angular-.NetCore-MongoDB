@@ -13,7 +13,11 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Arthur_Clive.Controllers
 {
+    /// <summary>
+    /// This class is used as an api for the all operations related to product category.
+    /// </summary>
     [Route("api/[controller]")]
+    [Produces("application/json")]
     public class CategoryController : Controller
     {
         public IMongoDatabase _db = MH._client.GetDatabase("ProductDB");
@@ -31,15 +35,15 @@ namespace Arthur_Clive.Controllers
                 var categories = cursor.ToList();
                 foreach (var category in categories)
                 {
-                    string objectName = category.Product_For + "-" + category.Product_Type + ".jpg";
-                    //category.ObjectUrl = WH.GetMinioObject("products", objectName).Result;
-                    //category.ObjectUrl = AH.GetAmazonS3Object("arthurclive-products", objectName);
-                    category.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
+                    string objectName = category.ProductFor + "-" + category.ProductType + ".jpg";
+                    //category.MinioObject_URL = WH.GetMinioObject("products", objectName).Result;
+                    //category.MinioObject_URL = AH.GetAmazonS3Object("product-category", objectName);
+                    category.MinioObject_URL = AH.GetS3Object("product-category", objectName);
                 }
                 return Ok(new ResponseData
                 {
                     Code = "200",
-                    Message = null,
+                    Message = "Success",
                     Data = categories
                 });
             }
@@ -57,13 +61,31 @@ namespace Arthur_Clive.Controllers
 
         #region Unused Post and Delete 
 
+        /// <summary>
+        /// Creates a Category.
+        /// </summary>
+        /// <remarks>
+        /// Post Category request:
+        ///
+        ///     POST /Category
+        ///     {
+        ///        "ProductFor" : "Men",
+        ///        "ProductType" : "Tshirt",
+        ///        "Description" : "Mens Tshirt"
+        ///     }
+        ///
+        /// </remarks>
+        /// <response code="200">Returns Code and message</response>
+        /// <response code="400">If a error occur during post</response>     
         [HttpPost]
+        [ProducesResponseType(typeof(ActionResult), 200)]
+        [ProducesResponseType(typeof(ActionResult), 400)]
         public async Task<ActionResult> Post([FromBody]Category product)
         {
             try
             {
-                string objectName = product.Product_For + "-" + product.Product_Type + ".jpg";
-                //product.MinioObject_URL = WH.GetMinioObject("product-category", objectName).Result;
+                string objectName = product.ProductFor + "-" + product.ProductType + ".jpg";
+                //product.MinioObject_URL = WH.GetMinioObject("products", objectName).Result;
                 //product.MinioObject_URL = AH.GetAmazonS3Object("product-category", objectName);
                 product.MinioObject_URL = AH.GetS3Object("product-category", objectName);
                 var collection = _db.GetCollection<Category>("Category");
@@ -92,12 +114,11 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var filter = Builders<BsonDocument>.Filter.Eq("Product_For", productFor) & Builders<BsonDocument>.Filter.Eq("Product_Type", productType);
+                var filter = Builders<BsonDocument>.Filter.Eq("ProductFor", productFor) & Builders<BsonDocument>.Filter.Eq("ProductType", productType);
                 var product = mongoHelper.GetSingleObject(filter, "ProductDB", "Category").Result;
                 if (product != null)
                 {
-                    var authCollection = _db.GetCollection<Category>("Category");
-                    var response = authCollection.DeleteOneAsync(product);
+                    var response = mongoHelper.DeleteSingleObject(filter, "ProductDB", "Category");
                     return Ok(new ResponseData
                     {
                         Code = "200",

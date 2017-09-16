@@ -7,7 +7,6 @@ using Arthur_Clive.Logger;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Arthur_Clive.Helper;
-using WH = Arthur_Clive.Helper.MinioHelper;
 using AH = Arthur_Clive.Helper.AmazonHelper;
 using MH = Arthur_Clive.Helper.MongoHelper;
 
@@ -30,10 +29,10 @@ namespace Arthur_Clive.Controllers
                 var products = cursor.ToList();
                 foreach (var data in products)
                 {
-                    string objectName = data.Product_SKU + ".jpg";
-                    //data.ObjectUrl = WH.GetMinioObject("products", objectName).Result;
-                    //data.ObjectUrl = AH.GetAmazonS3Object("arthurclive-products", objectName);
-                    data.MinioObject_Url = AH.GetS3Object("arthurclive-products", objectName);
+                    string objectName = data.ProductSKU + ".jpg";
+                    //data.ObjectURL = WH.GetMinioObject("products", objectName).Result;
+                    //data.ObjectURL = AH.GetAmazonS3Object("arthurclive-products", objectName);
+                    data.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
                 }
                 return Ok(new ResponseData
                 {
@@ -61,12 +60,12 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                product.Product_Discount_Price = (product.Product_Price - (product.Product_Price * (product.Product_Discount / 100)));
-                product.Product_SKU = product.Product_For + "-" + product.Product_Type + "-" + product.Product_Design + "-" + product.Product_Colour + "-" + product.Product_Size;
-                string objectName = product.Product_SKU + ".jpg";
+                product.ProductDiscountPrice = (product.ProductPrice - (product.ProductPrice * (product.ProductDiscount / 100)));
+                product.ProductSKU = product.ProductFor + "-" + product.ProductType + "-" + product.ProductDesign + "-" + product.ProductColour + "-" + product.ProductSize;
+                string objectName = product.ProductSKU + ".jpg";
                 //product.MinioObject_URL = WH.GetMinioObject("arthurclive-products", objectName).Result;
                 //product.MinioObject_URL = AH.GetAmazonS3Object("arthurclive-products", objectName);
-                product.MinioObject_Url = AH.GetS3Object("arthurclive-products", objectName);
+                product.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
                 var collection = _db.GetCollection<Product>("Product");
                 await collection.InsertOneAsync(product);
                 return Ok(new ResponseData

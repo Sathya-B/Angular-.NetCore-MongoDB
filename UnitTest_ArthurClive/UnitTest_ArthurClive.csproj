@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\netcore\Arthur_Clive.csproj" />
+    <ProjectReference Include="..\netcore\AuthorizedServer\AuthorizedServer.csproj" />
   </ItemGroup>
 
 </Project>

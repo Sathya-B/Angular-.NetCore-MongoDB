@@ -9,18 +9,12 @@ namespace Arthur_Clive.Helper
         public static IAmazonS3 s3Client;
         public static string s3PrefixUrl = "https://s3.ap-south-1.amazonaws.com/";
 
-        public static void GetAmazonS3Client()
+        public static IAmazonS3 GetAmazonS3Client()
         {
-            try
-            {
-                string accessKey = "AKIAIUAYVIL7A7I6XECA";
-                string secretKey = "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";
-                s3Client = new AmazonS3Client(accessKey, secretKey, Amazon.RegionEndpoint.APSouth1);
-            }
-            catch (Exception ex)
-            {
-                Logger.LoggerDataAccess.CreateLog("AmazonHelper", "GetAmazonS3Client", "GetAmazonS3Client", ex.Message);
-            }
+            string accessKey = "AKIAIUAYVIL7A7I6XECA";
+            string secretKey = "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";
+            s3Client = new AmazonS3Client(accessKey, secretKey, Amazon.RegionEndpoint.APSouth1);
+            return s3Client;
         }
 
         public static string GetAmazonS3Object(string bucketName, string objectKey)

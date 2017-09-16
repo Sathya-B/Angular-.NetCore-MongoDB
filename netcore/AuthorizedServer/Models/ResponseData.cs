@@ -1,5 +1,4 @@
-﻿
-namespace AuthorizedServer.Models
+﻿namespace AuthorizedServer
 {
     public class ResponseData
     {

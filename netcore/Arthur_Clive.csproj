@@ -4,6 +4,10 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netcoreapp2.0\Arthur_Clive.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="AuthorizedServer\**" />
     <Content Remove="AuthorizedServer\**" />
@@ -21,10 +25,18 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.0.0" />
     <PackageReference Include="Minio.NetCore" Version="1.0.1" />
     <PackageReference Include="mongocsharpdriver" Version="2.4.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="1.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="1.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="1.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUi" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy /y bin\Debug\netcoreapp2.0\ bin\copy" />
+  </Target>
 
 </Project>

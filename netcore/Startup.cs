@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.IO;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.PlatformAbstractions;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Arthur_Clive
 {
@@ -19,8 +22,7 @@ namespace Arthur_Clive
         }
 
         public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
+        
         public void ConfigureServices(IServiceCollection services)
         {
             ConfigureJwtAuthService(services);
@@ -35,9 +37,23 @@ namespace Arthur_Clive
                     .AllowAnyHeader()
                     .AllowCredentials());
             });
-        }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info
+                {
+                    Version = "v1",
+                    Title = "Arthur_Clive API",
+                    Description = "ASP.NET Core Web Api project to handle requests regrading Product , Category, Orders and Users",
+                    TermsOfService = "None"
+                });
+
+                var basePath = PlatformServices.Default.Application.ApplicationBasePath;
+                var xmlPath = Path.Combine(basePath, "Arthur_Clive.xml");
+                c.IncludeXmlComments(xmlPath);
+            });
+        }
+        
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
@@ -45,6 +61,14 @@ namespace Arthur_Clive
 
             app.UseCors("CorsPolicy");
             app.UseAuthentication();
+            app.UseSwagger(c =>
+            {
+                c.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
+            });
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Arthur_Clive API V1");
+            });
             app.UseMvc();
         }
     }

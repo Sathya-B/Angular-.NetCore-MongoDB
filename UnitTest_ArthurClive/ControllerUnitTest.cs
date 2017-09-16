@@ -19,15 +19,77 @@ namespace UnitTest_ArthurClive
     public class ControllerUnitTest
     {
         [TestMethod]
-        public void Get()
+        public void Controller_Category_GetMethod()
         {
             //Arrange
             CategoryController controller = new CategoryController();
             //Act
             var result = controller.Get() as Task<ActionResult>;
-            var viewResult = result.Result;
+            var viewResult = result.Result.ToBsonDocument();
+            var filter = viewResult["Value"].AsBsonDocument;
+            var code = filter["Code"].AsString;
+            var data = filter["Data"].AsBsonDocument;
+            var message = filter["Message"].AsString;
             //Assert
-            Assert.IsNotNull(viewResult);
+            Assert.IsNotNull(result.Result);
+            Assert.AreEqual("200",code);
+            Assert.AreEqual("Success",message);
+            Assert.IsNotNull(data);
+        }
+
+        [TestMethod]
+        public void Controller_Category_PostMethod()
+        {
+            //Arrange
+            CategoryController controller = new CategoryController();
+            //Act
+            var result = controller.Post(new Category()) as Task<ActionResult>;
+            var viewResult = result.Result.ToBsonDocument();
+            var filter = viewResult["Value"].AsBsonDocument;
+            var code = filter["Code"].AsString;
+            var message = filter["Message"].AsString;
+            //Assert
+            Assert.IsNotNull(result.Result);
+            Assert.AreEqual("200", code);
+            Assert.AreEqual("Inserted",message);
+        }
+
+        [TestMethod]
+        public void Controller_Category_DeleteMethod()
+        {
+            //Arrange
+            CategoryController controller = new CategoryController();
+            //Act
+            var result = controller.Delete(null,null) as ActionResult;
+            var viewResult = result.ToBsonDocument();
+            var filter = viewResult["Value"].AsBsonDocument;
+            var code = filter["Code"].AsString;
+            var message = filter["Message"].AsString;
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("200", code);
+            Assert.AreEqual("Deleted", message);
+        }
+
+        [TestMethod]
+        public void Controller_SubCategory_GetMethod()
+        {
+            //Arrange
+            SubCategoryController controller = new SubCategoryController();
+            var productFor = "All";
+            var productType = "Art";
+            //Act
+            var result = controller.Get(productFor,productType) as ActionResult;
+            var viewResult = result.ToBsonDocument();
+            var filter = viewResult["Value"].AsBsonDocument;
+            var code = filter["Code"].AsString;
+            var message = filter["Message"].AsString;
+            var data = filter["Data"].AsBsonDocument;
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("200", code);
+            Assert.AreEqual("Success", message);
+            Assert.IsNotNull(data);
         }
     }
 }

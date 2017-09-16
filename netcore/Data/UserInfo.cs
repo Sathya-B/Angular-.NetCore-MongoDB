@@ -16,7 +16,8 @@ namespace Arthur_Clive.Data
     public class Address
     {
         public int AddressId { get; set; }
-        public string Default { get; set; }
+        public string PhoneNumber { get; set; }
+        public bool Default { get; set; }
         public string DoorNo_Or_BuildingName { get; set; }
         public string Area_Or_Street { get; set; }
         public string City { get; set; }
@@ -28,8 +29,9 @@ namespace Arthur_Clive.Data
     public class Cart
     {
         public ObjectId Id { get; set; }
+        public string UserName { get; set; }
         public string ProductSKU { get; set; }
-        public string ObjectUrl { get; set; }
+        public string MinioObject_URL { get; set; }
         public string ProductFor { get; set; }
         public string ProductType { get; set; }
         public string ProductDesign { get; set; }
@@ -46,8 +48,9 @@ namespace Arthur_Clive.Data
     public class WishList
     {
         public ObjectId Id { get; set; }
+        public string UserName { get; set; }
         public string ProductSKU { get; set; }
-        public string ObjectUrl { get; set; }
+        public string MinioObject_URL { get; set; }
         public string ProductFor { get; set; }
         public string ProductType { get; set; }
         public string ProductDesign { get; set; }

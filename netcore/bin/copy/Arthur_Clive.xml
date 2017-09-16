@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Arthur_Clive</name>
+    </assembly>
+    <members>
+        <member name="T:Arthur_Clive.Controllers.CategoryController">
+            <summary>
+            This class is used as an api for the all operations related to product category.
+            </summary>
+        </member>
+        <member name="M:Arthur_Clive.Controllers.CategoryController.Post(Arthur_Clive.Data.Category)">
+             <summary>
+             Creates a Category.
+             </summary>
+             <remarks>
+             Post Category request:
+            
+                 POST /Category
+                 {
+                    "ProductFor" : "Men",
+                    "ProductType" : "Tshirt",
+                    "Description" : "Mens Tshirt"
+                 }
+            
+             </remarks>
+             <response code="200">Returns Code and message</response>
+             <response code="400">If a error occur during post</response>     
+        </member>
+    </members>
+</doc>

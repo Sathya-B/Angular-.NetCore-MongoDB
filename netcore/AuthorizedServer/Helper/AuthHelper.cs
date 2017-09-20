@@ -28,10 +28,13 @@ namespace AuthorizedServer.Helper
             //store the refresh_token 
             if (_repo.AddToken(rToken).Result)
             {
+                dynamic UserInfo = new System.Dynamic.ExpandoObject();
+                UserInfo.FirstName = parameters.fullname;
                 return new ResponseData
                 {
                     Code = "999",
                     Message = "OK",
+                    Content = UserInfo,
                     Data = GetJwt(parameters.username, refresh_token, _settings)
                 };
             }

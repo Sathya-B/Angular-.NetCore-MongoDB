@@ -31,5 +31,18 @@ namespace AuthorizedServer.Helper
            var cursor = await collection.UpdateOneAsync(filter, update);
             return cursor.ModifiedCount > 0;
         }
+
+        //public bool CheckForDatas(string filterField1,string filterData1,string filterField2,string filterData2,string dbName,string collectionName)
+        //{
+        //    if(filterField2 == null)
+        //    {
+        //        var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", filterData1);
+        //    }
+        //    else
+        //    {
+
+        //    }
+        //    var verifyUser = helper.GetSingleObject(filter, "Authentication", "Authentication").Result;
+        //}
     }
 }

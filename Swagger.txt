@@ -1,0 +1,402 @@
+swagger: "2.0"
+info:
+  description: "Arthur Clive Web Api"
+  version: "1.0.0"
+  title: "Arthur Clive Swagger"
+  contact:
+    email: "raguvarthan.n@turingminds.com"
+host: "arhturclive.swagger.io"
+basePath: "/v1"
+tags:
+- name: "Arthur Clive"
+  description: "Web Api calls for Products, Categories, Cart, Wishlist ,Orders and Users"
+- name: "ProductController"
+  description: "Product Insert, Get and Delete"
+- name: "CategoryController"
+  description: "Category Insert, Get and Delete"
+- name: "SubCategoryController"
+  description: "SubCategory Get"
+schemes:
+- "http"  
+paths:
+  /api/product:
+    get:
+      tags:
+      - "ProductController"
+      summary: "Get all the products added to the DB"
+      description: ""
+      operationId: "getProducts"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ProductDetails"
+        400:
+          description: "Failed"
+          schema:
+              $ref: "#/definitions/ResponseData"
+    post:
+      tags:
+      - "ProductController"
+      summary: "Insert new product to DB"
+      description: ""
+      operationId: "insertProduct"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Object that need to be added to the DB"
+        required: true
+        schema:
+          $ref: "#/definitions/Product"
+      responses:
+        200:
+          description: "Successfully Inserted"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        400:
+          description: "Failed"
+          schema:
+              $ref: "#/definitions/ResponseData"
+  /api/product/{productSKU}:
+    delete:
+      tags:
+      - "ProductController"
+      summary: "Deletes a product from DB with its SKU"
+      description: ""
+      operationId: "deleteProduct"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "productSKU"
+        in: "path"
+        description: "SKU of the product that needs to be deleted"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Deleted"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        400:
+          description: "Product Not Found"
+          schema:
+              $ref: "#/definitions/ResponseData"
+  /api/category:
+    get:
+      tags:
+      - "CategoryController"
+      summary: "Get all the categories added to the DB"
+      description: ""
+      operationId: "getCategories"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/CategoryDetails"
+        400:
+          description: "Failed"
+          schema:
+              $ref: "#/definitions/ResponseData"
+    post:
+      tags:
+      - "CategoryController"
+      summary: "Insert new category to DB"
+      description: ""
+      operationId: "insertCategory"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Object that need to be added to the DB"
+        required: true
+        schema:
+          $ref: "#/definitions/Category"
+      responses:
+        200:
+          description: "Successfully Inserted"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        400:
+          description: "Failed"
+          schema:
+              $ref: "#/definitions/ResponseData"
+  /api/category/{productFor}/{productType}:
+    delete:
+      tags:
+      - "CategoryController"
+      summary: "Deletes a category from DB with productFor and productType"
+      description: ""
+      operationId: "deleteCategory"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "productFor"
+        in: "path"
+        description: "productFor of the category that needs to be deleted"
+        required: true
+        type: "string"
+      - name: "productType"
+        in: "path"
+        description: "productType of the category that needs to be deleted"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Deleted"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        400:
+          description: "Product Not Found"
+          schema:
+              $ref: "#/definitions/ResponseData"
+  /api/subcategory/{productFor}/{productType}:
+    get:
+      tags:
+      - "SubCategoryController"
+      summary: "Get subcategories with filters product for and product from DB"
+      description: ""
+      operationId: "getSubCategories"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "productFor"
+        in: "path"
+        description: "productFor of the subcategory that needs to be filtered"
+        required: true
+        type: "string"
+      - name: "productType"
+        in: "path"
+        description: "productType of the subcategory that needs to be filtered"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ProductDetails"
+        400:
+          description: "Failed"
+          schema:
+              $ref: "#/definitions/ResponseData"
+definitions:
+  ResponseData:
+    type: "object"
+    properties:
+      Code: 
+        type: "number"
+      Message:
+        type: "string"
+      Data:
+        type: "object"
+  Product:
+    type: "object"
+    properties:
+      ProductFor:
+        type: "string"
+      ProductType:
+        type: "string"
+      ProductDesign:
+        type: "string"
+      ProductBrand:
+        type: "string"
+      ProductPrice:
+        type: "number"
+      ProductDiscount:
+        type: "number"
+      ProductStock:
+        type: "number"
+      ProductSize:
+        type: "string"
+      ProductMaterial:
+        type: "string"
+      ProductRating:
+        type: "number"
+      ProductReviews:
+        $ref: "#/definitions/Reviews"
+      ProductColour:
+        type: "string"
+      RefundApplicable:
+        type: "boolean"
+      ReplacementApplicable:
+        type: "boolean"
+      ProductDescription:
+        type: "string"
+  ProductDetails:
+    type: "object"
+    properties:
+      Id:
+        type: "number"
+      ProductSKU:
+        type: "string"
+      MinioObject_URl:
+        type: "string"
+      ProductFor:
+        type: "string"
+      ProductType:
+        type: "string"
+      ProductDesign:
+        type: "string"
+      ProductBrand:
+        type: "string"
+      ProductPrice:
+        type: "number"
+      ProductDiscount:
+        type: "number"
+      ProductDiscountPrice:
+        type: "string"
+      ProductStock:
+        type: "number"
+      ProductSize:
+        type: "string"
+      ProductMaterial:
+        type: "string"
+      ProductRating:
+        type: "number"
+      ProductReviews:
+        $ref: "#/definitions/Reviews"
+      ProductColour:
+        type: "string"
+      RefundApplicable:
+        type: "boolean"
+      ReplacementApplicable:
+        type: "boolean"
+      ProductDescription:
+        type: "string"
+  Reviews:
+    type: "object"
+    properties:
+      Name:
+        type: "string"
+      Comment:
+        type: "string"
+  Category:
+    type: "object"
+    properties:
+      ProductFor:
+       type: "string"
+      ProductType:
+        type: "string"
+      Description:
+        type: "string"
+  CategoryDetails:
+    type: "object"
+    properties:
+      Id:
+        type: "number"
+      ProductFor:
+        type: "string"
+      ProductType:
+        type: "string"
+      MinioObject_URL:
+        type: "string"
+      Description:
+        type: "string"
+  Cart:
+    type: "object"
+    properties:
+      ProductSKU: 
+        type: "string"
+      ProductQuantity:
+        type: "number"
+  CartDetails:
+    type: "object"
+    properties:
+      Id:
+        type: "number"
+      UserName:
+        type: "string"
+      ProductSKU:
+        type: "string"
+      MinioObject_Url:
+        type: "string"
+      ProductFor:
+        type: "string"
+      ProductType:
+        type: "string"
+      ProductDesign:
+        type: "string"
+      ProductBrand:
+        type: "string"
+      ProductPrice:
+        type: "number"
+      ProductDiscount:
+        type: "number"
+      ProductDiscountPrice:
+        type: "number"
+      ProductQuantity:
+        type: "number"
+      ProdyctSize:
+        type: "string"
+      ProductColour:
+        type: "string"
+      ProductDescription:
+        type: "string"
+  WishList:
+    type: "object"
+    properties:
+      ProductSKU:
+        type: "string"
+  WishListDetails:
+    type: "object"
+    properties:
+      Id:
+        type: "number"
+      UserName:
+        type: "string"
+      ProductSKU:
+        type: "string"
+      MinioObject_Url:
+        type: "string"
+      ProductFor:
+        type: "string"
+      ProductType:
+        type: "string"
+      ProductDesign:
+        type: "string"
+      ProductBrand:
+        type: "string"
+      ProductPrice:
+        type: "number"
+      ProductDiscount:
+        type: "number"
+      ProductDiscountPrice:
+        type: "number"
+      ProdyctSize:
+        type: "string"
+      ProductColour:
+        type: "string"
+      ProductDescription:
+        type: "string"
+  UserInfo:
+    type: "object"
+    properties:
+      PhoneNumber:
+        type: "number"
+  UserInfoDetails:
+    type: "object"
+    properties:
+      Id:
+        type: "number"
+      
+  
+      

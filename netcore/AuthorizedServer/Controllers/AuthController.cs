@@ -163,26 +163,39 @@ namespace AuthorizedServer.Controllers
                 try
                 {
                     var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", user.UserName);
-                    var verifyUser = BsonSerializer.Deserialize<RegisterModel>(helper.GetSingleObject(filter, "Authentication", "Authentication").Result);
-                    LoginModel loginModel = new LoginModel();
-                    loginModel.UserName = user.UserName;
-                    if (loginHasher.VerifyHashedPassword(loginModel, verifyUser.Password, user.Password).ToString() == "Success")
+                    var checkUser = helper.GetSingleObject(filter, "Authentication", "Authentication").Result;
+                    if (checkUser != null)
                     {
-                        Parameters parameters = new Parameters();
-                        parameters.username = user.UserName;
-                        return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
+                        var verifyUser = BsonSerializer.Deserialize<RegisterModel>(checkUser);
+                        LoginModel loginModel = new LoginModel();
+                        loginModel.UserName = user.UserName;
+                        if (loginHasher.VerifyHashedPassword(loginModel, verifyUser.Password, user.Password).ToString() == "Success")
+                        {
+                            Parameters parameters = new Parameters();
+                            parameters.username = user.UserName;
+                            parameters.fullname = verifyUser.FullName;
+                            return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
+                        }
+                        else
+                        {
+                            string response = LoginAttempts(filter);
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "400",
+                                Message = "Invalid User Infomation" + " & " + response,
+                                Data = null
+                            });
+                        }
                     }
                     else
                     {
-                        string response = LoginAttempts(filter);
                         return BadRequest(new ResponseData
                         {
-                            Code = "400",
-                            Message = "Invalid User Infomation" + " & " + response,
+                            Code = "404",
+                            Message = "User Not Found",
                             Data = null
                         });
                     }
-
                 }
                 catch (Exception ex)
                 {

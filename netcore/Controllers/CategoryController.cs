@@ -13,9 +13,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Arthur_Clive.Controllers
 {
-    /// <summary>
-    /// This class is used as an api for the all operations related to product category.
-    /// </summary>
     [Route("api/[controller]")]
     [Produces("application/json")]
     public class CategoryController : Controller
@@ -54,32 +51,14 @@ namespace Arthur_Clive.Controllers
                 {
                     Code = "400",
                     Message = "Failed",
-                    Data = null
+                    Data = ex.Message
                 });
             }
         }
 
         #region Unused Post and Delete 
-
-        /// <summary>
-        /// Creates a Category.
-        /// </summary>
-        /// <remarks>
-        /// Post Category request:
-        ///
-        ///     POST /Category
-        ///     {
-        ///        "ProductFor" : "Men",
-        ///        "ProductType" : "Tshirt",
-        ///        "Description" : "Mens Tshirt"
-        ///     }
-        ///
-        /// </remarks>
-        /// <response code="200">Returns Code and message</response>
-        /// <response code="400">If a error occur during post</response>     
+    
         [HttpPost]
-        [ProducesResponseType(typeof(ActionResult), 200)]
-        [ProducesResponseType(typeof(ActionResult), 400)]
         public async Task<ActionResult> Post([FromBody]Category product)
         {
             try
@@ -104,7 +83,7 @@ namespace Arthur_Clive.Controllers
                 {
                     Code = "400",
                     Message = "Failed",
-                    Data = null
+                    Data = ex.Message
                 });
             }
         }

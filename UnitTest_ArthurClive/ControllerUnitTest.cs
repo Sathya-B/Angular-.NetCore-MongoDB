@@ -79,7 +79,7 @@ namespace UnitTest_ArthurClive
             var productFor = "All";
             var productType = "Art";
             //Act
-            var result = controller.Get(productFor,productType) as ActionResult;
+            var result = controller.Get(productFor,productType).Result as ActionResult;
             var viewResult = result.ToBsonDocument();
             var filter = viewResult["Value"].AsBsonDocument;
             var code = filter["Code"].AsString;

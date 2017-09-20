@@ -48,7 +48,7 @@ namespace Arthur_Clive.Controllers
                 {
                     Code = "400",
                     Message = "Failed",
-                    Data = null
+                    Data = ex.Message
                 });
             }
         }
@@ -82,7 +82,7 @@ namespace Arthur_Clive.Controllers
                 {
                     Code = "400",
                     Message = "Failed",
-                    Data = null
+                    Data = ex.Message
                 });
             }
         }
@@ -110,7 +110,7 @@ namespace Arthur_Clive.Controllers
                     return BadRequest(new ResponseData
                     {
                         Code = "400",
-                        Message = "User Not Found",
+                        Message = "Product Not Found",
                         Data = null
                     });
                 }
@@ -122,7 +122,7 @@ namespace Arthur_Clive.Controllers
                 {
                     Code = "400",
                     Message = "Failed",
-                    Data = null
+                    Data = ex.Message
                 });
             }
         }

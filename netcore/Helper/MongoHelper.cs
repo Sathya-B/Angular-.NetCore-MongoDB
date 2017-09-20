@@ -30,6 +30,7 @@ namespace Arthur_Clive.Helper
             var cursor = await collection.UpdateOneAsync(filter, update);
             return cursor.ModifiedCount > 0;
         }
+
         public bool DeleteSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName)
         {
             var data = GetSingleObject(filter, dbName, collectionName).Result;

@@ -8,4 +8,3 @@ D:\Arthur_Clive\netcore\obj\Debug\netcoreapp2.0\Arthur_Clive.AssemblyInfoInputs.
 D:\Arthur_Clive\netcore\obj\Debug\netcoreapp2.0\Arthur_Clive.AssemblyInfo.cs
 D:\Arthur_Clive\netcore\obj\Debug\netcoreapp2.0\Arthur_Clive.dll
 D:\Arthur_Clive\netcore\obj\Debug\netcoreapp2.0\Arthur_Clive.pdb
-D:\Arthur_Clive\netcore\bin\Debug\netcoreapp2.0\Arthur_Clive.xml

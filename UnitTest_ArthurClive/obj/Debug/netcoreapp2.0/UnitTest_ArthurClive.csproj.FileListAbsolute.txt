@@ -6,7 +6,6 @@ D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\UnitTest_ArthurCliv
 D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\UnitTest_ArthurClive.runtimeconfig.dev.json
 D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\UnitTest_ArthurClive.dll
 D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\Arthur_Clive.dll
-D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\Arthur_Clive.pdb
 D:\Arthur_Clive\UnitTest_ArthurClive\obj\Debug\netcoreapp2.0\UnitTest_ArthurClive.csprojResolveAssemblyReference.cache
 D:\Arthur_Clive\UnitTest_ArthurClive\obj\Debug\netcoreapp2.0\UnitTest_ArthurClive.csproj.CoreCompileInputs.cache
 D:\Arthur_Clive\UnitTest_ArthurClive\obj\Debug\netcoreapp2.0\UnitTest_ArthurClive.AssemblyInfoInputs.cache
@@ -15,6 +14,3 @@ D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\UnitTest_ArthurCliv
 D:\Arthur_Clive\UnitTest_ArthurClive\obj\Debug\netcoreapp2.0\UnitTest_ArthurClive.dll
 D:\Arthur_Clive\UnitTest_ArthurClive\obj\Debug\netcoreapp2.0\UnitTest_ArthurClive.pdb
 D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\AuthorizedServer.dll
-D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\AuthorizedServer.pdb
-D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\x86\e_sqlite3.dll
-D:\Arthur_Clive\UnitTest_ArthurClive\bin\Debug\netcoreapp2.0\x64\e_sqlite3.dll

@@ -13685,9 +13685,6 @@
   },
   "project": {
     "version": "1.0.0",
-    "restoreSettings": {
-      "hideWarningsAndErrors": true
-    },
     "restore": {
       "projectUniqueName": "D:\\Arthur_Clive\\netcore\\Arthur_Clive.csproj",
       "projectName": "Arthur_Clive",
@@ -13724,36 +13721,20 @@
     "frameworks": {
       "netcoreapp2.0": {
         "dependencies": {
-          "mongocsharpdriver": {
-            "target": "Package",
-            "version": "2.4.4"
-          },
-          "Swashbuckle.AspNetCore.SwaggerUi": {
-            "target": "Package",
-            "version": "1.0.0"
-          },
-          "Swashbuckle.AspNetCore.Swagger": {
-            "target": "Package",
-            "version": "1.0.0"
-          },
-          "Microsoft.AspNetCore.Mvc.Core": {
-            "target": "Package",
-            "version": "2.0.0"
-          },
           "Microsoft.NETCore.App": {
             "target": "Package",
             "version": "2.0.0",
             "autoReferenced": true
           },
-          "Swashbuckle.AspNetCore.SwaggerGen": {
+          "AWSSDK.S3": {
             "target": "Package",
-            "version": "1.0.0"
-          },
-          "Swashbuckle.AspNetCore": {
-            "target": "Package",
-            "version": "1.0.0"
+            "version": "3.3.10.4"
           },
           "Microsoft.AspNetCore.All": {
+            "target": "Package",
+            "version": "2.0.0"
+          },
+          "Microsoft.AspNetCore.Mvc.Core": {
             "target": "Package",
             "version": "2.0.0"
           },
@@ -13761,9 +13742,25 @@
             "target": "Package",
             "version": "1.0.1"
           },
-          "AWSSDK.S3": {
+          "mongocsharpdriver": {
             "target": "Package",
-            "version": "3.3.10.4"
+            "version": "2.4.4"
+          },
+          "Swashbuckle.AspNetCore": {
+            "target": "Package",
+            "version": "1.0.0"
+          },
+          "Swashbuckle.AspNetCore.Swagger": {
+            "target": "Package",
+            "version": "1.0.0"
+          },
+          "Swashbuckle.AspNetCore.SwaggerGen": {
+            "target": "Package",
+            "version": "1.0.0"
+          },
+          "Swashbuckle.AspNetCore.SwaggerUi": {
+            "target": "Package",
+            "version": "1.0.0"
           }
         },
         "imports": [

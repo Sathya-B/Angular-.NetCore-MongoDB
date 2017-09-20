@@ -18,7 +18,6 @@ namespace AuthorizedServer.Controllers
     [Route("api/[controller]")]
     public class AuthController : Controller
     {
-        public MongoHelper helper = new MongoHelper();
         public AuthHelper authHelper = new AuthHelper();
         private IOptions<Audience> _settings;
         private IRTokenRepository _repo;
@@ -32,16 +31,31 @@ namespace AuthorizedServer.Controllers
             this._settings = settings;
             this._repo = repo;
         }
-
+        
         [HttpPost("register")]
         public async Task<ActionResult> Register([FromBody]RegisterModel data)
         {
             try
             {
-                var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.PhoneNumber);
-                var verifyUser = helper.GetSingleObject(filter, "Authentication", "Authentication").Result;
-                if (verifyUser == null)
+                BsonDocument checkUser;
+                if (data.VerificationType == "PhoneNumber")
                 {
+                    checkUser = MH.CheckForDatas("PhoneNumber", data.PhoneNumber, null, null, "Authentication", "Authentication");
+                }
+                else
+                {
+                    checkUser = MH.CheckForDatas("Email", data.Email, null, null, "Authentication", "Authentication");
+                }
+                if (checkUser == null)
+                {
+                    if (data.VerificationType == "PhoneNumber")
+                    {
+                        data.UserName = data.PhoneNumber;
+                    }
+                    else
+                    {
+                        data.UserName = data.Email;
+                    }
                     data.Password = registerHasher.HashPassword(data, data.Password);
                     SmsVerificationModel smsModel = new SmsVerificationModel();
                     smsModel.PhoneNumber = data.PhoneNumber;
@@ -52,7 +66,14 @@ namespace AuthorizedServer.Controllers
                     data.Status = "Registered";
                     var authCollection = _db.GetCollection<RegisterModel>("Authentication");
                     await authCollection.InsertOneAsync(data);
-                    SMSHelper.SendSMS(data.PhoneNumber, OTP);
+                    if (data.VerificationType == "PhoneNumber")
+                    {
+                        SMSHelper.SendSMS(data.PhoneNumber, OTP);
+                    }
+                    else
+                    {
+
+                    }
                     return Ok(new ResponseData
                     {
                         Code = "200",
@@ -87,11 +108,10 @@ namespace AuthorizedServer.Controllers
         {
             try
             {
-                var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.PhoneNumber);
-                var user = helper.GetSingleObject(filter, "Authentication", "Authentication").Result;
-                if (user != null)
+                var checkUser = MH.CheckForDatas("PhoneNumber", data.PhoneNumber, null, null, "Authentication", "Authentication");
+                if (checkUser != null)
                 {
-                    var verifyUser = BsonSerializer.Deserialize<RegisterModel>(user);
+                    var verifyUser = BsonSerializer.Deserialize<RegisterModel>(checkUser);
                     SmsVerificationModel smsModel = new SmsVerificationModel();
                     smsModel.PhoneNumber = data.PhoneNumber;
                     if (verifyUser.OTPExp > DateTime.UtcNow)
@@ -99,7 +119,8 @@ namespace AuthorizedServer.Controllers
                         if (smsHasher.VerifyHashedPassword(smsModel, verifyUser.VerificationCode, data.VerificationCode).ToString() == "Success")
                         {
                             var update = Builders<BsonDocument>.Update.Set("Status", "Verified");
-                            var result = helper.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
+                            var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.PhoneNumber);
+                            var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
                             Parameters parameters = new Parameters();
                             parameters.username = data.PhoneNumber;
                             return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
@@ -162,8 +183,7 @@ namespace AuthorizedServer.Controllers
             {
                 try
                 {
-                    var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", user.UserName);
-                    var checkUser = helper.GetSingleObject(filter, "Authentication", "Authentication").Result;
+                    var checkUser = MH.CheckForDatas("PhoneNumber", user.UserName, null, null, "Authentication", "Authentication");
                     if (checkUser != null)
                     {
                         var verifyUser = BsonSerializer.Deserialize<RegisterModel>(checkUser);
@@ -178,6 +198,7 @@ namespace AuthorizedServer.Controllers
                         }
                         else
                         {
+                            var filter = Builders<BsonDocument>.Filter.Eq("Username", user.UserName);
                             string response = LoginAttempts(filter);
                             return BadRequest(new ResponseData
                             {
@@ -214,17 +235,17 @@ namespace AuthorizedServer.Controllers
         {
             try
             {
-                var verifyUser = BsonSerializer.Deserialize<RegisterModel>(helper.GetSingleObject(filter, "Authentication", "Authentication").Result);
+                var verifyUser = BsonSerializer.Deserialize<RegisterModel>(MH.GetSingleObject(filter, "Authentication", "Authentication").Result);
                 if (verifyUser.WrongAttemptCount < 10)
                 {
                     var update = Builders<BsonDocument>.Update.Set("WrongAttemptCount", verifyUser.WrongAttemptCount + 1);
-                    var result = helper.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
+                    var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
                     return "Login Attempt Recorded";
                 }
                 else
                 {
                     var update = Builders<BsonDocument>.Update.Set("Status", "Revoked");
-                    var result = helper.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
+                    var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
                     return "Account Blocked";
                 }
             }
@@ -240,8 +261,17 @@ namespace AuthorizedServer.Controllers
         {
             try
             {
+                BsonDocument checkUser;
+                if (data.VerificationType == "PhoneNumber")
+                {
+                    checkUser = MH.CheckForDatas("PhoneNumber", data.PhoneNumber, null, null, "Authentication", "Authentication");
+                }
+                else
+                {
+                    checkUser = MH.CheckForDatas("Email", data.Email, null, null, "Authentication", "Authentication");
+                }
                 var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.PhoneNumber);
-                var user = helper.GetSingleObject(filter, "Authentication", "Authentication").Result;
+                var user = MH.GetSingleObject(filter, "Authentication", "Authentication").Result;
                 if (user != null)
                 {
                     SmsVerificationModel smsModel = new SmsVerificationModel();
@@ -250,7 +280,7 @@ namespace AuthorizedServer.Controllers
                     string OTP = codeGenerator.Next(0, 1000000).ToString("D6");
                     var update = Builders<BsonDocument>.Update.Set("Status", "Not Verified").Set("OTPExp", DateTime.UtcNow.AddMinutes(4))
                                                               .Set("VerificationCode", smsHasher.HashPassword(smsModel, OTP));
-                    var result = helper.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
+                    var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
                     SMSHelper.SendSMS(data.PhoneNumber, OTP);
                     return Ok(new ResponseData
                     {
@@ -287,7 +317,7 @@ namespace AuthorizedServer.Controllers
             try
             {
                 var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.PhoneNumber);
-                var user = helper.GetSingleObject(filter, "Authentication", "Authentication").Result;
+                var user = MH.GetSingleObject(filter, "Authentication", "Authentication").Result;
                 if (user != null)
                 {
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(user);
@@ -298,7 +328,7 @@ namespace AuthorizedServer.Controllers
                         if (smsHasher.VerifyHashedPassword(smsModel, verifyUser.VerificationCode, data.VerificationCode).ToString() == "Success")
                         {
                             var update = Builders<BsonDocument>.Update.Set("Status", "Verified");
-                            var result = helper.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result; Parameters parameters = new Parameters();
+                            var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result; Parameters parameters = new Parameters();
                             parameters.username = data.PhoneNumber;
                             var response = authHelper.DoPassword(parameters, _repo, _settings);
                             response.Code = "201";
@@ -354,14 +384,14 @@ namespace AuthorizedServer.Controllers
             try
             {
                 var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.PhoneNumber);
-                var user = helper.GetSingleObject(filter, "Authentication", "Authentication").Result;
+                var user = MH.GetSingleObject(filter, "Authentication", "Authentication").Result;
                 if (user != null)
                 {
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(user);
                     if (verifyUser.Status == "Verified")
                     {
                         var update = Builders<BsonDocument>.Update.Set("Password", registerHasher.HashPassword(data, data.Password));
-                        var result = helper.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
+                        var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
                         return Ok(new ResponseData
                         {
                             Code = "200",
@@ -408,7 +438,7 @@ namespace AuthorizedServer.Controllers
             try
             {
                 var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.PhoneNumber);
-                var user = helper.GetSingleObject(filter, "Authentication", "Authentication").Result;
+                var user = MH.GetSingleObject(filter, "Authentication", "Authentication").Result;
                 if (user != null)
                 {
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(user);
@@ -417,7 +447,7 @@ namespace AuthorizedServer.Controllers
                     if (smsHasher.VerifyHashedPassword(smsModel, verifyUser.Password, data.CurrentPassword).ToString() == "Success")
                     {
                         var update = Builders<BsonDocument>.Update.Set("Password", registerHasher.HashPassword(verifyUser, data.NewPassword));
-                        var result = helper.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
+                        var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
                         return Ok(new ResponseData
                         {
                             Code = "200",
@@ -464,7 +494,7 @@ namespace AuthorizedServer.Controllers
             try
             {
                 var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.UserName);
-                var user = helper.GetSingleObject(filter, "Authentication", "Authentication").Result;
+                var user = MH.GetSingleObject(filter, "Authentication", "Authentication").Result;
                 if (user != null)
                 {
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(user);

@@ -10,6 +10,7 @@ using Arthur_Clive.Logger;
 using AH = Arthur_Clive.Helper.AmazonHelper;
 using MH = Arthur_Clive.Helper.MongoHelper;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Arthur_Clive.Controllers
 {
@@ -198,34 +199,33 @@ namespace Arthur_Clive.Controllers
                 var cartFilter = Builders<Cart>.Filter.Eq("UserName", username);
                 var cartCollection = _db.GetCollection<Cart>("Cart");
                 var result = cartCollection.DeleteManyAsync(cartFilter).Result;
-                if (data != null)
-                {
-                    List<Cart> cartItems = new List<Cart>();
-                    foreach (Cart cartItem in data.ListOfProducts)
-                    {
-                        var productFilter = Builders<BsonDocument>.Filter.Eq("ProductSKU", cartItem.ProductSKU);
-                        var productCollection = mongoHelper.GetSingleObject(productFilter, "ProductDB", "Product").Result;
-                        var product = BsonSerializer.Deserialize<Product>(productCollection);
-                        cartItem.UserName = username;
-                        string objectName = cartItem.ProductSKU + ".jpg";
-                        //data.ObjectUrl = WH.GetMinioObject("products", objectName).Result;
-                        //data.ObjectUrl = AH.GetAmazonS3Object("arthurclive-products", objectName);
-                        cartItem.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
-                        cartItem.ProductFor = product.ProductFor;
-                        cartItem.ProductType = product.ProductType;
-                        cartItem.ProductDesign = product.ProductDesign;
-                        cartItem.ProductBrand = product.ProductBrand;
-                        cartItem.ProductPrice = product.ProductPrice;
-                        cartItem.ProductDiscount = product.ProductDiscount;
-                        cartItem.ProductDiscountPrice = product.ProductDiscountPrice;
-                        cartItem.ProductSize = product.ProductSize;
-                        cartItem.ProductColour = product.ProductColour;
-                        cartItem.ProductDescription = product.ProductDescription;
-                        cartItems.Add(cartItem);
-                    }
-                    var authCollection = _db.GetCollection<Cart>("Cart");
-                    await authCollection.InsertManyAsync(cartItems);
-                }
+                //List<Cart> cartItems = new List<Cart>();
+                //foreach (Cart cartItem in data.ListOfProducts)
+                //{
+                //    var productFilter = Builders<BsonDocument>.Filter.Eq("ProductSKU", cartItem.ProductSKU);
+                //    var productCollection = mongoHelper.GetSingleObject(productFilter, "ProductDB", "Product").Result;
+                //    var product = BsonSerializer.Deserialize<Product>(productCollection);
+                //    cartItem.UserName = username;
+                //    string objectName = cartItem.ProductSKU + ".jpg";
+                //    //cartItem.ObjectUrl = WH.GetMinioObject("products", objectName).Result;
+                //    //cartItem.ObjectUrl = AH.GetAmazonS3Object("arthurclive-products", objectName);
+                //    cartItem.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
+                //    cartItem.ProductFor = product.ProductFor;
+                //    cartItem.ProductType = product.ProductType;
+                //    cartItem.ProductDesign = product.ProductDesign;
+                //    cartItem.ProductBrand = product.ProductBrand;
+                //    cartItem.ProductPrice = product.ProductPrice;
+                //    cartItem.ProductDiscount = product.ProductDiscount;
+                //    cartItem.ProductDiscountPrice = product.ProductDiscountPrice;
+                //    cartItem.ProductSize = product.ProductSize;
+                //    cartItem.ProductColour = product.ProductColour;
+                //    cartItem.ProductDescription = product.ProductDescription;
+                //    cartItems.Add(cartItem);
+                //}
+                data.ListOfProducts.ToList().ForEach(c => c.UserName = username);
+
+                var authCollection = _db.GetCollection<Cart>("Cart");
+                await authCollection.InsertManyAsync(data.ListOfProducts);
                 return Ok(new ResponseData
                 {
                     Code = "200",
@@ -279,31 +279,40 @@ namespace Arthur_Clive.Controllers
                 });
             }
         }
-        
+
         [HttpPost("wishlist/{username}")]
-        public async Task<ActionResult> InsertToWishList([FromBody]WishList data, string username)
+        public async Task<ActionResult> RefreshWishList([FromBody]WishlistList data, string username)
         {
             try
             {
-                var filter = Builders<BsonDocument>.Filter.Eq("ProductSKU", data.ProductSKU);
-                var product = BsonSerializer.Deserialize<Product>(mongoHelper.GetSingleObject(filter, "ProductDB", "Product").Result);
-                data.UserName = username;
-                string objectName = data.ProductSKU + ".jpg";
-                //data.ObjectUrl = WH.GetMinioObject("products", objectName).Result;
-                //data.ObjectUrl = AH.GetAmazonS3Object("arthurclive-products", objectName);
-                data.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
-                data.ProductFor = product.ProductFor;
-                data.ProductType = product.ProductType;
-                data.ProductDesign = product.ProductDesign;
-                data.ProductBrand = product.ProductBrand;
-                data.ProductPrice = product.ProductPrice;
-                data.ProductDiscount = product.ProductDiscount;
-                data.ProductDiscountPrice = product.ProductDiscountPrice;
-                data.ProductSize = product.ProductSize;
-                data.ProductColour = product.ProductColour;
-                data.ProductDescription = product.ProductDescription;
+                var wishlistFilter = Builders<WishList>.Filter.Eq("UserName", username);
+                var wishlistCollection = _db.GetCollection<WishList>("WishList");
+                var result = wishlistCollection.DeleteManyAsync(wishlistFilter).Result;
+                //List<WishList> wishlistItems = new List<WishList>();
+                //foreach (WishList item in data.ListOfProducts)
+                //{
+                //    var filter = Builders<BsonDocument>.Filter.Eq("ProductSKU", item.ProductSKU);
+                //    var product = BsonSerializer.Deserialize<Product>(mongoHelper.GetSingleObject(filter, "ProductDB", "Product").Result);
+                //    item.UserName = username;
+                //    string objectName = item.ProductSKU + ".jpg";
+                //    //item.ObjectUrl = WH.GetMinioObject("products", objectName).Result;
+                //    //item.ObjectUrl = AH.GetAmazonS3Object("arthurclive-products", objectName);
+                //    item.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
+                //    item.ProductFor = product.ProductFor;
+                //    item.ProductType = product.ProductType;
+                //    item.ProductDesign = product.ProductDesign;
+                //    item.ProductBrand = product.ProductBrand;
+                //    item.ProductPrice = product.ProductPrice;
+                //    item.ProductDiscount = product.ProductDiscount;
+                //    item.ProductDiscountPrice = product.ProductDiscountPrice;
+                //    item.ProductSize = product.ProductSize;
+                //    item.ProductColour = product.ProductColour;
+                //    item.ProductDescription = product.ProductDescription;
+                //    wishlistItems.Add(item);
+                //}
+                data.ListOfProducts.ToList().ForEach(c => c.UserName = username);
                 var authCollection = _db.GetCollection<WishList>("WishList");
-                await authCollection.InsertOneAsync(data);
+                await authCollection.InsertManyAsync(data.ListOfProducts);
                 return Ok(new ResponseData
                 {
                     Code = "200",
@@ -313,7 +322,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "InsertToWishList", "InsertToWishList", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "RefreshWishList", "RefreshWishList", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -324,12 +333,12 @@ namespace Arthur_Clive.Controllers
         }
 
         [HttpGet("wishlist/{username}")]
-        public async Task<ActionResult> GetProductsInWishList()
+        public async Task<ActionResult> GetProductsInWishList(string username)
         {
             try
             {
                 var collection = _db.GetCollection<WishList>("WishList");
-                var filter = FilterDefinition<WishList>.Empty;
+                var filter = Builders<WishList>.Filter.Eq("UserName", username);
                 IAsyncCursor<WishList> cursor = await collection.FindAsync(filter);
                 var products = cursor.ToList();
                 foreach (var data in products)
@@ -349,46 +358,6 @@ namespace Arthur_Clive.Controllers
             catch (Exception ex)
             {
                 LoggerDataAccess.CreateLog("AuthController", "GetProductsInWishList", "GetProductsInWishList", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = null
-                });
-            }
-        }
-
-        [HttpDelete("wishlist/delete/{username}")]
-        public ActionResult DeleteProductInWishList([FromBody]WishList data, string username)
-        {
-            try
-            {
-                var filter = Builders<BsonDocument>.Filter.Eq("UserName", username) & Builders<BsonDocument>.Filter.Eq("ProductSKU", data.ProductSKU);
-                var product = mongoHelper.GetSingleObject(filter, "UserInfo", "WishList").Result;
-                if (product != null)
-                {
-                    var authCollection = _db.GetCollection<WishList>("WishList");
-                    var response = authCollection.DeleteOneAsync(product);
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Deleted",
-                        Data = null
-                    });
-                }
-                else
-                {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "400",
-                        Message = "User Not Found",
-                        Data = null
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                LoggerDataAccess.CreateLog("AuthController", "DeleteProductInWishList", "DeleteProductInWishList", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

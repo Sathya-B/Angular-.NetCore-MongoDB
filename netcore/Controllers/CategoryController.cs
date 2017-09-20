@@ -21,7 +21,7 @@ namespace Arthur_Clive.Controllers
         public MongoHelper mongoHelper = new MongoHelper();
 
         [HttpGet]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult> Get()
         {
             try

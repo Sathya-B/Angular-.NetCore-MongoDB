@@ -31,6 +31,11 @@ namespace Arthur_Clive.Data
         public List<Cart> ListOfProducts { get; set; }
     }
 
+    public class WishlistList
+    {
+        public List<WishList> ListOfProducts { get; set; }
+    }
+
     public class Cart
     {
         public ObjectId Id { get; set; }

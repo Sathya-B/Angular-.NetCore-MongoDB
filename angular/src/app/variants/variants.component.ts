@@ -3,13 +3,15 @@ import { AppState } from '../app.service';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { ParamMap } from '@angular/router';
-import { DataServ} from '../../services/data.service';
+import { CartService } from '../../services/cart.service';
 import { EventEmitter } from '@angular/core';
-import {RelatedComponent} from './related/related.component';
-import {ColorSizeStockComponent} from './colorsizestock/colorsizestock.component';
+import { RelatedComponent } from './related/related.component';
+import { ColorSizeStockComponent } from './colorsizestock/colorsizestock.component';
+import { ToastMsgService } from '../../services/toastmsg.service';
+import * as CartModel from '../../models/cart.model';
 
 @Component({
-  selector: 'variants',  
+  selector: 'variants',
   /**
    * We need to tell Angular's Dependency Injection which providers are in our app.
    */
@@ -25,7 +27,7 @@ import {ColorSizeStockComponent} from './colorsizestock/colorsizestock.component
   templateUrl: './variants.component.html'
 
 })
-export class VariantsComponent implements OnInit{
+export class VariantsComponent implements OnInit {
   /**
    * Set our default values
    */
@@ -49,49 +51,59 @@ export class VariantsComponent implements OnInit{
    * TypeScript public modifiers
    */
 
-  @ViewChild(ColorSizeStockComponent) css: ColorSizeStockComponent;
+  @ViewChild(ColorSizeStockComponent) public css: ColorSizeStockComponent;
 
-
-  constructor(private dataServ: DataServ, private route: ActivatedRoute) {
+  constructor(private cartService: CartService, private route: ActivatedRoute,
+              private toastMsg: ToastMsgService) {
     this.for = route.snapshot.paramMap.get('productFor');
     this.type = route.snapshot.paramMap.get('productType');
     this.design = route.snapshot.paramMap.get('productDesign');
   }
 
-ngOnInit(){
-this.variants = JSON.parse(localStorage.getItem(this.for + "-" + this.type + "-" + this.design));
+public ngOnInit() {
+this.variants = JSON.parse(localStorage.getItem(this.for + '-' + this.type + '-' + this.design));
+console.log(this.variants);
 this.relatedItems = findLocalItems(this.for);
 }
 
-checked(event: any, svariant?: any){
+public checked(event: any, svariant?: any) {
   this.selectedColor = event.target.id;
   this.selectedVariant = svariant;
 }
-isChecked(color: string){
-  if(this.selectedColor == color)
-  {
+public isChecked(color: string) {
+  if (this.selectedColor === color) {
     return true;
-  }
-  else{
+  } else {
     return false;
-  }  
+  }
 }
 
-variantItemClicked(variantItem: any){
+public variantItemClicked(variantItem: any) {
 this.variants = variantItem;
 this.selectedVariant = null;
 this.selectedColor = null;
 this.css.selectedSize = null;
 }
 
+public addToCart() {
+  let cartItem: CartModel.CartItem;
+  cartItem = this.css.itemToCart;
+  cartItem.productQuantity = this.css.quantity;
+  this.cartService.cartItems.listOfProducts.push(cartItem);
+  this.toastMsg.popToast('success','Success','Item Added to Bag!')
+  if (localStorage.getItem('UserName') !== undefined) {
+    console.log('cart');
+    console.log(cartItem);
+    this.cartService.refreshCart();
+  }
 }
-
+}
 function findLocalItems (query) {
-  var i, results = [];
-  for (i in localStorage) {
+  let results = [];
+  for (let i in localStorage) {
     if (localStorage.hasOwnProperty(i)) {
       if (i.match(query) || (!query && typeof i === 'string')) {
-        results.push({key:i,val:JSON.parse(localStorage.getItem(i))});
+        results.push({key: i, val: JSON.parse(localStorage.getItem(i))});
       }
     }
   }

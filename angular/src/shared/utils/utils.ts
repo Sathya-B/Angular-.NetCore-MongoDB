@@ -4,11 +4,10 @@ export function expiredJwt(token: string) {
   let base64 = base64Url.replace('-', '+').replace('_', '/');
   let jwt = JSON.parse(window.atob(base64));
   let exp = jwt.exp * 1000;
-  var current_time = new Date().getTime() / 1000;
-  if (current_time > jwt.exp) {
+  let currentTime = new Date().getTime() / 1000;
+  if (currentTime > jwt.exp) {
     return true;
-  }
-  else {
+  } else {
     return false;
   }
 }
@@ -18,8 +17,7 @@ export function checkOptions(options?: any) {
     if (options.useAuth) {
       return true;
     }
-  }
-  else {
+  } else {
     return false;
   }
 }

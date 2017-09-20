@@ -3,21 +3,20 @@
     opacity: 1;
 }
 
-.popupBox {
+.popupAfterLoginOuter {
     visibility:hidden;
     opacity:0;        
     transition:visibility 0s linear 0.3s,opacity 0.3s linear;
     transition: all 0.4s ease;
     transition-delay:  1s;
-
 }
-.popupHoverElement:hover > .popupBox {
+.popupHoverElement:hover > .popupAfterLoginOuter {
     visibility:visible;
     opacity:1;
     transition: all 0.3s ease;
-    transition-delay:  0s;        
+    transition-delay:  0s;  
 }       
-#two {
+/*#two {
     background: none repeat scroll 0 0 #EEEEEE;
     border: 1px solid #DADADA;
     color: #333333;
@@ -29,4 +28,4 @@
     height: 80px;
     width: 100px;
     z-index: 32;
-}
+}*/

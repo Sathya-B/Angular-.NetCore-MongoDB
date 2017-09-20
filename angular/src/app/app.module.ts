@@ -2,17 +2,11 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { HttpClientModule } from '@angular/common/http';
-import {HTTP_INTERCEPTORS} from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule, ApplicationRef } from '@angular/core';
 import { removeNgStyles, createNewHosts, createInputTransfer } from '@angularclass/hmr';
-import {
-  RouterModule,
-  PreloadAllModules
-} from '@angular/router';
+import { RouterModule, PreloadAllModules } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-/*
- * Platform and Environment providers/directives/pipes
- */
 import { ENV_PROVIDERS } from './environment';
 import { ROUTES } from './app.routes';
 // App is our top level component
@@ -27,25 +21,31 @@ import { LoginRegisterComponent } from './auth/loginregister/loginregister.compo
 import { CreateAccountComponent } from './auth/createaccount/createaccount.component';
 import { VerificationComponent } from './auth/verification/verification.component';
 import { ForgotPasswordComponent } from './auth/forgotpassword/forgotpassword.component';
-import {UpdatePasswordComponent } from './auth/updatepassword/updatepassword.component';
-import {ChangePasswordComponent } from './auth/changepassword/changepassword.component';
+import { UpdatePasswordComponent } from './auth/updatepassword/updatepassword.component';
+import { ChangePasswordComponent } from './auth/changepassword/changepassword.component';
 import { ProductsComponent } from './products/products.component';
 import { ProductItemComponent } from './products/productitem/productitem.component';
 import { ColorSizeStockComponent } from './variants/colorsizestock/colorsizestock.component';
 import { VariantsComponent } from './variants/variants.component';
 import { RelatedComponent } from './variants/related/related.component';
-import { DataServ } from '../services/data.service';
+import { CartComponent } from './cart/cart.component';
+import { CartItemComponent } from './cart/cartitem/cartitem.component';
+import { CartService } from '../services/cart.service';
 import { ApiService } from '../services/api.service';
-import { TokenService} from '../services/token.service';
+import { TokenService } from '../services/token.service';
 import { AuthInterceptor } from '../shared/auth.interceptor';
 import { ToastMsgService } from '../services/toastmsg.service';
-import { FilterPipe } from '../pipes/filterpipe.component'
+import { FilterPipe } from '../pipes/filterpipe.component';
 import { CategoryComponent } from './home/category';
 import { NoContentComponent } from './no-content';
 import { XLargeDirective } from './home/x-large';
 import { CarouselModule } from 'angular4-carousel';
-import {ToasterModule, ToasterService, ToasterConfig} from 'angular2-toaster';
-
+import { ToasterModule, ToasterService, ToasterConfig } from 'angular2-toaster';
+import { CancellationComponent } from './policies/cancellation/cancellation';
+import { DeliveryComponent } from './policies/delivery/delivery';
+import { DisclaimerComponent } from './policies/disclaimer/disclaimer';
+import { PrivacyComponent } from './policies/privacy/privacy';
+import { TermsComponent } from './policies/termsandconditions/terms';
 import '../styles/styles.scss';
 import '../styles/headings.css';
 
@@ -81,6 +81,13 @@ type StoreType = {
     UpdatePasswordComponent,
     ChangePasswordComponent,
     ColorSizeStockComponent,
+    CancellationComponent,
+    DeliveryComponent,
+    DisclaimerComponent,
+    PrivacyComponent,
+    TermsComponent,
+    CartComponent,
+    CartItemComponent,
     RelatedComponent,
     HeaderComponent,
     FooterComponent,
@@ -107,7 +114,7 @@ type StoreType = {
   providers: [
     ENV_PROVIDERS,
     APP_PROVIDERS,
-    DataServ,
+    CartService,
     ApiService,
     TokenService,
     ToastMsgService,

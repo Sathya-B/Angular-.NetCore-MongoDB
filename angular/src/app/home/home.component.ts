@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AppState } from '../app.service';
 import { Title } from './title';
-import { DataServ } from '../../services/data.service';
-import {ApiService} from '../../services/api.service';
-import { Category } from '../../models/category.model';
+import { CartService } from '../../services/cart.service';
+import { ApiService } from '../../services/api.service';
 import { XLargeDirective } from './x-large';
 import { CategoryComponent } from './category';
 import { ICarouselConfig, AnimationConfig } from 'angular4-carousel';
@@ -37,10 +36,10 @@ export class HomeComponent implements OnInit {
   public localState = { value: '' };
 
   public imageSources: string[] = [
-    "../assets/img/sliderhome/desktop/1200-X-450_B_01.jpg",
-    "../assets/img/sliderhome/desktop/1200-X-450_B_02.jpg",
-    "../assets/img/sliderhome/desktop/1200-X-450_B_03.jpg",
-    "../assets/img/sliderhome/desktop/1200-X-450_B_04.jpg"
+    '../assets/img/sliderhome/desktop/1200-X-450_B_01.jpg',
+    '../assets/img/sliderhome/desktop/1200-X-450_B_02.jpg',
+    '../assets/img/sliderhome/desktop/1200-X-450_B_03.jpg',
+    '../assets/img/sliderhome/desktop/1200-X-450_B_04.jpg'
   ];
 
   public config: ICarouselConfig = {
@@ -58,21 +57,21 @@ export class HomeComponent implements OnInit {
   /**
    * TypeScript public modifiers
    */
-  constructor(public appState: AppState, public title: Title, private dataServ: DataServ, private apiService: ApiService) {
+  constructor(public appState: AppState, public title: Title,
+              private cartServ: CartService, private apiService: ApiService) {
   }
-  ngOnInit() {
+
+  public ngOnInit() {
     this.GetCategories();
   }
 
-  GetCategories(){
-    this.apiService.get('category', {useAuth : true}).then(
-      
+  public GetCategories() {
+    this.apiService.get('category', {useAuth : false}).then(
       (response: any) => {
-//        console.log(response);
-        this.category = response.data;
+      this.category = response.data;
       })
       .catch((error: any) => {
-        console.log(error);
-      })    
+      console.log(error);
+    });
   }
 }

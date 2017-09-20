@@ -3,27 +3,27 @@
         <div class="wrapInner">
             <div class="pageBgWhite">
                 <div class="productMainWrap clearfix">
-                    <div class="productImgwrap"><img [src]="variants.topItem.minioObject_Url" alt=""></div>
+                    <div class="productImgwrap"><img [src]="variants.topItem.minioObject_URL" alt=""></div>
                     <div class="productBasicInfoWrap">
-                        <h1>{{variants.topItem.product_Design}}</h1>
+                        <h1>{{variants.topItem.productDesign}}</h1>
                         <!-- <div class="reviewTab">
 								<span class="review"></span>
 								<a href="" class="reviewLinkBtn"></a>
 							</div> -->
-                        <div class="priceTab"><span>INR</span> {{variants.topItem.product_Price}}</div>
+                        <div class="priceTab"><span>INR</span> {{variants.topItem.productPrice}}</div>
                         <!-- <div class="productShortDescription">
 							    <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. </p>
 							</div> -->
                         <div class="colourTab">
                             <div class="colourHeading">Colour</div>
                             <div class="colourBoxWrap clearfix">
-                                <div *ngFor="let variant of variants.variants | filter:'product_Colour'"><input type="radio" [id]="variant.product_Colour" name="selectedColour" [checked]="isChecked(variant.product_Colour)"
-                                        (change)="checked($event, variant)"><label [for]="variant.product_Colour" [ngStyle]="{'background-color': variant.product_Colour, 'border':'1px solid #cecece'}">{{variant.product_Colour}}</label></div>
+                                <div *ngFor="let variant of variants.variants | filter:'productColour'"><input type="radio" [id]="variant.productColour" name="selectedColour" [checked]="isChecked(variant.productColour)"
+                                        (change)="checked($event, variant)"><label [for]="variant.productColour" [ngStyle]="{'background-color': variant.productColour, 'border':'1px solid #cecece'}">{{variant.productColour}}</label></div>
                             </div>
                         </div>
                         <colorsizestock [selectedVariant]="selectedVariant"></colorsizestock>
                         <div class="singlePageBtnsWrap">
-                            <button type="submit" class="">Add to Shopping Bag <span class="iconShopBtn-Bag fa fa-shopping-bag"></span></button>
+                            <button type="submit" class="" (click)="addToCart()" [disabled]="!(this.css.remainingQty >= 1)">Add to Shopping Bag <span class="iconShopBtn-Bag fa fa-shopping-bag"></span></button>
                             <a href="#prdDetails" class="viewProductDetailsCustom">Product Details</a>
                         </div>
                         <div class="productMetaWrap">

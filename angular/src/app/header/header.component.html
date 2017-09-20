@@ -1,16 +1,29 @@
-<div id="mainHeader" class="headertop" [ngClass]="{hideMainHeader: scrolled}">
+<div id="mainHeader" class="headertop" *ngIf="!scrolled" [ngClass]="{hideMainHeader: scrolled}">
 	<div class="wrapper">
 		<div class="navBtn" [ngClass]="{activeNav: menuOpened == true}" (click)="openMenu()"><span></span></div>
 
 		<div class="logo"><a href="#"><img src="../assets/img/logo-caption.png" alt="Artur Clive"></a></div>
 		<div class="logoMobile"><a href="#"><img src="../assets/img/logo-arthur-clive-mobile.png" alt="Artur Clive"></a></div>
 		<div class="headerBtnWrap">
-			<div class="commonIconBtnHeader userIcon popupHoverElement" (click)="LoginRegister()">
-				<div id="two" class="popupBox" [hidden]="!this.appState.get('loggedIn')"><a (click)="ChangePassword()">Change Password</a><br><hr><a (click)="SignOutClicked()">Signout</a></div>
+			<div class="commonIconBtnHeader userIcon tooltipsParent userLoggedIn popupHoverElement" (click)="LoginRegister()">
+				<div class="popupAfterLoginOuter">
+				<div class="popupAfterLogin" *ngIf="this.appState.get('loggedIn')">
+				<div class="helloUserWrap">Hello, <span>{{getUserName()}}</span></div>
+				<a href="#">My Orders</a>
+				<a href="#">My Account</a>
+				<a (click)="SignOutClicked()">Signout</a>
+				</div>
+				<div class="popupAfterLogin" *ngIf="!this.appState.get('loggedIn')">
+				<a (click)="LoginRegister()">Login or Register</a>
+				</div>
+				</div>
 			</div>
-			<div class="commonIconBtnHeader wishListBtn"><span class="wishlistCount">3</span></div>
-			<div class="commonIconBtnHeader shoppingBagBtn">
-				<!-- View Bag --><span class="shoppingbagCountItem">5</span></div>
+			<div class="commonIconBtnHeader wishListBtn tooltipsParent">
+				<span class="tooltip">Show My Wishlist</span>
+				<span class="wishlistCount">{{wishlistCount}}</span></div>
+			<a [routerLink]="['./cart']"><div class="commonIconBtnHeader shoppingBagBtn tooltipsParent">
+				<span class="tooltip">Shopping Bag</span>
+				<span class="shoppingbagCountItem">{{this.cartService.getCount()}}</span></div></a>
 		</div>
 	</div>
 </div>
@@ -19,12 +32,25 @@
 		<div class="navBtn" [ngClass]="{activeNav: menuOpened == true}" (click)="openMenu()"><span></span></div>
 		<div class="logoMobile"><a href="#"><img src="../assets/img/logo-arthur-clive-mobile.png" alt="Artur Clive"></a></div>
 		<div class="headerBtnWrap">
-			<div class="commonIconBtnHeader userIcon popupHoverElement" (click)="LoginRegister()">
-				<div id="two" class="popupBox" [hidden]="!this.appState.get('loggedIn')"><a (click)="ChangePassword()">Change Password</a><hr><a (click)="SignOutClicked()">Signout</a></div>
+			<div class="commonIconBtnHeader userIcon tooltipsParent userLoggedIn popupHoverElement" (click)="LoginRegister()">
+				<div class="popupAfterLoginOuter">
+				<div class="popupAfterLogin" *ngIf="this.appState.get('loggedIn')">
+				<div class="helloUserWrap">Hello, <span>{{getUserName()}}</span></div>
+				<a href="#">My Orders</a>
+				<a href="#">My Account</a>
+				<a (click)="SignOutClicked()">Signout</a>
+				</div>
+				<div class="popupAfterLogin" *ngIf="!this.appState.get('loggedIn')">
+				<a (click)="LoginRegister()">Login or Register</a>
+				</div>
+				</div>
 			</div>
-			<div class="commonIconBtnHeader wishListBtn"><span class="wishlistCount">2</span></div>
-			<div class="commonIconBtnHeader shoppingBagBtn">
-				<!-- View Bag --><span class="shoppingbagCountItem">5</span></div>
+			<div class="commonIconBtnHeader wishListBtn tooltipsParent">
+				<span class="tooltip">Show My Wishlist</span>
+				<span class="wishlistCount">{{wishlistCount}}</span></div>
+			<a [routerLink]="['./cart']"><div class="commonIconBtnHeader shoppingBagBtn tooltipsParent">
+				<span class="tooltip">Shopping Bag</span>
+				<span class="shoppingbagCountItem">{{this.cartService.getCount()}}</span></div></a>
 		</div>
 	</div>
 </div>

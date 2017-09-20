@@ -1,0 +1,70 @@
+<div class="commonPageWrap">
+    <div class="wrapper">
+        <div class="wrapInner">
+            <h1 class="titleCommon">Shopping Bag</h1>            
+            <div class="shoppingBgcommon">
+                <div class="shoppingBagWrapper clearfix">
+                    <div class="shoppingBagWrapperInnerLeft">
+                   <cartitem *ngFor="let cartItem of cartService?.cartItems.listOfProducts; let i = index" [itemIndex]="i" [item]="cartItem"></cartitem>
+                    </div>
+                    <div class="shoppingBagWrapperInnerRight">
+                        <!-- STart Coupon Tab -->
+                        <div class="couponTab">
+                            <h2 class="couponHeading">Have a Coupon?</h2>
+                            <div>
+                                <!-- <p>Sign in to use account linked coupons</p> -->
+                                <p>Enter your coupon code</p>
+                                <p><input type="text"></p>
+                                <button>Apply Coupon</button>
+                            </div>
+                        </div>
+                        <!-- End Coupon Tab -->
+
+                        <!-- Start Order Tab -->
+                        <div class="shoppingOrderWrap">
+                            <h2 class="shoppingOrderHeading">Your Order</h2>
+                            <table class="orderTable">
+                                <tr>
+                                    <td>Bag Total</td>
+                                    <td><i class="fa fa-inr"></i>{{getCartTotal()}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Bag Discount</td>
+                                    <td class="discountAmount"><i class="fa fa-inr"></i> 0</td>
+                                </tr>
+                                <tr>
+                                    <td>Estimated Tax</td>
+                                    <td><i class="fa fa-inr"></i>{{(getCartTotal() * .15).toFixed(2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Coupon Discount</td>
+                                    <td class="discountAmount"><i class="fa fa-inr"></i> 0
+                                        <!-- <a href="" class="applyCoupon">Apply Coupon</a> --></td>
+                                </tr>
+                                <tr>
+                                    <td>Delivery Charges</td>
+                                    <td>Free</td>
+                                </tr>
+                                <tr>
+                                    <td>Order Total</td>
+                                    <td><i class="fa fa-inr"></i>{{(getCartTotal() * 1.15).toFixed(2) }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- End Order Tab -->
+
+                        <!-- Start Checkout Button -->
+                        <button class="orderCheckout">Secured Checkout <span class="fa fa-arrow-circle-right"></span></button>
+                        <!-- End Checkout Button -->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!--<button class="checkout">
+        Checkout
+      </button>
+
+        <div class="cartTotal textMsg">Cart Total:{{getCartTotal()}}</div>-->
+    </div>
+</div>

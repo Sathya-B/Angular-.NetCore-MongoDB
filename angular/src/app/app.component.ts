@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { AppState } from './app.service';
 import { Router, NavigationEnd } from '@angular/router';
-import {ToastMsgService} from '../services/toastmsg.service';
+import { ToastMsgService } from '../services/toastmsg.service';
 
 /**
  * App Component
@@ -27,25 +27,25 @@ export class AppComponent implements OnInit {
   public name = 'Angular 2 Webpack Starter';
   public url = 'https://twitter.com/AngularClass';
   public config: any;
-  constructor(public appState: AppState, private router: Router, private toastmsg: ToastMsgService) {
+  constructor(public appState: AppState, private router: Router,
+              private toastmsg: ToastMsgService) {
     this.config = toastmsg.config;
   }
 
   public ngOnInit() {
-    if(localStorage.getItem('UserName')!= null && localStorage.getItem('JWT')!= null)
-    {
-    this.appState.set('loggedIn', true);
-    }else{
+    if (localStorage.getItem('UserName') != null && localStorage.getItem('JWT') != null) {
+      this.appState.set('loggedIn', true);
+    } else {
       this.appState.set('loggedIn', false);
     }
     console.log('Initial App State', this.appState.state);
 
     this.router.events.subscribe((evt) => {
-            if (!(evt instanceof NavigationEnd)) {
-                return;
-            }
-            window.scrollTo(0, 0)
-        });
+      if (!(evt instanceof NavigationEnd)) {
+        return;
+      }
+      window.scrollTo(0, 0);
+    });
   }
 
 }

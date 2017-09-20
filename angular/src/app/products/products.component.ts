@@ -1,16 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { AppState } from '../app.service';
-import { DataServ } from '../../services/data.service';
-import {ApiService} from '../../services/api.service';
+import { CartService } from '../../services/cart.service';
+import { ApiService } from '../../services/api.service';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { ParamMap } from '@angular/router';
 import { ProductItemComponent } from './productitem/productitem.component';
-import {Product} from '../../models/product.model';
-
 
 @Component({
-  selector: 'products',  
+  selector: 'products',
   /**
    * We need to tell Angular's Dependency Injection which providers are in our app.
    */
@@ -26,36 +24,36 @@ import {Product} from '../../models/product.model';
   templateUrl: './products.component.html'
 
 })
-export class ProductsComponent implements OnInit{
+export class ProductsComponent implements OnInit {
   /**
    * Set our default values
    */
   public localState = { value: '' };
 
-  public products: Product[] = [];
+  public products: any[] = [];
   /**
    * TypeScript public modifiers
    */
   public for: any;
   public type: any;
-  constructor(public appState: AppState, private dataServ: DataServ, private apiService: ApiService, private route: ActivatedRoute) {
+  constructor(public appState: AppState, private cartServ: CartService,
+              private apiService: ApiService, private route: ActivatedRoute) {
       this.for = route.snapshot.paramMap.get('productFor');
       this.type = route.snapshot.paramMap.get('productType');
   }
 
-ngOnInit(){
+public ngOnInit() {
  this.GetProducts();
 }
-GetProducts(){
-    this.apiService.get('SubCategory/'+this.for + "s/" + this.type ).then(
+public GetProducts() {
+    this.apiService.get('SubCategory/' + this.for + 's/' + this.type).then(
       (response: any) => {
-//        console.log(response);
-        this.products = response.data;
-        
+      console.log(response);
+      this.products = response.data;
       },
       (error: any) => {
-        console.log(error);
+      console.log(error);
       }
-    )
+    );
 }
 }

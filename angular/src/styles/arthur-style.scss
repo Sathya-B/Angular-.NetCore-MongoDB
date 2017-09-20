@@ -1351,6 +1351,11 @@ span.quantityHeading{
 .singlePageBtnsWrap button[type="submit"]:hover .iconShopBtn-Bag {
 	color: #2a2c2e;
 }
+.singlePageBtnsWrap button[type="submit"]:disabled {
+    box-shadow: none;
+	background: grey;
+    color: #fff;
+}
 a.viewProductDetailsCustom{
 	display: block;
 	background: #e6e6e6;

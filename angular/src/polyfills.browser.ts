@@ -3,7 +3,8 @@
 /**
  * Polyfills
  */
-
+import 'zone.js';
+import 'reflect-metadata';
 /* import 'ie-shim'; *//* Internet Explorer 9 support */
 
 /* import 'core-js/es6'; */

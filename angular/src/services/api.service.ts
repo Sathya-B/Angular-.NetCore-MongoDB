@@ -1,116 +1,130 @@
 import { Inject, Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams, HttpRequest, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders,
+         HttpParams, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Rx';
-import { serverUrl } from '../app/config/configuration';
+import { apiUrl } from '../app/config/configuration';
+import { TokenService } from '../services/token.service';
 import * as Util from '../shared/utils/utils';
-import {TokenService} from '../services/token.service';
-
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class ApiService {
 
-    private http: HttpClient;
-    private auth_token: string;
-    public serverUrl = serverUrl;
-    private tokenServ: TokenService;
+    public serverUrl = apiUrl.serverUrl;
     public category: any;
+    private http: HttpClient;
+    private tokenServ: TokenService;
 
     constructor( http: HttpClient, private router: Router, private tokenService: TokenService) {
         this.http = http;
         this.tokenServ = tokenService;
     }
 
-    header(token){
-        const headers = new HttpHeaders().set('Content-Type','application/vnd.api+json')
+public header(token) {
+        const headers = new HttpHeaders().set('Content-Type', 'application/vnd.api+json')
         .set('Authorization', 'Bearer ' + token);
         return headers;
-    }        
-    get(url: string, options?: any) {
-    var useAuth = Util.checkOptions(options);  
-    return this.tokenService.getAuthToken(useAuth).then(       
+    }
+public get(url: string, options?: any, serverUrl?: string) {
+    let useAuth = Util.checkOptions(options);
+    if (serverUrl === undefined) {
+        serverUrl = this.serverUrl;
+    }
+    return this.tokenService.getAuthToken(useAuth).then(
         (token) => {
         const authHeader = this.header(token);
-        return this.http.get(serverUrl + url, { headers: authHeader }).timeout(30000)
+        return this.http.get(this.serverUrl + url, { headers: authHeader }).timeout(30000)
             .toPromise()
-            .then((res) => {                
+            .then((res) => {
                return this.handleSuccess(res, options);
             })
             .catch((err) => {
                 return this.handleError(err, options);
             });
-    })
+    });
     }
-    put(url: string, data: any, options?: any, serverUrl?: string) {
-        var useAuth = Util.checkOptions(options);        
+public put(url: string, data: any, options?: any, serverUrl?: string) {
+        let useAuth = Util.checkOptions(options);
         let body: any = data;
-        return this.tokenService.getAuthToken(useAuth).then(       
+        if (serverUrl === undefined) {
+        serverUrl = this.serverUrl;
+        }
+        return this.tokenService.getAuthToken(useAuth).then(
         (token) => {
         const authHeader = this.header(token);
         return this.http.post(serverUrl + url, body, { headers: authHeader }).timeout(30000)
             .toPromise()
-            .then((res) => {                
+            .then((res) => {
                return this.handleSuccess(res, options);
             })
             .catch((err) => {
                 return this.handleError(err, options);
             });
-    })
+    });
     }
-    patch(url: string, data: any, options?: any, serverUrl?: string) {
-        var useAuth = Util.checkOptions(options);        
+public patch(url: string, data: any, options?: any, serverUrl?: string) {
+        let useAuth = Util.checkOptions(options);
         let body: any = data;
-        return this.tokenService.getAuthToken(useAuth).then(       
+        if (serverUrl === undefined) {
+        serverUrl = this.serverUrl;
+        }
+        return this.tokenService.getAuthToken(useAuth).then(
         (token) => {
         const authHeader = this.header(token);
         return this.http.post(serverUrl + url, body, { headers: authHeader }).timeout(30000)
             .toPromise()
-            .then((res) => {                
+            .then((res) => {
                return this.handleSuccess(res, options);
             })
             .catch((err) => {
                 return this.handleError(err, options);
             });
-    })
+    });
     }
-    post(url: string, data: any, options?: any, serverUrl?: string) {
-        var useAuth = Util.checkOptions(options);        
+public post(url: string, data: any, options?: any, serverUrl?: string) {
+        let useAuth = Util.checkOptions(options);
         let body: any = data;
-        return this.tokenService.getAuthToken(useAuth).then(       
+        if (serverUrl === undefined) {
+        serverUrl = this.serverUrl;
+        }
+        return this.tokenService.getAuthToken(useAuth).then(
         (token) => {
         const authHeader = this.header(token);
         return this.http.post(serverUrl + url, body, { headers: authHeader }).timeout(30000)
             .toPromise()
-            .then((res) => {                
+            .then((res) => {
                return this.handleSuccess(res, options);
             })
             .catch((err) => {
                 return this.handleError(err, options);
             });
-    })
+    });
     }
-    deleteo(url: string, data: any, options?: any, serverUrl?: string) {
-        var useAuth = Util.checkOptions(options);        
+public delete(url: string, data: any, options?: any, serverUrl?: string) {
+        let useAuth = Util.checkOptions(options);
         let body: any = data;
-        return this.tokenService.getAuthToken(useAuth).then(       
+        if (serverUrl === undefined) {
+        serverUrl = this.serverUrl;
+        }
+        return this.tokenService.getAuthToken(useAuth).then(
         (token) => {
         const authHeader = this.header(token);
         return this.http.post(serverUrl + url, body, { headers: authHeader }).timeout(30000)
             .toPromise()
-            .then((res) => {                
+            .then((res) => {
                return this.handleSuccess(res, options);
             })
             .catch((err) => {
                 return this.handleError(err, options);
             });
-    })
+    });
     }
-    private handleSuccess(response: any, options: any) {
+private handleSuccess(response: any, options: any) {
         return response;
     }
-    private handleError(error: any, options: any) {
+private handleError(error: any, options: any) {
         return error;
     }
 }

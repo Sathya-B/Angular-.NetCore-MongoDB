@@ -172,7 +172,7 @@ namespace UnitTest_ArthurClive
             MongoHelper helper = new MongoHelper();
             //Act
             var filter = Builders<BsonDocument>.Filter.Eq("ProductFor", productFor) & Builders<BsonDocument>.Filter.Eq("ProductType", productType);
-            var result = helper.GetSingleObject(filter,dbName,collectionName);
+            var result = MOH.GetSingleObject(filter,dbName,collectionName);
             //Assert
             Assert.IsNotNull(result.Result);
             //Assert.AreEqual(result.Result,);

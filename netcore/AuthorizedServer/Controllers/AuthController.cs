@@ -11,7 +11,6 @@ using MongoDB.Bson.Serialization;
 using AuthorizedServer.Repositories;
 using Microsoft.Extensions.Options;
 using AuthorizedServer.Logger;
-using Microsoft.AspNetCore.Authorization;
 
 namespace AuthorizedServer.Controllers
 {
@@ -22,16 +21,15 @@ namespace AuthorizedServer.Controllers
         private IOptions<Audience> _settings;
         private IRTokenRepository _repo;
         public IMongoDatabase _db = MH._client.GetDatabase("Authentication");
-        public PasswordHasher<SmsVerificationModel> smsHasher = new PasswordHasher<SmsVerificationModel>();
-        public PasswordHasher<RegisterModel> registerHasher = new PasswordHasher<RegisterModel>();
-        public PasswordHasher<LoginModel> loginHasher = new PasswordHasher<LoginModel>();
+        public PasswordHasher<VerificationModel> smsHasher = new PasswordHasher<VerificationModel>();
+        public PasswordHasher<RegisterModel> passwordHasher = new PasswordHasher<RegisterModel>();
 
         public AuthController(IOptions<Audience> settings, IRTokenRepository repo)
         {
             this._settings = settings;
             this._repo = repo;
         }
-        
+
         [HttpPost("register")]
         public async Task<ActionResult> Register([FromBody]RegisterModel data)
         {
@@ -40,14 +38,15 @@ namespace AuthorizedServer.Controllers
                 BsonDocument checkUser;
                 if (data.VerificationType == "PhoneNumber")
                 {
-                    checkUser = MH.CheckForDatas("PhoneNumber", data.PhoneNumber, null, null, "Authentication", "Authentication");
+                    checkUser = MH.CheckForDatas("UserName", data.PhoneNumber, null, null, "Authentication", "Authentication");
                 }
                 else
                 {
-                    checkUser = MH.CheckForDatas("Email", data.Email, null, null, "Authentication", "Authentication");
+                    checkUser = MH.CheckForDatas("UserName", data.Email, null, null, "Authentication", "Authentication");
                 }
                 if (checkUser == null)
                 {
+                    var userData = BsonSerializer.Deserialize<RegisterModel>(checkUser);
                     if (data.VerificationType == "PhoneNumber")
                     {
                         data.UserName = data.PhoneNumber;
@@ -56,13 +55,21 @@ namespace AuthorizedServer.Controllers
                     {
                         data.UserName = data.Email;
                     }
-                    data.Password = registerHasher.HashPassword(data, data.Password);
-                    SmsVerificationModel smsModel = new SmsVerificationModel();
-                    smsModel.PhoneNumber = data.PhoneNumber;
+                    RegisterModel registerModel = new RegisterModel { UserName = data.UserName, Password = data.Password };
+                    data.Password = passwordHasher.HashPassword(registerModel, data.Password);
+                    VerificationModel smsModel = new VerificationModel();
+                    if (data.VerificationType == "PhoneNumber")
+                    {
+                        smsModel.UserName = data.PhoneNumber;
+                    }
+                    else
+                    {
+                        smsModel.UserName = data.Email;
+                    }
                     Random codeGenerator = new Random();
                     string OTP = codeGenerator.Next(0, 1000000).ToString("D6");
                     data.VerificationCode = smsHasher.HashPassword(smsModel, OTP);
-                    data.OTPExp = DateTime.UtcNow.AddMinutes(4);
+                    data.OTPExp = DateTime.UtcNow.AddMinutes(5);
                     data.Status = "Registered";
                     var authCollection = _db.GetCollection<RegisterModel>("Authentication");
                     await authCollection.InsertOneAsync(data);
@@ -72,7 +79,7 @@ namespace AuthorizedServer.Controllers
                     }
                     else
                     {
-
+                        await EmailHelper.SendEmail(userData.FullName, data.Email, OTP);
                     }
                     return Ok(new ResponseData
                     {
@@ -85,7 +92,7 @@ namespace AuthorizedServer.Controllers
                 {
                     return BadRequest(new ResponseData
                     {
-                        Code = "400",
+                        Code = "401",
                         Message = "User Already Registered",
                         Data = null
                     });
@@ -103,33 +110,31 @@ namespace AuthorizedServer.Controllers
             }
         }
 
-        [HttpPost("register/smsverification")]
-        public ActionResult SmsVerification([FromBody]SmsVerificationModel data)
+        [HttpPost("register/verification")]
+        public ActionResult RegisterVerification([FromBody]VerificationModel data)
         {
             try
             {
-                var checkUser = MH.CheckForDatas("PhoneNumber", data.PhoneNumber, null, null, "Authentication", "Authentication");
+                var checkUser = MH.CheckForDatas("UserName", data.UserName, null, null, "Authentication", "Authentication");
                 if (checkUser != null)
                 {
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(checkUser);
-                    SmsVerificationModel smsModel = new SmsVerificationModel();
-                    smsModel.PhoneNumber = data.PhoneNumber;
                     if (verifyUser.OTPExp > DateTime.UtcNow)
                     {
+                        VerificationModel smsModel = new VerificationModel { UserName = data.UserName };
                         if (smsHasher.VerifyHashedPassword(smsModel, verifyUser.VerificationCode, data.VerificationCode).ToString() == "Success")
                         {
                             var update = Builders<BsonDocument>.Update.Set("Status", "Verified");
-                            var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.PhoneNumber);
+                            var filter = Builders<BsonDocument>.Filter.Eq("UserName", data.UserName);
                             var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
-                            Parameters parameters = new Parameters();
-                            parameters.username = data.PhoneNumber;
+                            Parameters parameters = new Parameters { UserName = data.UserName };
                             return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
                         }
                         else
                         {
                             return BadRequest(new ResponseData
                             {
-                                Code = "400",
+                                Code = "402",
                                 Message = "OTP Invalid",
                                 Data = null
                             });
@@ -149,7 +154,7 @@ namespace AuthorizedServer.Controllers
                 {
                     return BadRequest(new ResponseData
                     {
-                        Code = "400",
+                        Code = "404",
                         Message = "User Not Found",
                         Data = null
                     });
@@ -157,7 +162,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "SMSVerification", "SMSVerification", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "RegisterVerification", "RegisterVerification", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -170,68 +175,76 @@ namespace AuthorizedServer.Controllers
         [HttpPost("login")]
         public ActionResult Login([FromBody]LoginModel user)
         {
-            if (user == null)
+            try
             {
-                return Json(new ResponseData
+                BsonDocument checkUser;
+                if (user.VerificationType == "PhoneNumber")
                 {
-                    Code = "901",
-                    Message = "null of parameters",
-                    Data = null
-                });
-            }
-            else
-            {
-                try
+                    checkUser = MH.CheckForDatas("PhoneNumber", user.UserName, null, null, "Authentication", "Authentication");
+                }
+                else
                 {
-                    var checkUser = MH.CheckForDatas("PhoneNumber", user.UserName, null, null, "Authentication", "Authentication");
-                    if (checkUser != null)
+
+                    checkUser = MH.CheckForDatas("Email", user.UserName, null, null, "Authentication", "Authentication");
+                }
+                if (checkUser != null)
+                {
+                    var verifyUser = BsonSerializer.Deserialize<RegisterModel>(checkUser);
+                    RegisterModel registerModel = new RegisterModel();
+                    registerModel.UserName = user.UserName;
+                    registerModel.Password = user.Password;
+                    if (passwordHasher.VerifyHashedPassword(registerModel, verifyUser.Password, user.Password).ToString() == "Success")
                     {
-                        var verifyUser = BsonSerializer.Deserialize<RegisterModel>(checkUser);
-                        LoginModel loginModel = new LoginModel();
-                        loginModel.UserName = user.UserName;
-                        if (loginHasher.VerifyHashedPassword(loginModel, verifyUser.Password, user.Password).ToString() == "Success")
-                        {
-                            Parameters parameters = new Parameters();
-                            parameters.username = user.UserName;
-                            parameters.fullname = verifyUser.FullName;
-                            return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
-                        }
+                        Parameters parameters = new Parameters();
+                        parameters.UserName = user.UserName;
+                        parameters.FullName = verifyUser.FullName;
+                        return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
+                    }
+                    else
+                    {
+                        var filter = Builders<BsonDocument>.Filter.Eq("UserName", user.UserName);
+                        string response = RecordLoginAttempts(filter);
+                        if (response != "Failed")
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "401",
+                                Message = "Invalid User Infomation" + " & " + response,
+                                Data = null
+                            });
                         else
                         {
-                            var filter = Builders<BsonDocument>.Filter.Eq("Username", user.UserName);
-                            string response = LoginAttempts(filter);
                             return BadRequest(new ResponseData
                             {
                                 Code = "400",
-                                Message = "Invalid User Infomation" + " & " + response,
+                                Message = "Failed",
                                 Data = null
                             });
                         }
                     }
-                    else
-                    {
-                        return BadRequest(new ResponseData
-                        {
-                            Code = "404",
-                            Message = "User Not Found",
-                            Data = null
-                        });
-                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    LoggerDataAccess.CreateLog("AuthController", "Login", "Login", ex.Message);
                     return BadRequest(new ResponseData
                     {
-                        Code = "400",
-                        Message = "Failed",
+                        Code = "404",
+                        Message = "User Not Found",
                         Data = null
                     });
                 }
             }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AuthController", "Login", "Login", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
+            }
         }
 
-        public string LoginAttempts(FilterDefinition<BsonDocument> filter)
+        public string RecordLoginAttempts(FilterDefinition<BsonDocument> filter)
         {
             try
             {
@@ -251,37 +264,37 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "LoginAttempts", "LoginAttempts", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "RecordLoginAttempts", "RecordLoginAttempts", ex.Message);
                 return "Failed";
             }
         }
 
         [HttpPost("forgotpassword")]
-        public ActionResult ForgotPassword([FromBody]ForgotPasswordModel data)
+        public async Task<ActionResult> ForgotPassword([FromBody]ForgotPasswordModel data)
         {
             try
             {
-                BsonDocument checkUser;
-                if (data.VerificationType == "PhoneNumber")
-                {
-                    checkUser = MH.CheckForDatas("PhoneNumber", data.PhoneNumber, null, null, "Authentication", "Authentication");
-                }
-                else
-                {
-                    checkUser = MH.CheckForDatas("Email", data.Email, null, null, "Authentication", "Authentication");
-                }
-                var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.PhoneNumber);
+                var checkUser = MH.CheckForDatas("UserName", data.UserName, null, null, "Authentication", "Authentication");
+                var filter = Builders<BsonDocument>.Filter.Eq("UserName", data.UserName);
                 var user = MH.GetSingleObject(filter, "Authentication", "Authentication").Result;
                 if (user != null)
                 {
-                    SmsVerificationModel smsModel = new SmsVerificationModel();
-                    smsModel.PhoneNumber = data.PhoneNumber;
+                    var userData = BsonSerializer.Deserialize<RegisterModel>(user);
+                    VerificationModel smsModel = new VerificationModel();
+                    smsModel.UserName = data.UserName;
                     Random codeGenerator = new Random();
                     string OTP = codeGenerator.Next(0, 1000000).ToString("D6");
                     var update = Builders<BsonDocument>.Update.Set("Status", "Not Verified").Set("OTPExp", DateTime.UtcNow.AddMinutes(4))
                                                               .Set("VerificationCode", smsHasher.HashPassword(smsModel, OTP));
                     var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
-                    SMSHelper.SendSMS(data.PhoneNumber, OTP);
+                    if (data.VerificationType == "PhoneNumber")
+                    {
+                        SMSHelper.SendSMS(data.UserName, OTP);
+                    }
+                    else
+                    {
+                        await EmailHelper.SendEmail(userData.FullName, data.UserName, OTP);
+                    }
                     return Ok(new ResponseData
                     {
                         Code = "200",
@@ -311,25 +324,24 @@ namespace AuthorizedServer.Controllers
             }
         }
 
-        [HttpPost("forgotpassword/smsverification")]
-        public ActionResult ForgotPasswordVerification([FromBody]SmsVerificationModel data)
+        [HttpPost("forgotpassword/verification")]
+        public ActionResult ForgotPasswordVerification([FromBody]VerificationModel data)
         {
             try
             {
-                var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.PhoneNumber);
+                var filter = Builders<BsonDocument>.Filter.Eq("UserName", data.UserName);
                 var user = MH.GetSingleObject(filter, "Authentication", "Authentication").Result;
                 if (user != null)
                 {
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(user);
                     if (verifyUser.OTPExp > DateTime.UtcNow)
                     {
-                        SmsVerificationModel smsModel = new SmsVerificationModel();
-                        smsModel.PhoneNumber = data.PhoneNumber;
-                        if (smsHasher.VerifyHashedPassword(smsModel, verifyUser.VerificationCode, data.VerificationCode).ToString() == "Success")
+                        VerificationModel model = new VerificationModel { UserName = data.UserName };
+                        if (smsHasher.VerifyHashedPassword(model, verifyUser.VerificationCode, data.VerificationCode).ToString() == "Success")
                         {
                             var update = Builders<BsonDocument>.Update.Set("Status", "Verified");
                             var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result; Parameters parameters = new Parameters();
-                            parameters.username = data.PhoneNumber;
+                            parameters.UserName = data.UserName;
                             var response = authHelper.DoPassword(parameters, _repo, _settings);
                             response.Code = "201";
                             response.Message = "OTP Verified";
@@ -339,7 +351,7 @@ namespace AuthorizedServer.Controllers
                         {
                             return BadRequest(new ResponseData
                             {
-                                Code = "400",
+                                Code = "401",
                                 Message = "Invalied OTP",
                                 Data = null
                             });
@@ -378,19 +390,19 @@ namespace AuthorizedServer.Controllers
         }
 
         [HttpPost("forgotpassword/changepassword")]
-        //[Authorize]
-        public ActionResult ChangePassword([FromBody]RegisterModel data)
+        public ActionResult ChangePassword([FromBody]LoginModel data)
         {
             try
             {
-                var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.PhoneNumber);
+                var filter = Builders<BsonDocument>.Filter.Eq("UserName", data.UserName);
                 var user = MH.GetSingleObject(filter, "Authentication", "Authentication").Result;
                 if (user != null)
                 {
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(user);
                     if (verifyUser.Status == "Verified")
                     {
-                        var update = Builders<BsonDocument>.Update.Set("Password", registerHasher.HashPassword(data, data.Password));
+                        RegisterModel registerModel = new RegisterModel { UserName = data.UserName, Password = data.Password };
+                        var update = Builders<BsonDocument>.Update.Set("Password", passwordHasher.HashPassword(registerModel, data.Password));
                         var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
                         return Ok(new ResponseData
                         {
@@ -403,8 +415,8 @@ namespace AuthorizedServer.Controllers
                     {
                         return BadRequest(new ResponseData
                         {
-                            Code = "400",
-                            Message = "User Not Verified to Chanage Password",
+                            Code = "401",
+                            Message = "User Not Verified to Change Password",
                             Data = null
                         });
                     }
@@ -413,7 +425,7 @@ namespace AuthorizedServer.Controllers
                 {
                     return BadRequest(new ResponseData
                     {
-                        Code = "400",
+                        Code = "404",
                         Message = "User Not Found",
                         Data = null
                     });
@@ -432,21 +444,19 @@ namespace AuthorizedServer.Controllers
         }
 
         [HttpPost("changepassword")]
-        //[Authorize]
-        public ActionResult ChangePasswordWhenLoggedIn([FromBody]ChangePassword data)
+        public ActionResult ChangePasswordWhenLoggedIn([FromBody]ChangePasswordModel data)
         {
             try
             {
-                var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.PhoneNumber);
+                var filter = Builders<BsonDocument>.Filter.Eq("UserName", data.UserName);
                 var user = MH.GetSingleObject(filter, "Authentication", "Authentication").Result;
                 if (user != null)
                 {
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(user);
-                    SmsVerificationModel smsModel = new SmsVerificationModel();
-                    smsModel.PhoneNumber = verifyUser.PhoneNumber;
-                    if (smsHasher.VerifyHashedPassword(smsModel, verifyUser.Password, data.CurrentPassword).ToString() == "Success")
+                    RegisterModel registerModel = new RegisterModel { UserName = verifyUser.UserName, Password = data.OldPassword };
+                    if (passwordHasher.VerifyHashedPassword(registerModel, verifyUser.Password, data.OldPassword).ToString() == "Success")
                     {
-                        var update = Builders<BsonDocument>.Update.Set("Password", registerHasher.HashPassword(verifyUser, data.NewPassword));
+                        var update = Builders<BsonDocument>.Update.Set("Password", passwordHasher.HashPassword(verifyUser, data.NewPassword));
                         var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
                         return Ok(new ResponseData
                         {
@@ -458,12 +468,23 @@ namespace AuthorizedServer.Controllers
                     }
                     else
                     {
-                        return BadRequest(new ResponseData
+                        string response = RecordLoginAttempts(filter);
+                        if (response != "Failed")
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "401",
+                                Message = "Invalid User Infomation" + " & " + response,
+                                Data = null
+                            });
+                        else
                         {
-                            Code = "401",
-                            Message = "Invalid Password",
-                            Data = null
-                        });
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "400",
+                                Message = "Failed",
+                                Data = null
+                            });
+                        }
                     }
                 }
                 else
@@ -498,16 +519,15 @@ namespace AuthorizedServer.Controllers
                 if (user != null)
                 {
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(user);
-                    LoginModel loginModel = new LoginModel();
-                    loginModel.UserName = data.UserName;
-                    if (loginHasher.VerifyHashedPassword(loginModel, verifyUser.Password, data.Password).ToString() == "Success")
+                    RegisterModel registerModel = new RegisterModel { UserName = data.UserName, Password = data.Password };
+                    if (passwordHasher.VerifyHashedPassword(registerModel, verifyUser.Password, data.Password).ToString() == "Success")
                     {
                         var authCollection = _db.GetCollection<RegisterModel>("Authentication");
                         var response = authCollection.DeleteOneAsync(user);
                         return Ok(new ResponseData
                         {
                             Code = "200",
-                            Message = "user Deactivated",
+                            Message = "User Deactivated",
                             Data = null
                         });
                     }

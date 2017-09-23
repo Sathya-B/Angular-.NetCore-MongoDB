@@ -19,7 +19,6 @@ namespace Arthur_Clive.Controllers
     {
         public IMongoDatabase _db = MH._client.GetDatabase("UserInfo");
         public IMongoDatabase order_db = MH._client.GetDatabase("OrderDB");
-        public MongoHelper mongoHelper = new MongoHelper();
         public UpdateDefinition<BsonDocument> updateDefinition;
 
         [HttpPost("placeorder")]
@@ -34,13 +33,13 @@ namespace Arthur_Clive.Controllers
                 if (products != null)
                 {
                     var addressFilter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.UserName);
-                    var user = BsonSerializer.Deserialize<UserInfo>(mongoHelper.GetSingleObject(addressFilter, "UserInfo", "UserInfo").Result);
+                    var user = BsonSerializer.Deserialize<UserInfo>(MH.GetSingleObject(addressFilter, "UserInfo", "UserInfo").Result);
                     if (user != null)
                     {
                         foreach (var product in products)
                         {
                             var productFilter = Builders<BsonDocument>.Filter.Eq("Product_SKU", product.ProductSKU);
-                            var productData = BsonSerializer.Deserialize<Product>(mongoHelper.GetSingleObject(productFilter, "ProductDB", "Product").Result);
+                            var productData = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(productFilter, "ProductDB", "Product").Result);
                             if (productData != null)
                             {
                                 if (productData.ProductStock < product.ProductQuantity)
@@ -53,7 +52,7 @@ namespace Arthur_Clive.Controllers
                                     });
                                 }
                                 var update = Builders<BsonDocument>.Update.Set("Product_Stock", productData.ProductStock - product.ProductQuantity);
-                                var result = mongoHelper.UpdateSingleObject(productFilter, "ProductDB", "Product", update).Result;
+                                var result = MH.UpdateSingleObject(productFilter, "ProductDB", "Product", update).Result;
                             }
                             else
                             {
@@ -131,7 +130,7 @@ namespace Arthur_Clive.Controllers
                         foreach (var product in products)
                         {
                             var cartFilter = Builders<BsonDocument>.Filter.Eq("_id", product.Id);
-                            mongoHelper.DeleteSingleObject(cartFilter, "UserInfo", "Cart");
+                            MH.DeleteSingleObject(cartFilter, "UserInfo", "Cart");
                         }
                         return Ok(new ResponseData
                         {
@@ -271,7 +270,7 @@ namespace Arthur_Clive.Controllers
                                     }
                                     updateDefinition = Builders<BsonDocument>.Update.Set("ProductDetails", productDetailsList);
                                     var updateFilter = Builders<BsonDocument>.Filter.Eq("UserName", data.UserName) & Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId);
-                                    await mongoHelper.UpdateSingleObject(updateFilter, "OrderDB", "OrderInfo", updateDefinition);
+                                    await MH.UpdateSingleObject(updateFilter, "OrderDB", "OrderInfo", updateDefinition);
                                     if (order.PaymentMethod == "Cash On Delivery")
                                     {
                                         return Ok(new ResponseData
@@ -296,7 +295,7 @@ namespace Arthur_Clive.Controllers
                                         if (product.Status == "Delivered")
                                         {
                                             var productFilter = Builders<BsonDocument>.Filter.Eq("Product_SKU", data.ProductSKU);
-                                            var productData = BsonSerializer.Deserialize<Product>(mongoHelper.GetSingleObject(productFilter, "ProductDB", "Product").Result);
+                                            var productData = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(productFilter, "ProductDB", "Product").Result);
                                             if (request == "Refund")
                                             {
                                                 if (productData.RefundApplicable == true)
@@ -386,7 +385,7 @@ namespace Arthur_Clive.Controllers
                                     }
                                     updateDefinition = Builders<BsonDocument>.Update.Set("ProductDetails", productDetailsList);
                                     var updateFilter = Builders<BsonDocument>.Filter.Eq("UserName", data.UserName) & Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId);
-                                    await mongoHelper.UpdateSingleObject(updateFilter, "OrderDB", "OrderInfo", updateDefinition);
+                                    await MH.UpdateSingleObject(updateFilter, "OrderDB", "OrderInfo", updateDefinition);
                                     if (request == "Refund")
                                     {
                                         return Ok(new ResponseData

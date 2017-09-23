@@ -36,11 +36,11 @@ namespace AuthorizedServer.Controllers
                 });
             }
 
-            if (parameters.grant_type == "password")
+            if (parameters.GrantType == "password")
             {
                 return Json(DoPassword(parameters));
             }
-            else if (parameters.grant_type == "refresh_token")
+            else if (parameters.GrantType == "refresh_token")
             {
                 return Json(DoRefreshToken(parameters));
             }
@@ -58,25 +58,11 @@ namespace AuthorizedServer.Controllers
         //scenario 1 ： get the access-token by username and password
         private ResponseData DoPassword(Parameters parameters)
         {
-            
-            var isValidated = UserInfo.GetAllUsers().Any(x => x.ClientId == parameters.client_id
-                                    && x.ClientSecret == parameters.client_secret
-                                    && x.UserName == parameters.username
-                                    && x.Password == parameters.password);
-            if (!isValidated)
-            {
-                return new ResponseData
-                {
-                    Code = "902",
-                    Message = "invalid user infomation",
-                    Data = null
-                };
-            }
-            var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
+            var refreshToken = Guid.NewGuid().ToString().Replace("-", "");
             var rToken = new RToken
             {
-                ClientId = parameters.client_id,
-                RefreshToken = refresh_token,
+                ClientId = parameters.ClientId,
+                RefreshToken = refreshToken,
                 Id = Guid.NewGuid().ToString(),
                 IsStop = 0
             };
@@ -86,7 +72,7 @@ namespace AuthorizedServer.Controllers
                 {
                     Code = "999",
                     Message = "OK",
-                    Data = GetJwt(parameters.client_id, refresh_token)
+                    Data = GetJwt(parameters.ClientId, refreshToken)
                 };
             }
             else
@@ -103,7 +89,7 @@ namespace AuthorizedServer.Controllers
         //scenario 2 ： get the access_token by refresh_token
         private ResponseData DoRefreshToken(Parameters parameters)
         {
-            var token = _repo.GetToken(parameters.refresh_token, parameters.client_id).Result;
+            var token = _repo.GetToken(parameters.RefreshToken, parameters.ClientId).Result;
             if (token == null)
             {
                 return new ResponseData
@@ -127,7 +113,7 @@ namespace AuthorizedServer.Controllers
             var updateFlag = _repo.ExpireToken(token).Result;
             var addFlag = _repo.AddToken(new RToken
             {
-                ClientId = parameters.client_id,
+                ClientId = parameters.ClientId,
                 RefreshToken = refresh_token,
                 Id = Guid.NewGuid().ToString(),
                 IsStop = 0
@@ -138,7 +124,7 @@ namespace AuthorizedServer.Controllers
                 {
                     Code = "999",
                     Message = "OK",
-                    Data = GetJwt(parameters.client_id, refresh_token)
+                    Data = GetJwt(parameters.ClientId, refresh_token)
                 };
             }
             else

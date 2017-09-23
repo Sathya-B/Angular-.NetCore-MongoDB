@@ -3,13 +3,11 @@ using System.Threading.Tasks;
 using Arthur_Clive.Data;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
-using Arthur_Clive.Helper;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using Arthur_Clive.Logger;
 using AH = Arthur_Clive.Helper.AmazonHelper;
 using MH = Arthur_Clive.Helper.MongoHelper;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Arthur_Clive.Controllers
@@ -18,7 +16,6 @@ namespace Arthur_Clive.Controllers
     public class UserController : Controller
     {
         public IMongoDatabase _db = MH._client.GetDatabase("UserInfo");
-        public MongoHelper mongoHelper = new MongoHelper();
         public UpdateDefinition<BsonDocument> updateDefinition;
 
         [HttpPost("userinfo")]
@@ -30,15 +27,15 @@ namespace Arthur_Clive.Controllers
                 {
                     return BadRequest(new ResponseData
                     {
-                        Code = "400",
+                        Code = "401",
                         Message = "Billing or Shipping Address Not Avaliable",
                         Data = null
                     });
                 }
                 else
                 {
-                    var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.PhoneNumber);
-                    var userInfo = mongoHelper.GetSingleObject(filter, "UserInfo", "UserInfo").Result;
+                    var filter = Builders<BsonDocument>.Filter.Eq("UserName", data.UserName);
+                    var userInfo = MH.GetSingleObject(filter, "UserInfo", "UserInfo").Result;
                     if (userInfo == null)
                     {
                         var userCollection = _db.GetCollection<UserInfo>("UserInfo");
@@ -93,12 +90,12 @@ namespace Arthur_Clive.Controllers
                                 updateDefinition = Builders<BsonDocument>.Update.Set("BillingAddress", oldData.BillingAddress).Set("ShippingAddress", oldData.ShippingAddress);
                             }
                         }
-                        await mongoHelper.UpdateSingleObject(filter, "UserInfo", "UserInfo", updateDefinition);
+                        await MH.UpdateSingleObject(filter, "UserInfo", "UserInfo", updateDefinition);
                         string response = await Update(oldData, data);
                         return Ok(new ResponseData
                         {
                             Code = "200",
-                            Message = response,
+                            Message = "User updated" + response,
                             Data = null
                         });
                     }
@@ -136,8 +133,8 @@ namespace Arthur_Clive.Controllers
                 {
                     updateDefinition = Builders<BsonDocument>.Update.Set("BillingAddress", data.BillingAddress).Set("ShippingAddress", data.ShippingAddress);
                 }
-                var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.PhoneNumber);
-                await mongoHelper.UpdateSingleObject(filter, "UserInfo", "UserInfo", updateDefinition);
+                var filter = Builders<BsonDocument>.Filter.Eq("UserName", data.UserName);
+                await MH.UpdateSingleObject(filter, "UserInfo", "UserInfo", updateDefinition);
                 return "Updated";
             }
             catch (Exception ex)
@@ -170,13 +167,13 @@ namespace Arthur_Clive.Controllers
             }
         }
 
-        [HttpGet("userinfo")]
-        public ActionResult GetOneUser([FromBody]string phonenumber)
+        [HttpGet("userinfo/{username}")]
+        public ActionResult GetOneUser(string username)
         {
             try
             {
-                var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", phonenumber);
-                var userInfo = BsonSerializer.Deserialize<UserInfo>(mongoHelper.GetSingleObject(filter, "UserInfo", "UserInfo").Result);
+                var filter = Builders<BsonDocument>.Filter.Eq("UserName", username);
+                var userInfo = BsonSerializer.Deserialize<UserInfo>(MH.GetSingleObject(filter, "UserInfo", "UserInfo").Result);
                 return Ok(userInfo);
             }
             catch (Exception ex)
@@ -199,29 +196,6 @@ namespace Arthur_Clive.Controllers
                 var cartFilter = Builders<Cart>.Filter.Eq("UserName", username);
                 var cartCollection = _db.GetCollection<Cart>("Cart");
                 var result = cartCollection.DeleteManyAsync(cartFilter).Result;
-                //List<Cart> cartItems = new List<Cart>();
-                //foreach (Cart cartItem in data.ListOfProducts)
-                //{
-                //    var productFilter = Builders<BsonDocument>.Filter.Eq("ProductSKU", cartItem.ProductSKU);
-                //    var productCollection = mongoHelper.GetSingleObject(productFilter, "ProductDB", "Product").Result;
-                //    var product = BsonSerializer.Deserialize<Product>(productCollection);
-                //    cartItem.UserName = username;
-                //    string objectName = cartItem.ProductSKU + ".jpg";
-                //    //cartItem.ObjectUrl = WH.GetMinioObject("products", objectName).Result;
-                //    //cartItem.ObjectUrl = AH.GetAmazonS3Object("arthurclive-products", objectName);
-                //    cartItem.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
-                //    cartItem.ProductFor = product.ProductFor;
-                //    cartItem.ProductType = product.ProductType;
-                //    cartItem.ProductDesign = product.ProductDesign;
-                //    cartItem.ProductBrand = product.ProductBrand;
-                //    cartItem.ProductPrice = product.ProductPrice;
-                //    cartItem.ProductDiscount = product.ProductDiscount;
-                //    cartItem.ProductDiscountPrice = product.ProductDiscountPrice;
-                //    cartItem.ProductSize = product.ProductSize;
-                //    cartItem.ProductColour = product.ProductColour;
-                //    cartItem.ProductDescription = product.ProductDescription;
-                //    cartItems.Add(cartItem);
-                //}
                 data.ListOfProducts.ToList().ForEach(c => c.UserName = username);
 
                 var authCollection = _db.GetCollection<Cart>("Cart");
@@ -264,7 +238,7 @@ namespace Arthur_Clive.Controllers
                 return Ok(new ResponseData
                 {
                     Code = "200",
-                    Message = null,
+                    Message = "Success",
                     Data = products
                 });
             }
@@ -288,28 +262,6 @@ namespace Arthur_Clive.Controllers
                 var wishlistFilter = Builders<WishList>.Filter.Eq("UserName", username);
                 var wishlistCollection = _db.GetCollection<WishList>("WishList");
                 var result = wishlistCollection.DeleteManyAsync(wishlistFilter).Result;
-                //List<WishList> wishlistItems = new List<WishList>();
-                //foreach (WishList item in data.ListOfProducts)
-                //{
-                //    var filter = Builders<BsonDocument>.Filter.Eq("ProductSKU", item.ProductSKU);
-                //    var product = BsonSerializer.Deserialize<Product>(mongoHelper.GetSingleObject(filter, "ProductDB", "Product").Result);
-                //    item.UserName = username;
-                //    string objectName = item.ProductSKU + ".jpg";
-                //    //item.ObjectUrl = WH.GetMinioObject("products", objectName).Result;
-                //    //item.ObjectUrl = AH.GetAmazonS3Object("arthurclive-products", objectName);
-                //    item.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
-                //    item.ProductFor = product.ProductFor;
-                //    item.ProductType = product.ProductType;
-                //    item.ProductDesign = product.ProductDesign;
-                //    item.ProductBrand = product.ProductBrand;
-                //    item.ProductPrice = product.ProductPrice;
-                //    item.ProductDiscount = product.ProductDiscount;
-                //    item.ProductDiscountPrice = product.ProductDiscountPrice;
-                //    item.ProductSize = product.ProductSize;
-                //    item.ProductColour = product.ProductColour;
-                //    item.ProductDescription = product.ProductDescription;
-                //    wishlistItems.Add(item);
-                //}
                 data.ListOfProducts.ToList().ForEach(c => c.UserName = username);
                 var authCollection = _db.GetCollection<WishList>("WishList");
                 await authCollection.InsertManyAsync(data.ListOfProducts);
@@ -351,7 +303,7 @@ namespace Arthur_Clive.Controllers
                 return Ok(new ResponseData
                 {
                     Code = "200",
-                    Message = null,
+                    Message = "Success",
                     Data = products
                 });
             }

@@ -19,7 +19,7 @@ namespace AuthorizedServer.Helper
 
             var rToken = new RToken
             {
-                ClientId = parameters.username,
+                ClientId = parameters.UserName,
                 RefreshToken = refresh_token,
                 Id = Guid.NewGuid().ToString(),
                 IsStop = 0
@@ -29,13 +29,13 @@ namespace AuthorizedServer.Helper
             if (_repo.AddToken(rToken).Result)
             {
                 dynamic UserInfo = new System.Dynamic.ExpandoObject();
-                UserInfo.FirstName = parameters.fullname;
+                UserInfo.FirstName = parameters.FullName;
                 return new ResponseData
                 {
                     Code = "999",
                     Message = "OK",
                     Content = UserInfo,
-                    Data = GetJwt(parameters.username, refresh_token, _settings)
+                    Data = GetJwt(parameters.UserName, refresh_token, _settings)
                 };
             }
             else
@@ -52,7 +52,7 @@ namespace AuthorizedServer.Helper
           //scenario 2 ： get the access_token by refresh_token
         public ResponseData DoRefreshToken(Parameters parameters, IRTokenRepository _repo, IOptions<Audience> _settings)
         {
-            var token = _repo.GetToken(parameters.refresh_token, parameters.client_id).Result;
+            var token = _repo.GetToken(parameters.RefreshToken, parameters.ClientId).Result;
 
             if (token == null)
             {
@@ -82,7 +82,7 @@ namespace AuthorizedServer.Helper
 
             var addFlag = _repo.AddToken(new RToken
             {
-                ClientId = parameters.client_id,
+                ClientId = parameters.ClientId,
                 RefreshToken = refresh_token,
                 Id = Guid.NewGuid().ToString(),
                 IsStop = 0
@@ -94,7 +94,7 @@ namespace AuthorizedServer.Helper
                 {
                     Code = "999",
                     Message = "OK",
-                    Data = GetJwt(parameters.client_id, refresh_token, _settings)
+                    Data = GetJwt(parameters.ClientId, refresh_token, _settings)
                 };
             }
             else

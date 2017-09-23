@@ -16,7 +16,6 @@ namespace Arthur_Clive.Controllers
     public class ProductController : Controller
     {
         public IMongoDatabase _db = MH._client.GetDatabase("ProductDB");
-        public MongoHelper mongoHelper = new MongoHelper();
 
         [HttpGet]
         public async Task<ActionResult> Get()
@@ -37,7 +36,7 @@ namespace Arthur_Clive.Controllers
                 return Ok(new ResponseData
                 {
                     Code = "200",
-                    Message = null,
+                    Message = "Success",
                     Data = products
                 });
             }
@@ -93,7 +92,7 @@ namespace Arthur_Clive.Controllers
             try
             {
                 var filter = Builders<BsonDocument>.Filter.Eq("Product_SKU", productSKU);
-                var product = mongoHelper.GetSingleObject(filter, "ProductDB", "Product").Result;
+                var product = MH.GetSingleObject(filter, "ProductDB", "Product").Result;
                 if (product != null)
                 {
                     var authCollection = _db.GetCollection<Product>("Product");
@@ -109,7 +108,7 @@ namespace Arthur_Clive.Controllers
                 {
                     return BadRequest(new ResponseData
                     {
-                        Code = "400",
+                        Code = "404",
                         Message = "Product Not Found",
                         Data = null
                     });

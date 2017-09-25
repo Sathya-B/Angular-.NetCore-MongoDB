@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v2.0": {
-      "AWSSDK.Core/3.3.17": {
+      "AWSSDK.Core/3.3.17.9": {
         "type": "package",
         "dependencies": {
           "Microsoft.CSharp": "4.0.1",
@@ -18,16 +18,28 @@
           "lib/netstandard1.3/AWSSDK.Core.dll": {}
         }
       },
-      "AWSSDK.S3/3.3.10.4": {
+      "AWSSDK.S3/3.3.11": {
         "type": "package",
         "dependencies": {
-          "AWSSDK.Core": "[3.3.17, 3.4.0)"
+          "AWSSDK.Core": "[3.3.17.9, 3.4.0)"
         },
         "compile": {
           "lib/netstandard1.3/AWSSDK.S3.dll": {}
         },
         "runtime": {
           "lib/netstandard1.3/AWSSDK.S3.dll": {}
+        }
+      },
+      "AWSSDK.SimpleEmail/3.3.3": {
+        "type": "package",
+        "dependencies": {
+          "AWSSDK.Core": "[3.3.17, 3.4.0)"
+        },
+        "compile": {
+          "lib/netstandard1.3/AWSSDK.SimpleEmail.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/AWSSDK.SimpleEmail.dll": {}
         }
       },
       "Libuv/1.10.0": {
@@ -5219,12 +5231,12 @@
     }
   },
   "libraries": {
-    "AWSSDK.Core/3.3.17": {
-      "sha512": "NTE47l/BVjbelMxYKCAMaPM+OsnDY3t5nTFXYHEJeV+EFvSHsFNLCt2pbu4YBKWRhgvYmGCJzykdngkfwgjeog==",
+    "AWSSDK.Core/3.3.17.9": {
+      "sha512": "7ztkmMvumu1aMR6ETKqZwznLQR4SC/axTj3q4QauyWv5E36Hio6r1UzmDjOOexMUl3Cg4IqQgGfe8oBidSiJuw==",
       "type": "package",
-      "path": "awssdk.core/3.3.17",
+      "path": "awssdk.core/3.3.17.9",
       "files": [
-        "awssdk.core.3.3.17.nupkg.sha512",
+        "awssdk.core.3.3.17.9.nupkg.sha512",
         "awssdk.core.nuspec",
         "lib/MonoAndroid10/AWSSDK.Core.XML",
         "lib/MonoAndroid10/AWSSDK.Core.dll",
@@ -5262,13 +5274,13 @@
         "tools/account-management.ps1"
       ]
     },
-    "AWSSDK.S3/3.3.10.4": {
-      "sha512": "ISU+332T9lBfgKeP03ZZSQ69+immhHYklSMhSy7zp5oxEKZI0RGkVuuTRrnzhu8Y2vIBv3tUSVollQnLQHs84g==",
+    "AWSSDK.S3/3.3.11": {
+      "sha512": "cMe0yG16Jw5jmw5IvGNhs0PsrJXnN9qNkI1hUKqdQBMcUrjy02MRDe4vQ7DDH7xo5vJJJSAWpzbB0UeyV6Q0nw==",
       "type": "package",
-      "path": "awssdk.s3/3.3.10.4",
+      "path": "awssdk.s3/3.3.11",
       "files": [
         "analyzers/dotnet/cs/AWSSDK.S3.CodeAnalysis.dll",
-        "awssdk.s3.3.3.10.4.nupkg.sha512",
+        "awssdk.s3.3.3.11.nupkg.sha512",
         "awssdk.s3.nuspec",
         "lib/MonoAndroid10/AWSSDK.S3.XML",
         "lib/MonoAndroid10/AWSSDK.S3.dll",
@@ -5289,6 +5301,37 @@
         "lib/portable-net45+win8+wpa81+wp8/AWSSDK.S3.XML",
         "lib/portable-net45+win8+wpa81+wp8/AWSSDK.S3.dll",
         "lib/portable-net45+win8+wpa81+wp8/AWSSDK.S3.pdb",
+        "tools/install.ps1",
+        "tools/uninstall.ps1"
+      ]
+    },
+    "AWSSDK.SimpleEmail/3.3.3": {
+      "sha512": "bIL9dF8gbaImhP3sbtYVQnu2drozJqt7wDVAGu9V8k6sqQM7q25MUpyNzgH0NaGO+j7gHFWmFq1VI/vB+iXLqw==",
+      "type": "package",
+      "path": "awssdk.simpleemail/3.3.3",
+      "files": [
+        "analyzers/dotnet/cs/AWSSDK.SimpleEmail.CodeAnalysis.dll",
+        "awssdk.simpleemail.3.3.3.nupkg.sha512",
+        "awssdk.simpleemail.nuspec",
+        "lib/MonoAndroid10/AWSSDK.SimpleEmail.XML",
+        "lib/MonoAndroid10/AWSSDK.SimpleEmail.dll",
+        "lib/MonoTouch10/AWSSDK.SimpleEmail.XML",
+        "lib/MonoTouch10/AWSSDK.SimpleEmail.dll",
+        "lib/MonoTouch10/AWSSDK.SimpleEmail.pdb",
+        "lib/Xamarin.iOS10/AWSSDK.SimpleEmail.XML",
+        "lib/Xamarin.iOS10/AWSSDK.SimpleEmail.dll",
+        "lib/net35/AWSSDK.SimpleEmail.dll",
+        "lib/net35/AWSSDK.SimpleEmail.pdb",
+        "lib/net35/AWSSDK.SimpleEmail.xml",
+        "lib/net45/AWSSDK.SimpleEmail.dll",
+        "lib/net45/AWSSDK.SimpleEmail.pdb",
+        "lib/net45/AWSSDK.SimpleEmail.xml",
+        "lib/netstandard1.3/AWSSDK.SimpleEmail.dll",
+        "lib/netstandard1.3/AWSSDK.SimpleEmail.pdb",
+        "lib/netstandard1.3/AWSSDK.SimpleEmail.xml",
+        "lib/portable-net45+win8+wpa81+wp8/AWSSDK.SimpleEmail.XML",
+        "lib/portable-net45+win8+wpa81+wp8/AWSSDK.SimpleEmail.dll",
+        "lib/portable-net45+win8+wpa81+wp8/AWSSDK.SimpleEmail.pdb",
         "tools/install.ps1",
         "tools/uninstall.ps1"
       ]
@@ -13667,7 +13710,8 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
-      "AWSSDK.S3 >= 3.3.10.4",
+      "AWSSDK.S3 >= 3.3.11",
+      "AWSSDK.SimpleEmail >= 3.3.3",
       "Microsoft.AspNetCore.All >= 2.0.0",
       "Microsoft.AspNetCore.Mvc.Core >= 2.0.0",
       "Microsoft.NETCore.App >= 2.0.0",
@@ -13732,6 +13776,10 @@
             "target": "Package",
             "version": "1.0.0"
           },
+          "AWSSDK.SimpleEmail": {
+            "target": "Package",
+            "version": "3.3.3"
+          },
           "Swashbuckle.AspNetCore.Swagger": {
             "target": "Package",
             "version": "1.0.0"
@@ -13763,7 +13811,7 @@
           },
           "AWSSDK.S3": {
             "target": "Package",
-            "version": "3.3.10.4"
+            "version": "3.3.11"
           }
         },
         "imports": [

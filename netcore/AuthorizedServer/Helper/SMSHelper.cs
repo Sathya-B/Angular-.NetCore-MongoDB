@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using AuthorizedServer.Logger;
@@ -10,12 +13,21 @@ namespace AuthorizedServer.Helper
 {
     public class SMSHelper
     {
+        public static string GetCredentials(string key)
+        {
+            var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            var xmlStr = File.ReadAllText(Path.Combine(dir,"AmazonKeys.xml"));
+            var str = XElement.Parse(xmlStr);
+            var result = str.Elements("amazonsns").Where(x => x.Element("current").Value.Equals("Yes")).Descendants(key);
+            return result.First().Value;
+        }
+
         public static string SendSMS(string phoneNumber, string otp)
         {
             try
             {
                 AmazonSimpleNotificationServiceClient smsClient = new AmazonSimpleNotificationServiceClient
-                    ("AKIAJ3B7P4FXGYSUXMYA", "BcJKVujqRbxsyUlkPYSIoAoO0Z+yYXkyk6qXkIlS", Amazon.RegionEndpoint.APSoutheast1);
+                    (GetCredentials("accesskey"), GetCredentials("secretkey"), Amazon.RegionEndpoint.APSoutheast1);
 
                 var smsAttributes = new Dictionary<string, MessageAttributeValue>();
 

@@ -9,10 +9,11 @@ namespace AuthorizedServer.Models
         public string Title { get; set; }
         public string FullName { get; set; }
         public string UserName { get; set; }
+        public string DialCode { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public string VerificationType { get; set; }
+        public string UserLocation { get; set; }
         public string VerificationCode { get; set; }
         public string Status { get; set; }
         public int WrongAttemptCount { get; set; }
@@ -22,7 +23,7 @@ namespace AuthorizedServer.Models
     public class ForgotPasswordModel
     {
         public string UserName { get; set; }
-        public string VerificationType { get; set; }
+        public string UserLocation { get; set; }
         public string VerificationCode { get; set; }
         public string Status { get; set; }
         public DateTime OTPExp { get; set; }
@@ -38,7 +39,6 @@ namespace AuthorizedServer.Models
     {
         public string UserName { get; set; }
         public string Password { get; set; }
-        public string VerificationType { get; set; }
     }
 
     public class ChangePasswordModel

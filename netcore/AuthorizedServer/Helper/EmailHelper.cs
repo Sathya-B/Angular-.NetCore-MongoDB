@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
 
@@ -9,10 +11,19 @@ namespace AuthorizedServer.Helper
 {
     public class EmailHelper
     {
-        public static async Task<string> SendEmail(string fullname, string emailReceiver, string otp)
+        public static string GetCredentials(string key)
+        {
+            var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            var xmlStr = File.ReadAllText(Path.Combine(dir, "AmazonKeys.xml"));
+            var str = XElement.Parse(xmlStr);
+            var result = str.Elements("amazonses").Where(x => x.Element("current").Value.Equals("raguvarthan.n@turingminds.com")).Descendants(key);
+            return result.First().Value;
+        }
+
+        public static async Task<string> SendEmail(string fullname,string emailReceiver, string link)
         {
             string emailSender = "raguvarthan.n@turingminds.com";
-            using (var client = new AmazonSimpleEmailServiceClient("AKIAIMRQIQV343SHCTXQ", "mqiQXSzZNwyH0q+krpgXuONLwFul81ssc4JaolSU", Amazon.RegionEndpoint.USWest2))
+            using (var client = new AmazonSimpleEmailServiceClient(GetCredentials("accesskey"), GetCredentials("secretkey"), Amazon.RegionEndpoint.USWest2))
             {
                 var sendRequest = new SendEmailRequest
                 {
@@ -23,7 +34,7 @@ namespace AuthorizedServer.Helper
                         Subject = new Content("Verification of your ArthurClive account."),
                         Body = new Body
                         {
-                            Html = new Content(CreateEmailBody(fullname, emailReceiver, otp, "", "< a href =\"http://google.com\">Click Here</a>"))
+                            Html = new Content(CreateEmailBody(fullname, "<a href ='" + link + "'>Click Here To Verify</a>"))
                         }
                     }
                 };
@@ -39,17 +50,14 @@ namespace AuthorizedServer.Helper
             }
         }
 
-        public static string CreateEmailBody(string fullname, string username, string otp, string message, string link)
+        public static string CreateEmailBody(string fullname, string link)
         {
             string emailBody;
-            using (StreamReader reader = System.IO.File.OpenText("D:/Arthur_Clive/netcore/AuthorizedServer/EmailTemplate/EmailVerification.html"))
+            using (StreamReader reader = File.OpenText("D:/Arthur_Clive/netcore/AuthorizedServer/EmailTemplate/EmailVerification.html"))
             {
                 emailBody = reader.ReadToEnd();
             }
             emailBody = emailBody.Replace("{FullName}", fullname);
-            emailBody = emailBody.Replace("{UserName}", username);
-            emailBody = emailBody.Replace("{OTP}", otp);
-            emailBody = emailBody.Replace("{Message}", message);
             emailBody = emailBody.Replace("{Link}", link);
             return emailBody;
         }

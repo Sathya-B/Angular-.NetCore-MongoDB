@@ -5593,7 +5593,8 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
-          "AWSSDK.S3": "3.3.10.4",
+          "AWSSDK.S3": "3.3.11",
+          "AWSSDK.SimpleEmail": "3.3.3",
           "Microsoft.AspNetCore.All": "2.0.0",
           "Microsoft.AspNetCore.Mvc.Core": "2.0.0",
           "Microsoft.NETCore.App": "2.0.0",

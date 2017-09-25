@@ -3,6 +3,12 @@ using MongoDB.Bson;
 
 namespace Arthur_Clive.Data
 {
+    public class Subscribe
+    {
+        public ObjectId Id { get; set; }
+        public string UserName { get; set; }
+    }
+
     public class UserInfo
     {
         public ObjectId Id { get; set; }

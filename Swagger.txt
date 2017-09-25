@@ -28,6 +28,13 @@ tags:
   description: "Web api calls for authentication and authorization of user"
 - name: "AuthController"
   description: "Register, Login, Forgot Password, Change Password and Deactivate Account"
+- name: "Register"
+- name: "Login"
+- name: "ForgotPassword"
+- name: "ChangePassword"
+- name: "Deactivate Account"
+- name: "AdminContoller"
+  description: "Subscribe user, Unscubcribe user and Send message to subscribed users"
 schemes:
 - "http"  
 paths:
@@ -407,8 +414,8 @@ paths:
           description: "Failed"
           schema:
               $ref: "#/definitions/ResponseData"
-  /api/auth/register/verification:
-    post:
+  /api/auth/register/verification/{username}/{otp}:
+    get:
       tags:
       - "Register"
       operationId: "registerVerification"
@@ -418,7 +425,17 @@ paths:
       produces:
       - "application/xml"
       - "application/json"
-      parameters:
+      parameters: 
+      - in: "path"
+        name: "username"
+        description: "Username of the user"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "otp"
+        description: "OTP sent to the users phone number or email for verification"
+        required: true
+        type: "string"
       - in: "body"
         name: "body"
         description: "Details of user who's registration needs to be verified'"
@@ -524,8 +541,8 @@ paths:
           description: "Failed"
           schema:
               $ref: "#/definitions/ResponseData"
-  /api/auth/forgotpassword/verification:
-    post:
+  /api/auth/forgotpassword/verification/{username}/{otp}:
+    get:
       tags:
       - "ForgotPassword"
       summary: ""
@@ -538,6 +555,16 @@ paths:
       - "application/xml"
       - "application/json"
       parameters:
+      - in: "path"
+        name: "username"
+        description: "Username of the user"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "otp"
+        description: "OTP sent to the users phone number or email for verification"
+        required: true
+        type: "string"
       - in: "body"
         name: "body"
         description: "Details of user who forgot password and needs to get verfied"
@@ -672,6 +699,105 @@ paths:
               $ref: "#/definitions/ResponseData"
         404:
           description: "User Not Found"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        400:
+          description: "Failed"
+          schema:
+              $ref: "#/definitions/ResponseData"
+  /api/admin/subscribe/{username}:
+    post:
+      tags:
+      - "AdminContoller"
+      operationId: "subscribe"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "username"
+        description: "UserName of user who needs to subscribe"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Subscribed Succesfully"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        401:
+          description: "User Already Subscribed"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        402:
+          description: "UserName connot be empty"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        400:
+          description: "Failed"
+          schema:
+              $ref: "#/definitions/ResponseData"
+  /api/admin/unsubscribe/{username}:
+    post:
+      tags:
+      - "AdminContoller"
+      operationId: "unsubscribe"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "username"
+        description: "UserName of user who needs to unsubscribe"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Unsubscribed Succesfully"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        401:
+          description: "No user found"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        402:
+          description: "UserName connot be empty"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        400:
+          description: "Failed"
+          schema:
+              $ref: "#/definitions/ResponseData"
+  /api/admin/sendmessage:
+    post:
+      tags:
+      - "AdminContoller"
+      operationId: "publicPost"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "message"
+        description: "Message that needs to be sent to the subscribed users"
+        required: true
+        schema:
+            type: "string"
+      responses:
+        200:
+          description: "Email sent to all subscribed users"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        401:
+          description: "There are no subscribed users"
           schema:
               $ref: "#/definitions/ResponseData"
         400:
@@ -965,8 +1091,6 @@ definitions:
         type: "string"
       Password:
         type: "string"
-      VerificationType:
-        type: "string"
   ForgotPassword:
     type: "object"
     properties:
@@ -1004,6 +1128,11 @@ definitions:
       OldPassword:
         type: "string"
       NewPassword:
+        type: "string"
+  Subscribe:
+    type: "object"
+    properties:
+      UserName: 
         type: "string"
   ResponceData:
     type: "object"

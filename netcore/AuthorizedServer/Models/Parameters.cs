@@ -1,4 +1,6 @@
-﻿namespace AuthorizedServer
+﻿using MongoDB.Bson.Serialization.Attributes;
+
+namespace AuthorizedServer
 {
     public class ResponseData
     {
@@ -17,20 +19,23 @@
 
     public class Parameters
     {
-        public string GrantType { get; set; }
-        public string RefreshToken { get; set; }
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
-        public string FullName { get; set; }
+        public string grant_type { get; set; }
+        public string refresh_token { get; set; }
+        public string client_id { get; set; }
+        public string client_secret { get; set; }
+        public string username { get; set; }
+        public string password { get; set; }
+        public string fullname { get; set; }
     }
 
     public class RToken
     {
         public string Id { get; set; }
+        [BsonElement("client_id")]
         public string ClientId { get; set; }
+        [BsonElement("refresh_token")]
         public string RefreshToken { get; set; }
+        [BsonElement("isstop")]
         public int IsStop { get; set; }
     }
 }

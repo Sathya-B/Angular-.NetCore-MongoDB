@@ -4,9 +4,9 @@ using Arthur_Clive.Data;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using Arthur_Clive.Logger;
 using AH = Arthur_Clive.Helper.AmazonHelper;
+using WH = Arthur_Clive.Helper.MinioHelper;
 using MH = Arthur_Clive.Helper.MongoHelper;
 using System.Linq;
 
@@ -18,167 +18,83 @@ namespace Arthur_Clive.Controllers
         public IMongoDatabase _db = MH._client.GetDatabase("UserInfo");
         public UpdateDefinition<BsonDocument> updateDefinition;
 
-        [HttpPost("userinfo")]
-        public async Task<ActionResult> Post([FromBody]UserInfo data)
+        [HttpPost("userinfo/{username}")]
+        public async Task<ActionResult> RefreshUserInfo([FromBody]UserInfoList data,string username)
         {
             try
             {
-                if (data.ShippingAddress == null || data.BillingAddress == null)
+                var addressFilter = Builders<Address>.Filter.Eq("UserName", username);
+                var addressCollection = _db.GetCollection<Address>("UserInfo");
+                var result = addressCollection.DeleteManyAsync(addressFilter).Result;
+                data.ListOfAddress.ToList().ForEach(c => c.UserName = username);
+                var authCollection = _db.GetCollection<Address>("UserInfo");
+                await authCollection.InsertManyAsync(data.ListOfAddress);
+                return Ok(new ResponseData
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "401",
-                        Message = "Billing or Shipping Address Not Avaliable",
-                        Data = null
-                    });
-                }
-                else
-                {
-                    var filter = Builders<BsonDocument>.Filter.Eq("UserName", data.UserName);
-                    var userInfo = MH.GetSingleObject(filter, "UserInfo", "UserInfo").Result;
-                    if (userInfo == null)
-                    {
-                        var userCollection = _db.GetCollection<UserInfo>("UserInfo");
-                        if (data.BillingAddress[0].Default == true)
-                        {
-                            data.BillingAddress[0].Default = true;
-                            data.BillingAddress[0].AddressId = 1;
-                        }
-                        if (data.ShippingAddress != null)
-                        {
-                            data.ShippingAddress[0].Default = true;
-                            data.ShippingAddress[0].AddressId = 1;
-                        }
-                        await userCollection.InsertOneAsync(data);
-                        return Ok(new ResponseData
-                        {
-                            Code = "200",
-                            Message = "Inserted",
-                            Data = null
-                        });
-                    }
-                    else
-                    {
-                        var oldData = BsonSerializer.Deserialize<UserInfo>(userInfo);
-                        if (data.BillingAddress != null)
-                        {
-                            if (data.BillingAddress[0].Default == true)
-                            {
-                                foreach (var array in oldData.BillingAddress)
-                                {
-                                    array.Default = false;
-                                }
-                                updateDefinition = Builders<BsonDocument>.Update.Set("BillingAddress", oldData.BillingAddress);
-                            }
-                        }
-                        if (data.ShippingAddress != null)
-                        {
-                            if (data.ShippingAddress[0].Default == true)
-                            {
-                                foreach (var array in oldData.ShippingAddress)
-                                {
-                                    array.Default = false;
-                                }
-                                updateDefinition = Builders<BsonDocument>.Update.Set("ShippingAddress", oldData.ShippingAddress);
-                            }
-
-                        }
-                        if (data.BillingAddress != null && data.ShippingAddress != null)
-                        {
-                            if (data.BillingAddress[0].Default == true && data.ShippingAddress[0].Default == true)
-                            {
-                                updateDefinition = Builders<BsonDocument>.Update.Set("BillingAddress", oldData.BillingAddress).Set("ShippingAddress", oldData.ShippingAddress);
-                            }
-                        }
-                        await MH.UpdateSingleObject(filter, "UserInfo", "UserInfo", updateDefinition);
-                        string response = await Update(oldData, data);
-                        return Ok(new ResponseData
-                        {
-                            Code = "200",
-                            Message = "User updated" + response,
-                            Data = null
-                        });
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                LoggerDataAccess.CreateLog("UserController", "Post", "Post", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
+                    Code = "200",
+                    Message = "Inserted",
                     Data = null
                 });
             }
-        }
-
-        public async Task<string> Update(UserInfo data, UserInfo updateData)
-        {
-            try
-            {
-                if (updateData.BillingAddress != null)
-                {
-                    updateData.BillingAddress[0].AddressId = data.BillingAddress.Count + 1;
-                    data.BillingAddress.Add(updateData.BillingAddress[0]);
-                    updateDefinition = Builders<BsonDocument>.Update.Set("BillingAddress", data.BillingAddress);
-                }
-                if (updateData.ShippingAddress != null)
-                {
-                    updateData.ShippingAddress[0].AddressId = data.ShippingAddress.Count + 1;
-                    data.ShippingAddress.Add(updateData.ShippingAddress[0]);
-                    updateDefinition = Builders<BsonDocument>.Update.Set("ShippingAddress", data.ShippingAddress);
-                }
-                if (updateData.BillingAddress != null && updateData.ShippingAddress != null)
-                {
-                    updateDefinition = Builders<BsonDocument>.Update.Set("BillingAddress", data.BillingAddress).Set("ShippingAddress", data.ShippingAddress);
-                }
-                var filter = Builders<BsonDocument>.Filter.Eq("UserName", data.UserName);
-                await MH.UpdateSingleObject(filter, "UserInfo", "UserInfo", updateDefinition);
-                return "Updated";
-            }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("UserController", "Update", "Update", ex.Message);
-                return "Failed";
+                LoggerDataAccess.CreateLog("UserController", "RefreshUserInfo", "RefreshUserInfo", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
             }
         }
-
-        [HttpGet("userinfo")]
-        public async Task<ActionResult> Get()
+        
+        [HttpGet("userinfo/address/{username}")]
+        public async Task<ActionResult> GetAddressOfUser(string username)
         {
             try
             {
-                var userCollection = _db.GetCollection<UserInfo>("UserInfo");
-                var filter = FilterDefinition<UserInfo>.Empty;
-                IAsyncCursor<UserInfo> cursor = await userCollection.FindAsync(filter);
+                var userCollection = _db.GetCollection<Address>("UserInfo");
+                var filter = Builders<Address>.Filter.Eq("UserName", username);
+                IAsyncCursor<Address> cursor = await userCollection.FindAsync(filter);
                 var userInfo = cursor.ToList();
-                return Ok(userInfo);
+                return Ok(new ResponseData
+                {
+                    Code = "200",
+                    Message = "Success",
+                    Data = userInfo
+                });
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("UserController", "Get", "Get", ex.Message);
+                LoggerDataAccess.CreateLog("UserController", "GetAddressOfUser", "GetAddressOfUser", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
                     Message = "Failed",
                     Data = null
-                }); ;
+                }); 
             }
         }
 
         [HttpGet("userinfo/{username}")]
-        public ActionResult GetOneUser(string username)
+        public async Task<ActionResult> GetDefaultAddressOfUser(string username)
         {
             try
             {
-                var filter = Builders<BsonDocument>.Filter.Eq("UserName", username);
-                var userInfo = BsonSerializer.Deserialize<UserInfo>(MH.GetSingleObject(filter, "UserInfo", "UserInfo").Result);
-                return Ok(userInfo);
+                var userCollection = _db.GetCollection<Address>("UserInfo");
+                var filter = Builders<Address>.Filter.Eq("UserName", username) & Builders<Address>.Filter.Eq("DefaultAddress", true);
+                IAsyncCursor<Address> cursor = await userCollection.FindAsync(filter);
+                var userInfo = cursor.ToList();
+                return Ok(new ResponseData
+                {
+                    Code = "200",
+                    Message = "Success",
+                    Data = userInfo
+                });
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("UserController", "GetOneUser", "GetOneUser", ex.Message);
+                LoggerDataAccess.CreateLog("UserController", "GetDefaultAddressOfUser", "GetDefaultAddressOfUser", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -197,7 +113,6 @@ namespace Arthur_Clive.Controllers
                 var cartCollection = _db.GetCollection<Cart>("Cart");
                 var result = cartCollection.DeleteManyAsync(cartFilter).Result;
                 data.ListOfProducts.ToList().ForEach(c => c.UserName = username);
-
                 var authCollection = _db.GetCollection<Cart>("Cart");
                 await authCollection.InsertManyAsync(data.ListOfProducts);
                 return Ok(new ResponseData
@@ -249,7 +164,7 @@ namespace Arthur_Clive.Controllers
                 {
                     Code = "400",
                     Message = "Failed",
-                    Data = null
+                    Data = ex.Message
                 });
             }
         }
@@ -279,7 +194,7 @@ namespace Arthur_Clive.Controllers
                 {
                     Code = "400",
                     Message = "Failed",
-                    Data = null
+                    Data = ex.Message
                 });
             }
         }
@@ -314,7 +229,7 @@ namespace Arthur_Clive.Controllers
                 {
                     Code = "400",
                     Message = "Failed",
-                    Data = null
+                    Data = ex.Message
                 });
             }
         }

@@ -13,17 +13,14 @@ namespace Arthur_Clive.Helper
     {
         public static string GetCredentials(string key)
         {
-            var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            var xmlStr = File.ReadAllText(Path.Combine(dir, "AmazonKeys.xml"));
-            var str = XElement.Parse(xmlStr);
-            var result = str.Elements("amazonses").Where(x => x.Element("current").Value.Equals("raguvarthan.n@turingminds.com")).Descendants(key);
+            var result = GlobalHelper.ReadXML().Elements("amazonses").Where(x => x.Element("current").Value.Equals("test")).Descendants(key);
             return result.First().Value;
         }
 
         public static async Task<string> SendEmail(string fullname, string emailReceiver, string message)
         {
-            string emailSender = "raguvarthan.n@turingminds.com";
-            string link = "https://artwear.in/";
+            string emailSender = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsender").First().Value;
+            string link = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("websitelink").First().Value;
             using (var client = new AmazonSimpleEmailServiceClient(GetCredentials("accesskey"), GetCredentials("secretkey"), Amazon.RegionEndpoint.USWest2))
             {
                 var sendRequest = new SendEmailRequest
@@ -32,7 +29,7 @@ namespace Arthur_Clive.Helper
                     Destination = new Destination { ToAddresses = new List<string> { emailReceiver } },
                     Message = new Message
                     {
-                        Subject = new Content("Message from the Arthur Clive admin."),
+                        Subject = new Content(GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsubject1").First().Value),
                         Body = new Body
                         {
                             Html = new Content(CreateEmailBody(fullname, "<a href ='" + link + "'>Click Here</a>", message))
@@ -54,7 +51,9 @@ namespace Arthur_Clive.Helper
         public static string CreateEmailBody(string fullname, string link, string message)
         {
             string emailBody;
-            using (StreamReader reader = System.IO.File.OpenText("D:/Arthur_Clive/netcore/EmailTemplate/PublicPostEmailTemplate.html"))
+            var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            var path = Path.Combine(dir, "PublicPostEmailTemplate.html");
+            using (StreamReader reader = File.OpenText(path))
             {
                 emailBody = reader.ReadToEnd();
             }

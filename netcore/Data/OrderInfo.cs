@@ -11,8 +11,7 @@ namespace Arthur_Clive.Data
         public string UserName { get; set; }
         public string PaymentMethod { get; set; }
         public PaymentMethod PaymentDetails { get; set; }
-        public Address ShippingAddress { get; set; }
-        public Address BillingAddress { get; set; }
+        public Address Address { get; set; }
         public List<ProductDetails> ProductDetails { get; set; }
     }
 

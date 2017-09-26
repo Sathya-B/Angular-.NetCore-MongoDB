@@ -4,11 +4,9 @@ using Arthur_Clive.Helper;
 using Arthur_Clive.Logger;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
-using WH = Arthur_Clive.Helper.MinioHelper;
 using AH = Arthur_Clive.Helper.AmazonHelper;
+using WH = Arthur_Clive.Helper.MinioHelper;
 using MH = Arthur_Clive.Helper.MongoHelper;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson;
 using System.Threading.Tasks;
 
 namespace Arthur_Clive.Controllers
@@ -17,7 +15,6 @@ namespace Arthur_Clive.Controllers
     public class SubCategoryController : Controller
     {
         public IMongoDatabase _db = MH._client.GetDatabase("ProductDB");
-        public MongoHelper mongoHelper = new MongoHelper();
 
         [HttpGet("{productFor}/{productType}")]
         public async Task<ActionResult> Get(string productFor, string productType)
@@ -49,7 +46,7 @@ namespace Arthur_Clive.Controllers
                 {
                     Code = "400",
                     Message = "Failed",
-                    Data = null
+                    Data = ex.Message
                 }); 
             }
         }

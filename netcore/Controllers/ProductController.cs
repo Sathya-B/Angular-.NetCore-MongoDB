@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using Arthur_Clive.Helper;
 using AH = Arthur_Clive.Helper.AmazonHelper;
+using WH = Arthur_Clive.Helper.MinioHelper;
 using MH = Arthur_Clive.Helper.MongoHelper;
 
 namespace Arthur_Clive.Controllers

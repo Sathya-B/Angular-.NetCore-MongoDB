@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Minio;
 
 namespace Arthur_Clive.Helper
@@ -8,7 +10,9 @@ namespace Arthur_Clive.Helper
     {
         public static MinioClient GetMinioClient()
         {
-            return new MinioClient("localhost:9000", "MinioServer", "123654789@Ragu");
+            return new MinioClient(GlobalHelper.ReadXML().Elements("minioclient").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("host").First().Value,
+                                    GlobalHelper.ReadXML().Elements("minioclient").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("accesskey").First().Value,
+                                    GlobalHelper.ReadXML().Elements("minioclient").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("secretkey").First().Value);
         }
 
         public static async Task<string> GetMinioObject(string bucketName, string objectName)

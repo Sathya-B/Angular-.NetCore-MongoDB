@@ -9,27 +9,26 @@ namespace Arthur_Clive.Data
         public string UserName { get; set; }
     }
 
-    public class UserInfo
+    public class UserInfoList
     {
-        public ObjectId Id { get; set; }
-        public string UserName { get; set; }
-        public string FullName { get; set; }
-        public string Email { get; set; }
-        public List<Address> ShippingAddress { get; set; }
-        public List<Address> BillingAddress { get; set; }
+        public List<Address> ListOfAddress { get; set; }
     }
 
     public class Address
     {
-        public int AddressId { get; set; }
+        public ObjectId Id { get; set; }
+        public string UserName { get; set; }
+        public string Name { get; set; }
         public string PhoneNumber { get; set; }
-        public bool Default { get; set; }
-        public string DoorNo_Or_BuildingName { get; set; }
-        public string Area_Or_Street { get; set; }
+        public string AddressLines { get; set; }
+        public string PostOffice { get; set; }
         public string City { get; set; }
         public string State { get; set; }
-        public string Pincode { get; set; }
+        public string PinCode { get; set; }
         public string Landmark { get; set; }
+        public bool BillingAddress { get; set; }
+        public bool ShippingAddress { get; set; }
+        public bool DefaultAddress { get; set; }
     }
 
     public class CartList

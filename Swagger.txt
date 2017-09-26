@@ -35,6 +35,8 @@ tags:
 - name: "Deactivate Account"
 - name: "AdminContoller"
   description: "Subscribe user, Unscubcribe user and Send message to subscribed users"
+- name: "TokenContoller"
+  description: "Get JWT"
 schemes:
 - "http"  
 paths:
@@ -211,7 +213,7 @@ paths:
           description: "Failed"
           schema:
               $ref: "#/definitions/ResponseData"
-  /api/user/userinfo:
+  /api/user/userinfo/{username}:
     post:
       tags:
       - "User"
@@ -223,25 +225,22 @@ paths:
       - "application/xml"
       - "application/json"
       parameters:
+      - in: "path"
+        name: "username"
+        description: "UserName of user whoes address need to be added"
+        required: true
+        type: "string"
       - in: "body"
         name: "data"
         description: "Object that need to be added to the DB"
         required: true
         schema:
-          $ref: "#/definitions/UserInfo"
+          $ref: "#/definitions/UserInfoList"
       responses:
         200:
           description: "Inserted"
           schema:
             $ref: "#/definitions/ResponseData"
-        201:
-          description: "User Updated + responce"
-          schema:
-            $ref: "#/definitions/ResponseData"
-        401:
-          description: "Billing or Shipping Address Not Avaliable"
-          schema:
-            $ref: "#/definitions/ResponseData"
         400:
           description: "Failed"
           schema:
@@ -249,38 +248,44 @@ paths:
     get:
       tags:
       - "User"
-      operationId: "getAllUsers"
-      produces:
-      - "application/xml"
-      - "application/json"
-      responses:
-        200:
-          description: "Success"
-          schema:
-            $ref: "#/definitions/UserInfoDetails"
-        400:
-          description: "Failed"
-          schema:
-              $ref: "#/definitions/ResponseData"
-  /api.user/userinfo/{phonenumber}:
-    get:
-      tags:
-      - "User"
-      operationId: "getOneUser"
+      operationId: "getDefaultAddress"
       produces:
       - "application/xml"
       - "application/json"
       parameters:
-      - name: "phonenumber"
+      - name: "username"
         in: "path"
-        description: "Phonenumber of user whoes details need to be filtered."
+        description: "UserName of uswer whos default address details needs to be taken."
         required: true
         type: "string"
       responses:
         200:
           description: "Success"
           schema:
-            $ref: "#/definitions/UserInfoDetails"
+            $ref: "#/definitions/ResponceData"
+        400:
+          description: "Failed"
+          schema:
+              $ref: "#/definitions/ResponseData"
+  /api/user/userinfo/address/{username}:
+    get:
+      tags:
+      - "User"
+      operationId: "getAllAddress"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "UserName of uswer whos address details needs to be taken."
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/ResponceData"
         400:
           description: "Failed"
           schema:
@@ -804,6 +809,30 @@ paths:
           description: "Failed"
           schema:
               $ref: "#/definitions/ResponseData"
+  /api/token/auth:
+     get:
+      tags:
+      - "TokenController"
+      operationId: "getJWT"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Parameters to get JWT Token"
+        required: true
+        schema:
+          $ref: "#/definitions/Parameters"
+      responses:
+        999:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/ResponceData"
+        910:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/ResponceData"
 definitions:
   ResponseData:
     type: "object"
@@ -983,51 +1012,40 @@ definitions:
         type: "string"
       ProductDescription:
         type: "string"
-  UserInfo:
+  UserInfoList:
     type: "object"
     properties:
-      PhoneNumber:
-        type: "number"
-  UserInfoDetails:
-    type: "object"
-    properties:
-      Id:
-        type: "number"
-      PhoneNumber:
-        type: "number"
-      FullName:
-        type: "string"
-      Email:
-        type: "string"
-      ShippingAddress:
+      ListOfAddress:
         type: "array"
-        items:
-          $ref: "#/definitions/Address" 
-      BillingsAddress:
-        type: "array"
-        items:
-          $ref: "#/definitions/Address" 
+        items: 
+          $ref: "#/definitions/Address"
   Address:
     type: "object"
     properties:
-      AddressId:
-        type: "integer"
+      UserName:
+        type: "string"
+      Name:
+        type: "string"
       PhoneNumber:
         type: "number"
-      Default:
-        type: "boolean"
-      DoorNo_Or_BuildingName:
+      AddressLines:
         type: "string"
-      Area_Or_Street:
+      PostOffice:
         type: "string"
       City:
         type: "string"
       State:
         type: "string"
-      Pincode:
+      PinCode:
         type: "string"
       Landmark:
         type: "string"
+      BillingAddress:
+        type: "boolean"
+      ShippingAddress:
+        type: "boolean"
+      Default:
+        type: "boolean"
   CartList:
     type: "object"
     properties:
@@ -1157,19 +1175,19 @@ definitions:
   Parameters:
     type: "object"
     properties:
-      GrandType:
+      grand_type:
         type: "string"
-      RefershToken:
+      refersh_token:
         type: "string"
-      Clientid:
+      client_id:
         type: "string"
-      ClientSecret:
+      client_secret:
         type: "string"
-      UserName:
+      username:
         type: "string"
-      Password:
+      password:
         type: "string"
-      FullName:
+      fullname:
         type: "string"
   RToken:
     type: "object"

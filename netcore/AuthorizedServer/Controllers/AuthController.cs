@@ -11,8 +11,6 @@ using MongoDB.Bson.Serialization;
 using AuthorizedServer.Repositories;
 using Microsoft.Extensions.Options;
 using AuthorizedServer.Logger;
-using System.Xml.Linq;
-using System.Linq;
 
 namespace AuthorizedServer.Controllers
 {
@@ -31,15 +29,7 @@ namespace AuthorizedServer.Controllers
             this._settings = settings;
             this._repo = repo;
         }
-
-        public static string GetIpConfig()
-        {
-            var xmlStr = System.IO.File.ReadAllText("D:/AmazonKeys.xml");
-            var str = XElement.Parse(xmlStr);
-            var result = str.Elements("ipconfig").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("authorizedserver");
-            return result.First().Value;
-        }
-
+        
         [HttpPost("register")]
         public async Task<ActionResult> Register([FromBody]RegisterModel data)
         {
@@ -64,7 +54,7 @@ namespace AuthorizedServer.Controllers
                         data.UserName = userName;
                         RegisterModel registerModel = new RegisterModel { UserName = userName, Password = data.Password };
                         data.Password = passwordHasher.HashPassword(registerModel, data.Password);
-                        data.OTPExp = DateTime.UtcNow.AddMinutes(5);
+                        data.OTPExp = DateTime.UtcNow.AddMinutes(2);
                         VerificationModel smsModel = new VerificationModel();
                         smsModel.UserName = userName;
                         if (data.UserLocation == "IN")
@@ -77,7 +67,7 @@ namespace AuthorizedServer.Controllers
                         else
                         {
                             OTP = Guid.NewGuid().ToString();
-                            string link = GetIpConfig() + data.UserName + "/" + OTP + "/no";
+                            string link = GlobalHelper.GetIpConfig() + data.UserName + "/" + OTP + "/no";
                             await EmailHelper.SendEmail(data.FullName, data.Email, link);
                         }
                         data.VerificationCode = smsHasher.HashPassword(smsModel, OTP);
@@ -140,7 +130,7 @@ namespace AuthorizedServer.Controllers
                             var update = Builders<BsonDocument>.Update.Set("Status", "Verified");
                             var filter = Builders<BsonDocument>.Filter.Eq("UserName", username);
                             var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
-                            Parameters parameters = new Parameters { UserName = username ,FullName = verifyUser.FullName};
+                            Parameters parameters = new Parameters { username = username ,fullname = verifyUser.FullName};
                             return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
                         }
                         else
@@ -201,8 +191,8 @@ namespace AuthorizedServer.Controllers
                     if (passwordHasher.VerifyHashedPassword(registerModel, verifyUser.Password, user.Password).ToString() == "Success")
                     {
                         Parameters parameters = new Parameters();
-                        parameters.UserName = user.UserName;
-                        parameters.FullName = verifyUser.FullName;
+                        parameters.username = user.UserName;
+                        parameters.fullname = verifyUser.FullName;
                         return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
                     }
                     else
@@ -298,10 +288,10 @@ namespace AuthorizedServer.Controllers
                     else
                     {
                         OTP = Guid.NewGuid().ToString();
-                        string link = GetIpConfig() + data.UserName + "/" + OTP + "/yes";
+                        string link = GlobalHelper.GetIpConfig() + data.UserName + "/" + OTP + "/yes";
                         await EmailHelper.SendEmail(userData.FullName,data.UserName, link);
                     }
-                    var update = Builders<BsonDocument>.Update.Set("Status", "Not Verified").Set("OTPExp", DateTime.UtcNow.AddMinutes(5))
+                    var update = Builders<BsonDocument>.Update.Set("Status", "Not Verified").Set("OTPExp", DateTime.UtcNow.AddMinutes(2))
                                                               .Set("VerificationCode", smsHasher.HashPassword(smsModel, OTP));
                     var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
                     return Ok(new ResponseData
@@ -350,8 +340,8 @@ namespace AuthorizedServer.Controllers
                         {
                             var update = Builders<BsonDocument>.Update.Set("Status", "Verified");
                             var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result; Parameters parameters = new Parameters();
-                            parameters.UserName = username;
-                            parameters.FullName = verifyUser.FullName;
+                            parameters.username = username;
+                            parameters.fullname = verifyUser.FullName;
                             var response = authHelper.DoPassword(parameters, _repo, _settings);
                             response.Code = "201";
                             response.Message = "OTP Verified";

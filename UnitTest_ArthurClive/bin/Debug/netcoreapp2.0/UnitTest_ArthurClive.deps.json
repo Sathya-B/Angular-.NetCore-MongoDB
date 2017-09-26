@@ -3856,6 +3856,7 @@
       "Arthur_Clive/1.0.0": {
         "dependencies": {
           "AWSSDK.S3": "3.3.11",
+          "AWSSDK.SimpleEmail": "3.3.3",
           "Microsoft.AspNetCore.All": "2.0.0",
           "Microsoft.AspNetCore.Mvc.Core": "2.0.0",
           "Minio.NetCore": "1.0.2",

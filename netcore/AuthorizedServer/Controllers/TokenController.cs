@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
 
@@ -36,11 +35,11 @@ namespace AuthorizedServer.Controllers
                 });
             }
 
-            if (parameters.GrantType == "password")
+            if (parameters.grant_type == "password")
             {
                 return Json(DoPassword(parameters));
             }
-            else if (parameters.GrantType == "refresh_token")
+            else if (parameters.grant_type == "refresh_token")
             {
                 return Json(DoRefreshToken(parameters));
             }
@@ -54,14 +53,13 @@ namespace AuthorizedServer.Controllers
                 });
             }
         }
-
-        //scenario 1 ： get the access-token by username and password
+        
         private ResponseData DoPassword(Parameters parameters)
         {
             var refreshToken = Guid.NewGuid().ToString().Replace("-", "");
             var rToken = new RToken
             {
-                ClientId = parameters.ClientId,
+                ClientId = parameters.client_id,
                 RefreshToken = refreshToken,
                 Id = Guid.NewGuid().ToString(),
                 IsStop = 0
@@ -72,7 +70,7 @@ namespace AuthorizedServer.Controllers
                 {
                     Code = "999",
                     Message = "OK",
-                    Data = GetJwt(parameters.ClientId, refreshToken)
+                    Data = GetJwt(parameters.client_id, refreshToken)
                 };
             }
             else
@@ -85,11 +83,10 @@ namespace AuthorizedServer.Controllers
                 };
             }
         }
-
-        //scenario 2 ： get the access_token by refresh_token
+        
         private ResponseData DoRefreshToken(Parameters parameters)
         {
-            var token = _repo.GetToken(parameters.RefreshToken, parameters.ClientId).Result;
+            var token = _repo.GetToken(parameters.refresh_token, parameters.client_id).Result;
             if (token == null)
             {
                 return new ResponseData
@@ -113,7 +110,7 @@ namespace AuthorizedServer.Controllers
             var updateFlag = _repo.ExpireToken(token).Result;
             var addFlag = _repo.AddToken(new RToken
             {
-                ClientId = parameters.ClientId,
+                ClientId = parameters.client_id,
                 RefreshToken = refresh_token,
                 Id = Guid.NewGuid().ToString(),
                 IsStop = 0
@@ -124,7 +121,7 @@ namespace AuthorizedServer.Controllers
                 {
                     Code = "999",
                     Message = "OK",
-                    Data = GetJwt(parameters.ClientId, refresh_token)
+                    Data = GetJwt(parameters.client_id, refresh_token)
                 };
             }
             else
@@ -155,13 +152,13 @@ namespace AuthorizedServer.Controllers
                 audience: _settings.Value.Aud,
                 claims: claims,
                 notBefore: now,
-                expires: now.Add(TimeSpan.FromMinutes(2)),
+                expires: now.Add(TimeSpan.FromMinutes(1)),
                 signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256));
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
             var response = new
             {
                 access_token = encodedJwt,
-                expires_in = (int)TimeSpan.FromMinutes(2).TotalSeconds,
+                expires_in = (int)TimeSpan.FromMinutes(1).TotalSeconds,
                 refresh_token = refresh_token,
             };
             return JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented });

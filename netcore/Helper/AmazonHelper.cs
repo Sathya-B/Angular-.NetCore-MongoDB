@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Xml.Linq;
 using Amazon.S3;
 using Amazon.S3.Model;
 
@@ -11,8 +13,8 @@ namespace Arthur_Clive.Helper
 
         public static IAmazonS3 GetAmazonS3Client()
         {
-            string accessKey = "AKIAIUAYVIL7A7I6XECA";
-            string secretKey = "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";
+            string accessKey = GlobalHelper.ReadXML().Elements("amazons3").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("accesskey").First().Value;
+            string secretKey = GlobalHelper.ReadXML().Elements("amazons3").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("secretkey").First().Value;
             s3Client = new AmazonS3Client(accessKey, secretKey, Amazon.RegionEndpoint.APSouth1);
             return s3Client;
         }

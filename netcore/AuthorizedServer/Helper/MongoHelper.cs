@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -13,7 +14,7 @@ namespace AuthorizedServer.Helper
 
         public static MongoClient GetClient()
         {
-            return new MongoClient("mongodb://localhost:27017");
+            return new MongoClient(GlobalHelper.ReadXML().Elements("mongoclient").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("host").First().Value);
         }
 
         public static async Task<BsonDocument> GetSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName)

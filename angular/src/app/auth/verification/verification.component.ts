@@ -26,14 +26,14 @@ export class VerificationComponent {
 
 public onSubmit(form: NgForm) {
     if (this.action === 'createaccount') {
-     this.postUrl = '/register/smsverification';
+     this.postUrl = '/register/verification/' + this.PhoneNumber + "/" + form.value.VerificationCode;
     } else if (this.action === 'forgotpassword') {
-    this.postUrl = '/forgotpassword/smsverification';
+    this.postUrl = '/forgotpassword/verification/'  + this.PhoneNumber + "/" + form.value.VerificationCode;;
     }
     const verificationCode = form.value;
     verificationCode.PhoneNumber = this.PhoneNumber;
     console.log(verificationCode);
-    this.apiService.post(this.postUrl, verificationCode, undefined, apiUrl.authServer).then(
+    this.apiService.get(this.postUrl, undefined, apiUrl.authServer).then(
       (response: any) => {
         console.log(response);
         if (response.value === undefined) {

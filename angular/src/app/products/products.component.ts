@@ -38,15 +38,18 @@ export class ProductsComponent implements OnInit {
   public type: any;
   constructor(public appState: AppState, private cartServ: CartService,
               private apiService: ApiService, private route: ActivatedRoute) {
-      this.for = route.snapshot.paramMap.get('productFor');
-      this.type = route.snapshot.paramMap.get('productType');
+      this.route.params.subscribe( (params) => {
+      this.for = params['productFor'];
+      this.type = params['productType'];
+      this.ngOnInit();     
+      })
   }
 
 public ngOnInit() {
  this.GetProducts();
 }
 public GetProducts() {
-    this.apiService.get('SubCategory/' + this.for + 's/' + this.type).then(
+    this.apiService.get('SubCategory/' + this.for + '/' + this.type).then(
       (response: any) => {
       console.log(response);
       this.products = response.data;

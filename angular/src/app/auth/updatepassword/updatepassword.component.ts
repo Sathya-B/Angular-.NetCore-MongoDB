@@ -14,17 +14,17 @@ import { apiUrl } from '../../config/configuration';
 })
 export class UpdatePasswordComponent {
 public password: string;
-public newPassword: { PhoneNumber: string, Password: string} = { PhoneNumber: '', Password: ''};
-public phoneNumber: string;
+public newPassword: { userName: string, Password: string} = { userName: '', Password: ''};
+public userName: string;
 constructor(private apiService: ApiService, private toastmsg: ToastMsgService,
             private activatedRoute: ActivatedRoute, private router: Router,
             public appState: AppState) {
-    this.phoneNumber = activatedRoute.snapshot.paramMap.get('PhoneNumber');
+    this.userName = activatedRoute.snapshot.paramMap.get('userName');
 }
 
 public onSubmit(form: NgForm) {
     this.newPassword.Password = form.value.Password;
-    this.newPassword.PhoneNumber = this.phoneNumber;
+    this.newPassword.userName = this.userName;
     console.log(this.newPassword);
     this.apiService.post('/forgotpassword/changepassword',
                          this.newPassword, undefined, apiUrl.authServer).then(

@@ -23,7 +23,7 @@ import { ICarouselConfig, AnimationConfig } from 'angular4-carousel';
   /**
    * Our list of styles in our component. We may add more to compose many styles together.
    */
-  styleUrls: ['./home.component.css'],
+  styleUrls: ['./home.component.scss'],
   /**
    * Every Angular template is first compiled by the browser before Angular runs it's compiler.
    */
@@ -41,19 +41,24 @@ export class HomeComponent implements OnInit {
     '../assets/img/sliderhome/desktop/1200-X-450_B_03.jpg',
     '../assets/img/sliderhome/desktop/1200-X-450_B_04.jpg'
   ];
-
+  public mobileImageSources: string[] = [
+    '../assets/img/sliderhome/mobile/600X600_1.jpg',
+    '../assets/img/sliderhome/mobile/600X600_2.jpg',
+    '../assets/img/sliderhome/mobile/600X600_3.jpg',
+    '../assets/img/sliderhome/mobile/600X600_4.jpg'
+  ];
   public config: ICarouselConfig = {
     verifyBeforeLoad: false,
     log: false,
     animation: true,
     animationType: AnimationConfig.SLIDE,
-    autoplay: false,
-    autoplayDelay: 2000,
+    autoplay: true,
+    autoplayDelay: 3000,
     stopAutoplayMinWidth: 1200
   };
 
   public category: any[] = [];
-
+  public imgStyle: any = 'block';
   /**
    * TypeScript public modifiers
    */
@@ -73,5 +78,8 @@ export class HomeComponent implements OnInit {
       .catch((error: any) => {
       console.log(error);
     });
+  }
+  public onCloseImg(){
+   this.imgStyle = 'none';
   }
 }

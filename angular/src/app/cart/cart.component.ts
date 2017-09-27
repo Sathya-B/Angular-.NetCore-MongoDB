@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CartItem } from 'cartitem/cartitem.component';
 import { CartService } from '../../services/cart.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'cart',
@@ -11,7 +11,7 @@ export class CartComponent implements OnInit, OnDestroy {
 
 public cartItems: any;
 
-constructor(private cartService: CartService) {
+constructor(private cartService: CartService, private route: Router) {
 
 }
 
@@ -19,13 +19,10 @@ public ngOnInit() {
  this.cartItems = this.cartService.cartItems.listOfProducts;
 
 }
-public getCartTotal() {
-      return this.cartService.cartItems.listOfProducts.reduce((acc, item) => {
-            return acc + (Number(item.productPrice) * item.productQuantity);
-        }, 0);
-}
-
 public ngOnDestroy() {
     this.cartService.refreshCart();
+}
+public checkOut(){
+this.route.navigate(['/checkout']);
 }
 }

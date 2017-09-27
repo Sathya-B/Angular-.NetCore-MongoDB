@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, OnChanges } from '@angular/core';
+import { ToastMsgService } from '../../../services/toastmsg.service';
 
 @Component({
   selector: 'colorsizestock',
@@ -17,9 +18,19 @@ export class ColorSizeStockComponent implements OnInit, OnChanges {
   public selectSize: string = 'Select a Size';
 
   @Input() public selectedVariant: any;
-
+  @Input() public initItem: any;
+  public topItem: any = {};
+ constructor(private toastMsg: ToastMsgService) {
+ 
+ }
   public ngOnInit() {
     this.isDataLoaded = true;
+    this.topItem = this.initItem.topItem;
+    console.log('init');
+    console.log(this.selectedVariant);
+    if(this.topItem.productSize == "") {
+      this.checked("");
+    }
   }
 
   public ngOnChanges() {
@@ -35,7 +46,7 @@ export class ColorSizeStockComponent implements OnInit, OnChanges {
     if (this.selectedVariant) {
       let index = this.selectedVariant.variants.findIndex( (myObj) =>
                                                             myObj['productSize'] === size);
-      if (index >= 0) {
+      if (this.selectedVariant.variants[index].productStock > 0) {
         return false;
       } else {
         return true;
@@ -47,7 +58,7 @@ export class ColorSizeStockComponent implements OnInit, OnChanges {
     if (this.selectedVariant) {
       let index = this.selectedVariant.variants.findIndex( (myObj) =>
                                                             myObj['productSize'] === size);
-      if (index < 0) {
+      if (this.selectedVariant.variants[index].productStock == 0) {
         this.selectedSize = null;
         this.remainingQty = this.selectSize;
       } else {
@@ -64,6 +75,8 @@ export class ColorSizeStockComponent implements OnInit, OnChanges {
   public addOne() {
     if (this.quantity < 10 && this.quantity < Number(this.remainingQty)) {
     this.quantity++;
+    } else {
+     this.toastMsg.popToast('info','Info','Please Select a Colour and Size.')
     }
   }
   public reduceOne() {

@@ -1,4 +1,4 @@
-<div id="mainHeader" class="headertop" *ngIf="!scrolled" [ngClass]="{hideMainHeader: scrolled}">
+<div id="mainHeader" class="headertop" *ngIf="!scrolled" [ngClass]="{hideMainHeader: scrolled}">    
 	<div class="wrapper">
 		<div class="navBtn" [ngClass]="{activeNav: menuOpened == true}" (click)="openMenu()"><span></span></div>
 
@@ -18,9 +18,9 @@
 				</div>
 				</div>
 			</div>
-			<div class="commonIconBtnHeader wishListBtn tooltipsParent">
+			<a [routerLink]="['./wishlist']"><div class="commonIconBtnHeader wishListBtn tooltipsParent">
 				<span class="tooltip">Show My Wishlist</span>
-				<span class="wishlistCount">{{wishlistCount}}</span></div>
+				<span class="wishlistCount">{{this.wishListService.getCount()}}</span></div></a>
 			<a [routerLink]="['./cart']"><div class="commonIconBtnHeader shoppingBagBtn tooltipsParent">
 				<span class="tooltip">Shopping Bag</span>
 				<span class="shoppingbagCountItem">{{this.cartService.getCount()}}</span></div></a>
@@ -45,9 +45,9 @@
 				</div>
 				</div>
 			</div>
-			<div class="commonIconBtnHeader wishListBtn tooltipsParent">
+			<a [routerLink]="['./wishlist']"><div class="commonIconBtnHeader wishListBtn tooltipsParent">
 				<span class="tooltip">Show My Wishlist</span>
-				<span class="wishlistCount">{{wishlistCount}}</span></div>
+				<span class="wishlistCount">{{this.wishListService.getCount()}}</span></div></a>
 			<a [routerLink]="['./cart']"><div class="commonIconBtnHeader shoppingBagBtn tooltipsParent">
 				<span class="tooltip">Shopping Bag</span>
 				<span class="shoppingbagCountItem">{{this.cartService.getCount()}}</span></div></a>
@@ -60,15 +60,15 @@
 			<nav class="mainNav">
 				<ul>
 					<li><a href="">Home</a></li>
-					<li><a href="">Womens</a></li>
-					<li><a href="#">Mens</a></li>
-					<li><a href="">Girls</a></li>
-					<li><a href="">Boys</a></li>
-					<li><a href="">Art for Home</a></li>
+					<li><a [routerLink]="['/products/Women/Tshirt']" (click)="menuOpened = !menuOpened">Women</a></li>
+					<li><a [routerLink]="['/products/Men/Tshirt']" (click)="menuOpened = !menuOpened">Men</a></li>
+					<li><a [routerLink]="['/products/Girls/Tshirt']" (click)="menuOpened = !menuOpened">Girls</a></li>
+					<li><a [routerLink]="['/products/Boys/Tshirt']" (click)="menuOpened = !menuOpened">Boys</a></li>
+					<li><a [routerLink]="['/products/All/Art']" (click)="menuOpened = !menuOpened">Art for Home</a></li>
 					<li><a href="">Artists</a></li>
 					<li><a href="">Gift Vouchers</a></li>
-					<li><a href="">Clearance</a></li>
-					<li><a href="">Contacts</a></li>
+					<li><a href="">Special Offers</a></li>
+					<li><a [routerLink]="['./contact']" (click)="menuOpened = !menuOpened">Contacts</a></li>
 				</ul>
 			</nav>
 			<div class="navBottomSpace"></div>

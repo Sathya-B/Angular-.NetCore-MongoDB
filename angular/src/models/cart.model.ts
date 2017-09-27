@@ -11,12 +11,13 @@ public productQuantity: number;
 public productSize: string;
 public productColour: string;
 public productDescription: string;
+public userName: string;
 
 constructor(productSKU: string, minioObject_URL: string, productFor: string,
             productDesign: string, productBrand: string, productPrice: string,
             productDiscount: string, productDiscountPrice: string,
             productQuantity: number, productSize: string, productColour: string,
-            productDescription: string) {
+            productDescription: string, userName: string) {
 this.productSKU = productSKU;
 this.minioObject_URL = minioObject_URL;
 this.productFor = productFor;
@@ -29,6 +30,7 @@ this.productQuantity = productQuantity;
 this.productSize = productSize;
 this.productColour = productColour;
 this.productDescription = productDescription;
+this.userName = userName;
 }
 }
 

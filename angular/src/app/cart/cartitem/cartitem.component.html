@@ -6,7 +6,7 @@
         <div class="itemDescColourWrapInner">
           <a href=""><span class="itemOderTabHeading">{{item.productFor + ' ' + item.productType}}</span></a>
           <div class="itemColour">Colour : <span>{{item.productColour}}</span></div>
-          <div class="itemSize" title="Selected Size">
+          <div class="itemSize" title="Selected Size" *ngIf="item.productSize !=''">
             <span>{{item.productSize}}</span>
           </div>
         </div>
@@ -33,8 +33,12 @@
             <span class="BagTabHeading">Total Price</span>
             <span class="BagTabPrice"><i class="fa fa-inr"></i>{{totalAmount()}}</span>
           </div>
+          <button class="shoppingTabWishlistBtn" (click)="addToWishList()"><span class="fa fa-heart"></span> Add to Wish List</button>
         </div>
-      </div>
+      </div>      
+      <!--<div class="wishListButton">
+                            <button type="submit" class="" (click)="addToWishList()">Add to WishList <span class="fa fa-heart-o"></span></button>
+      </div>-->
     </div>
     <div class="removeProduct" (click)="removeItem()">Remove <span>This Product</span></div>
   </div>

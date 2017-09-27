@@ -9,7 +9,8 @@ import {
 import { AppState } from './app.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { ToastMsgService } from '../services/toastmsg.service';
-
+import { ApiService } from '../services/api.service';
+import * as Config from './config/configuration';
 /**
  * App Component
  * Top Level Component
@@ -18,7 +19,7 @@ import { ToastMsgService } from '../services/toastmsg.service';
   selector: 'app',
   encapsulation: ViewEncapsulation.None,
   styleUrls: [
-    './app.component.css'
+    './app.component.scss'
   ],
   templateUrl: './app.component.html'
 })
@@ -28,7 +29,7 @@ export class AppComponent implements OnInit {
   public url = 'https://twitter.com/AngularClass';
   public config: any;
   constructor(public appState: AppState, private router: Router,
-              private toastmsg: ToastMsgService) {
+              private toastmsg: ToastMsgService, private apiService: ApiService) {
     this.config = toastmsg.config;
   }
 
@@ -46,6 +47,17 @@ export class AppComponent implements OnInit {
       }
       window.scrollTo(0, 0);
     });
+   
+   
+     this.apiService.get('', undefined, 'https://ipapi.co/json/').then(
+      (response: any) => {
+      localStorage.setItem('Country', response.country);
+      let countryCode = Config.isdCodes.filter((country) => {return country.code === response.country})[0];
+      localStorage.setItem('IsdCode', countryCode['dial_code']);
+      })
+      .catch((error: any) => {
+      console.log(error);
+    });   
   }
 
 }

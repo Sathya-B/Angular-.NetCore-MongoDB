@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
@@ -11,22 +11,36 @@ import { apiUrl } from '../../config/configuration';
   templateUrl: './createaccount.component.html',
   styleUrls: ['./createaccount.component.scss']
 })
-export class CreateAccountComponent {
+export class CreateAccountComponent implements OnInit {
 
+public userLocation: string;
+public dialCode: string;
   constructor(private apiService: ApiService, private route: ActivatedRoute,
               private router: Router, private toastmsg: ToastMsgService) {
-
+  this.userLocation = localStorage.getItem('Country');
+  this.dialCode = localStorage.getItem('IsdCode');
+  console.log(this.dialCode);
   }
 
-  public onSubmit(form: NgForm) {
-    const userDetails = form.value;
+public ngOnInit(){
+
+
+}
+
+public onSubmit(form: NgForm) {
+
+    let userDetails: any = {};
+    userDetails = form.value;    
     this.apiService.post('/register', userDetails, undefined, apiUrl.authServer).then(
       (response: any) => {
         if (response.message === 'User Registered') {
           this.toastmsg.popToast('success', 'Success', 'Account Created');
           localStorage.setItem('UserName', userDetails.PhoneNumber);
+          if(this.userLocation == 'IN') {
           this.router.navigate(['../verify', userDetails.PhoneNumber, 'createaccount'],
-            { relativeTo: this.route });
+            { relativeTo: this.route });} else {
+              this.router.navigate(['../checkemail']);
+            }
         } else {
           throw response.error;
         }

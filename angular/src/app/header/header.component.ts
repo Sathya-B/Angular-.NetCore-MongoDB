@@ -4,6 +4,7 @@ import { AppState } from '../app.service';
 import { NgZone } from '@angular/core';
 import { ToastMsgService } from '../../services/toastmsg.service';
 import { CartService } from '../../services/cart.service';
+import { WishListService } from '../../services/wishlist.service';
 
 @Component({
   selector: 'header',  // <header></header>
@@ -22,7 +23,7 @@ export class HeaderComponent implements OnInit {
 
   constructor(private router: Router, public appState: AppState,
               zone: NgZone, private toastmsg: ToastMsgService,
-              private cartService: CartService) {
+              private cartService: CartService, private wishListService: WishListService) {
     this.loggedIn = this.appState.get('loggedIn');
     window.onscroll = () => {
       zone.run(() => {
@@ -37,6 +38,7 @@ export class HeaderComponent implements OnInit {
 public ngOnInit() {
     if (this.appState.get('loggedIn') === true) {
     this.cartService.getCartItems(localStorage.getItem('UserName'));
+    this.wishListService.getWishListItems(localStorage.getItem('UserName'));
     }
   }
 public openMenu() {
@@ -58,6 +60,7 @@ public SignOutClicked() {
     this.loggedIn.loggedIn = false;
     this.toastmsg.popToast('success', 'Success', 'Logged Out');
     this.cartService.cartItems.listOfProducts = [];
+    this.wishListService.wishListItems.listOfProducts = [];
     this.router.navigate(['/']);
   }
 public getUserName(){

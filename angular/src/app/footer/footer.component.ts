@@ -10,4 +10,8 @@ import {
   templateUrl: './footer.component.html'
 })
 export class FooterComponent {
+
+public onSubscribe(){
+  
+}
 }

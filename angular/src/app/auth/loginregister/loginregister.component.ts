@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
 import { CartService } from '../../../services/cart.service';
+import { WishListService } from '../../../services/wishlist.service';
 import { ToastMsgService } from '../../../services/toastmsg.service';
 import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router, ParamMap } from '@angular/router';
@@ -13,13 +14,18 @@ import { apiUrl } from '../../config/configuration';
   templateUrl: './loginregister.component.html',
   styleUrls: ['./loginregister.component.css']
 })
-export class LoginRegisterComponent {
+export class LoginRegisterComponent implements OnInit {
 
+public userLocation: string;
   constructor(private appState: AppState, private cartService: CartService,
               private apiService: ApiService, private route: ActivatedRoute,
-              private router: Router, private toastmsg: ToastMsgService) {
+              private router: Router, private toastmsg: ToastMsgService,
+              private wishListService: WishListService) {
   }
 
+public ngOnInit(){
+this.userLocation = localStorage.getItem('Country');
+}
 public  onSignin(form: NgForm) {
 
     const loginDetails = form.value;
@@ -37,6 +43,7 @@ public  onSignin(form: NgForm) {
           localStorage.setItem('UserName', loginDetails.UserName);
           this.appState.set('loggedIn', true);
           this.cartService.getCartItems(loginDetails.UserName);
+          this.wishListService.getWishListItems(localStorage.getItem('UserName'));
           this.router.navigate(['/']);
         }
       })
@@ -44,6 +51,9 @@ public  onSignin(form: NgForm) {
       (error: any) => {
         if (error.code === '400') {
           this.toastmsg.popToast('error', 'Error', 'Wrong Credentials. Please try again');
+        }
+        if (error.code === '404') {
+          this.toastmsg.popToast('error', 'Error', 'User not Found. Please register to continue.');
         }
       }
     );

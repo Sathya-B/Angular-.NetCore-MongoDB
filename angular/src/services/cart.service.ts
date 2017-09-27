@@ -9,7 +9,6 @@ import 'rxjs/add/operator/map';
 export class CartService {
 
     public cartItems: CartModel.Cart = { listOfProducts: [] };
-    public iterableDiffer: any;
     constructor(private apiService: ApiService, private appState: AppState) {
     }
     public getCount() {

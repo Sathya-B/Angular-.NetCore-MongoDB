@@ -1,5 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CartService } from '../../../services/cart.service';
+import { WishListService } from '../../../services/wishlist.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'cartitem',
@@ -12,8 +14,9 @@ export class CartItemComponent {
 
 @Input() public itemIndex: number;
 
-constructor(private cartService: CartService) {
-
+constructor(private cartService: CartService, private wishListService: WishListService,
+            private router: Router) {
+console.log(this.item);
 }
 public totalAmount() {
   return this.item.productQuantity * this.item.productPrice;
@@ -30,5 +33,10 @@ public reduceOne() {
   }
 public removeItem() {
   this.cartService.cartItems.listOfProducts.splice(this.itemIndex, 1);
-  }
+}
+public addToWishList(){
+  this.wishListService.wishListItems.listOfProducts.push(this.item);
+  this.removeItem();
+  this.router.navigate(['/addedtowishlist']);
+}
 }

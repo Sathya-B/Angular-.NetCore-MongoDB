@@ -21,7 +21,10 @@
                                         (change)="checked($event, variant)"><label [for]="variant.productColour" [ngStyle]="{'background-color': variant.productColour, 'border':'1px solid #cecece'}">{{variant.productColour}}</label></div>
                             </div>
                         </div>
-                        <colorsizestock [selectedVariant]="selectedVariant"></colorsizestock>
+                        <colorsizestock [selectedVariant]="selectedVariant" [initItem]="initItem"></colorsizestock>
+                        <div class="addToWishListWrap" (click)="addToWishList()">
+                        <a class="wishLIstBtn"><span class="fa fa-heart-o"></span> Add to Wish List</a>
+                        </div>
                         <div class="singlePageBtnsWrap">
                             <button type="submit" class="" (click)="addToCart()" [disabled]="!(this.css.remainingQty >= 1)">Add to Shopping Bag <span class="iconShopBtn-Bag fa fa-shopping-bag"></span></button>
                             <a href="#prdDetails" class="viewProductDetailsCustom">Product Details</a>
@@ -36,9 +39,7 @@
                 <span id="prdDetails"></span>
                 <div class="productDescription">
                     <h2>Description</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla at consequat orci. Donec fermentum tristique
-                        erat et tincidunt. Maecenas interdum fringilla dui sit amet sodales.</p>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                    <p>{{variants.topItem.productDescription}}</p>                    
                 </div>
                 <div class="productAdditionalInfo">
                     <h2>Additional information</h2>
@@ -52,7 +53,7 @@
 					</div> -->
                 <!-- <div style="height:200px;"></div> -->
             </div>
-            <h1 class="titleCommon2">Related Products<span>Authentic Art Wear For Men</span></h1>
+            <h1 class="titleCommon2">Related Products<span>Authentic {{variants.topItem.productType}} For {{variants.topItem.productFor}}</span></h1>
             <div class="itemsWrapOuter clearfix">
                 <relateditem *ngFor="let relatedItem of relatedItems" [productitem]="relatedItem.val" (variantItemClicked)="variantItemClicked($event)"  ></relateditem>
             </div>

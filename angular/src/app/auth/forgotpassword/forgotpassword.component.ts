@@ -14,9 +14,10 @@ import { apiUrl } from '../../config/configuration';
 })
 export class ForgotPasswordComponent {
 public PhoneNumber: string;
+public userLocation: string;
 constructor(private apiService: ApiService, private activatedRoute: ActivatedRoute,
             private router: Router,  public appState: AppState, private toastmsg: ToastMsgService) {
-
+this.userLocation = localStorage.getItem('Country');
 }
 
 public onSubmit(form: NgForm) {
@@ -29,9 +30,13 @@ public onSubmit(form: NgForm) {
           throw response.error;
         }
         if (response.message === 'Success') {
-         localStorage.setItem('UserName', phoneNumber.PhoneNumber);
-         this.router.navigate(['../verify', phoneNumber.PhoneNumber, 'forgotpassword'],
+         localStorage.setItem('UserName', phoneNumber.userName);
+         if(this.userLocation == 'IN') {
+         this.router.navigate(['../verify', phoneNumber.userName, 'forgotpassword'],
                               { relativeTo: this.activatedRoute});
+         } else {
+           this.router.navigate(['../checkemail'], { relativeTo: this.activatedRoute});
+         }
         }
       })
       .catch(

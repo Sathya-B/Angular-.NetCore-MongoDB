@@ -16,9 +16,10 @@ import { AppState, InternalStateType } from './app.service';
 import { HomeComponent } from './home';
 import { HeaderComponent } from './header';
 import { FooterComponent } from './footer';
-import { AboutComponent } from './about';
 import { LoginRegisterComponent } from './auth/loginregister/loginregister.component';
 import { CreateAccountComponent } from './auth/createaccount/createaccount.component';
+import { CheckEmailComponent } from './auth/createaccount/checkemail/checkemail.component';
+import { VerifyEmailComponent } from './auth/createaccount/verifyemail/verifyemail.component';
 import { VerificationComponent } from './auth/verification/verification.component';
 import { ForgotPasswordComponent } from './auth/forgotpassword/forgotpassword.component';
 import { UpdatePasswordComponent } from './auth/updatepassword/updatepassword.component';
@@ -30,7 +31,17 @@ import { VariantsComponent } from './variants/variants.component';
 import { RelatedComponent } from './variants/related/related.component';
 import { CartComponent } from './cart/cart.component';
 import { CartItemComponent } from './cart/cartitem/cartitem.component';
+import { OrderComponent } from './cart/order/order.component';
+import { CheckOutComponent } from './checkout/checkout.component';
+import { AddressBookComponent } from './checkout/addressbook/addressbook.component';
+import { NewAddressComponent } from './checkout/newaddress/newaddress.component';
+import { AddressItemComponent } from './checkout/addressbook/addressitem/addressitem.component';  
+import { PrimaryAddressComponent} from './checkout/primaryaddress/primaryaddress.component';
+import { WishListComponent } from './wishlist/wishlist.component';
+import { WishListItemComponent } from './wishlist/wishlistitem/wishlistitem.component';
 import { CartService } from '../services/cart.service';
+import { AddressService } from '../services/address.service';
+import { WishListService } from '../services/wishlist.service';
 import { ApiService } from '../services/api.service';
 import { TokenService } from '../services/token.service';
 import { AuthInterceptor } from '../shared/auth.interceptor';
@@ -41,11 +52,17 @@ import { NoContentComponent } from './no-content';
 import { XLargeDirective } from './home/x-large';
 import { CarouselModule } from 'angular4-carousel';
 import { ToasterModule, ToasterService, ToasterConfig } from 'angular2-toaster';
+import { AboutComponent } from './policies/about/about.component';
+import { ContactComponent } from './policies/contact/contact';
 import { CancellationComponent } from './policies/cancellation/cancellation';
 import { DeliveryComponent } from './policies/delivery/delivery';
 import { DisclaimerComponent } from './policies/disclaimer/disclaimer';
 import { PrivacyComponent } from './policies/privacy/privacy';
 import { TermsComponent } from './policies/termsandconditions/terms';
+import { AddedToCartComponent } from './message/addedtocart/addedtocart';
+import { AddedToWishListComponent } from './message/addedtowishlist/addedtowishlist';
+import { SpinnerModule } from 'angular-spinners';
+import { SpinnerService } from 'angular-spinners';
 import '../styles/styles.scss';
 import '../styles/headings.css';
 
@@ -76,11 +93,14 @@ type StoreType = {
     CategoryComponent,
     LoginRegisterComponent,
     CreateAccountComponent,
+    CheckEmailComponent,
+    VerifyEmailComponent,
     VerificationComponent,
     ForgotPasswordComponent,
     UpdatePasswordComponent,
     ChangePasswordComponent,
     ColorSizeStockComponent,
+    ContactComponent,
     CancellationComponent,
     DeliveryComponent,
     DisclaimerComponent,
@@ -88,9 +108,19 @@ type StoreType = {
     TermsComponent,
     CartComponent,
     CartItemComponent,
+    OrderComponent,
+    CheckOutComponent,
+    NewAddressComponent,
+    AddressItemComponent,
+    AddressBookComponent,
+    PrimaryAddressComponent,
+    WishListComponent,
+    WishListItemComponent,
     RelatedComponent,
     HeaderComponent,
     FooterComponent,
+    AddedToCartComponent,
+    AddedToWishListComponent,
     NoContentComponent,
     FilterPipe,
     XLargeDirective
@@ -105,6 +135,7 @@ type StoreType = {
     HttpClientModule,
     CarouselModule,
     ToasterModule,
+    SpinnerModule,
     BrowserAnimationsModule,
     RouterModule.forRoot(ROUTES, { useHash: true, preloadingStrategy: PreloadAllModules })
   ],
@@ -115,9 +146,12 @@ type StoreType = {
     ENV_PROVIDERS,
     APP_PROVIDERS,
     CartService,
+    AddressService,
+    WishListService,
     ApiService,
     TokenService,
     ToastMsgService,
+    SpinnerService,
     {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}
   ]
 })

@@ -11,9 +11,13 @@
                 <h2>I HAVE AN ACCOUNT</h2>
                 <div class="loginBoxFormWrap">
                   <form (ngSubmit)="onSignin(f)" #f="ngForm">
-                  <div class="formRow">                   
+                  <div class="formRow" *ngIf="userLocation == 'IN'">
                     <input type="Email" name="UserName" placeholder="Phone Number*" required ngModel pattern="^([0-9]{10})$">
                     <div class="mobileNumberError" *ngIf="f.controls.UserName?.errors && f.controls.UserName?.touched"><span class="error">Please enter a valid Mobile Number</span></div>
+                  </div>
+                  <div class="formRow" *ngIf="userLocation != 'IN'">
+                  <input type="email" name="UserName" placeholder="Email Address*" ngModel required pattern="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?">
+                  <div class="error" *ngIf="f.controls.UserName?.errors && f.controls.UserName?.touched"><span class="error">Please enter a valid Email</span></div>
                   </div>
                   <div class="formRow">
                     <input type="password" name="Password" placeholder="Password*" class="error" required ngModel>
@@ -57,7 +61,8 @@
 
                 <p>Find your previous orders</p>
 
-                <a [routerLink]="['../createaccount']" class="CreatAcWithEmail">Create an account using your email address</a>
+                <a *ngIf="userLocation != 'IN'" [routerLink]="['../createaccount']" class="CreatAcWithEmail">Create an account using your email address</a>
+                <a *ngIf="userLocation == 'IN'" [routerLink]="['../createaccount']" class="CreatAcWithEmail">Create an account using your Mobile Number</a>
 
               </div>
             </div>

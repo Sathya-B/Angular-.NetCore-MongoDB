@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Rx';
 import { apiUrl } from '../app/config/configuration';
 import { TokenService } from '../services/token.service';
+import { SpinnerService } from 'angular-spinners';
 import * as Util from '../shared/utils/utils';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/toPromise';
@@ -17,7 +18,8 @@ export class ApiService {
     private http: HttpClient;
     private tokenServ: TokenService;
 
-    constructor( http: HttpClient, private router: Router, private tokenService: TokenService) {
+    constructor( http: HttpClient, private router: Router, private tokenService: TokenService,
+                 private spinnerService: SpinnerService) {
         this.http = http;
         this.tokenServ = tokenService;
     }
@@ -28,6 +30,7 @@ public header(token) {
         return headers;
     }
 public get(url: string, options?: any, serverUrl?: string) {
+    this.spinnerService.show('acSpinner');
     let useAuth = Util.checkOptions(options);
     if (serverUrl === undefined) {
         serverUrl = this.serverUrl;
@@ -35,17 +38,20 @@ public get(url: string, options?: any, serverUrl?: string) {
     return this.tokenService.getAuthToken(useAuth).then(
         (token) => {
         const authHeader = this.header(token);
-        return this.http.get(this.serverUrl + url, { headers: authHeader }).timeout(30000)
+        return this.http.get(serverUrl + url, { headers: authHeader }).timeout(30000)
             .toPromise()
             .then((res) => {
+               this.spinnerService.hide('acSpinner');
                return this.handleSuccess(res, options);
             })
             .catch((err) => {
+                this.spinnerService.hide('acSpinner');
                 return this.handleError(err, options);
             });
     });
     }
 public put(url: string, data: any, options?: any, serverUrl?: string) {
+        this.spinnerService.show('acSpinner');
         let useAuth = Util.checkOptions(options);
         let body: any = data;
         if (serverUrl === undefined) {
@@ -57,6 +63,7 @@ public put(url: string, data: any, options?: any, serverUrl?: string) {
         return this.http.post(serverUrl + url, body, { headers: authHeader }).timeout(30000)
             .toPromise()
             .then((res) => {
+               this.spinnerService.hide('acSpinner');
                return this.handleSuccess(res, options);
             })
             .catch((err) => {
@@ -65,6 +72,7 @@ public put(url: string, data: any, options?: any, serverUrl?: string) {
     });
     }
 public patch(url: string, data: any, options?: any, serverUrl?: string) {
+        this.spinnerService.show('acSpinner');
         let useAuth = Util.checkOptions(options);
         let body: any = data;
         if (serverUrl === undefined) {
@@ -76,14 +84,17 @@ public patch(url: string, data: any, options?: any, serverUrl?: string) {
         return this.http.post(serverUrl + url, body, { headers: authHeader }).timeout(30000)
             .toPromise()
             .then((res) => {
+               this.spinnerService.hide('acSpinner');
                return this.handleSuccess(res, options);
             })
             .catch((err) => {
+                this.spinnerService.hide('acSpinner');
                 return this.handleError(err, options);
             });
     });
     }
 public post(url: string, data: any, options?: any, serverUrl?: string) {
+        this.spinnerService.show('acSpinner');
         let useAuth = Util.checkOptions(options);
         let body: any = data;
         if (serverUrl === undefined) {
@@ -95,14 +106,17 @@ public post(url: string, data: any, options?: any, serverUrl?: string) {
         return this.http.post(serverUrl + url, body, { headers: authHeader }).timeout(30000)
             .toPromise()
             .then((res) => {
+               this.spinnerService.hide('acSpinner');
                return this.handleSuccess(res, options);
             })
             .catch((err) => {
+                this.spinnerService.hide('acSpinner');
                 return this.handleError(err, options);
             });
     });
     }
 public delete(url: string, data: any, options?: any, serverUrl?: string) {
+        this.spinnerService.show('acSpinner');
         let useAuth = Util.checkOptions(options);
         let body: any = data;
         if (serverUrl === undefined) {
@@ -114,9 +128,11 @@ public delete(url: string, data: any, options?: any, serverUrl?: string) {
         return this.http.post(serverUrl + url, body, { headers: authHeader }).timeout(30000)
             .toPromise()
             .then((res) => {
+               this.spinnerService.hide('acSpinner');
                return this.handleSuccess(res, options);
             })
             .catch((err) => {
+                this.spinnerService.hide('acSpinner');
                 return this.handleError(err, options);
             });
     });

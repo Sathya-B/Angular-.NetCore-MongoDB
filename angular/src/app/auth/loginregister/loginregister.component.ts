@@ -4,7 +4,6 @@ import { ApiService } from '../../../services/api.service';
 import { CartService } from '../../../services/cart.service';
 import { WishListService } from '../../../services/wishlist.service';
 import { ToastMsgService } from '../../../services/toastmsg.service';
-import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router, ParamMap } from '@angular/router';
 import { AppState } from '../../app.service';
 import { apiUrl } from '../../config/configuration';
@@ -27,12 +26,9 @@ public ngOnInit(){
 this.userLocation = localStorage.getItem('Country');
 }
 public  onSignin(form: NgForm) {
-
     const loginDetails = form.value;
-    console.log(apiUrl.authServer);
     this.apiService.post('/login', loginDetails, undefined, apiUrl.authServer).then(
       (response: any) => {
-        console.log(response);
         if (response.value === undefined) {
           throw response.error;
         }
@@ -43,13 +39,13 @@ public  onSignin(form: NgForm) {
           localStorage.setItem('UserName', loginDetails.UserName);
           this.appState.set('loggedIn', true);
           this.cartService.getCartItems(loginDetails.UserName);
-          this.wishListService.getWishListItems(localStorage.getItem('UserName'));
+          this.wishListService.getWishListItems(loginDetails.UserName);
           this.router.navigate(['/']);
         }
       })
       .catch(
       (error: any) => {
-        if (error.code === '400') {
+        if (error.code === '401') {
           this.toastmsg.popToast('error', 'Error', 'Wrong Credentials. Please try again');
         }
         if (error.code === '404') {

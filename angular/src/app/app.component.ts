@@ -4,12 +4,15 @@
 import {
   Component,
   OnInit,
+  AfterViewChecked,
   ViewEncapsulation
 } from '@angular/core';
 import { AppState } from './app.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { ToastMsgService } from '../services/toastmsg.service';
 import { ApiService } from '../services/api.service';
+import { HeaderComponent } from './header';
+
 import * as Config from './config/configuration';
 /**
  * App Component
@@ -59,5 +62,4 @@ export class AppComponent implements OnInit {
       console.log(error);
     });   
   }
-
 }

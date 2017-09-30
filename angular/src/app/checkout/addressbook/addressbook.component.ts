@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { apiUrl } from '../../config/configuration';
 import { ApiService } from '../../../services/api.service';
 import { AddressService } from '../../../services/address.service';
@@ -7,15 +7,11 @@ import { AddressService } from '../../../services/address.service';
     selector: 'addressbook',
     templateUrl: './addressbook.component.html'
 })
-export class AddressBookComponent implements OnInit {
+export class AddressBookComponent {
     @Output() public addAddress = new EventEmitter<boolean>();    
     public addresses: any;
-    constructor(private apiService: ApiService, private addressService: AddressService) {
+    constructor(private apiService: ApiService, public addressService: AddressService) {
     
-    }
-
-    public ngOnInit() {
-    //this.addresses = this.addressService.addressItems.listOfAddress;
     }
     public addNewAddress() {
         this.addAddress.emit(true);

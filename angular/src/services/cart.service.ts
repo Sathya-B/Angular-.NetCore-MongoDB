@@ -18,8 +18,11 @@ export class CartService {
     public getCartItems(userName: string) {
         this.apiService.get('user/cart/' + userName, { useAuth: true }).then(
             (response: any) => {
-                this.cartItems.listOfProducts = response.data;
-                console.log(this.cartItems);
+                if( response.data != null) {
+                response.data.forEach((cartitem) => {
+                this.cartItems.listOfProducts.push(cartitem)    
+            });
+            }
             })
             .catch((error: any) => {
                 console.log(error);
@@ -28,19 +31,15 @@ export class CartService {
     public refreshCart() {
         let userName = localStorage.getItem('UserName');
         if (userName !== undefined) {
-            this.apiService.put('user/cart/' + userName, this.cartItems , { useAuth: true }).then(
+         return   this.apiService.put('user/cart/' + userName, this.cartItems , { useAuth: true }).then(
                 (response: any) => {
                     console.log(response);
+                    return true;
                 })
                 .catch((error: any) => {
                     console.log(error);
+                    return false;
                 });
         }
-    }
-    public removeFromCart(product: any) {
-
-    }
-    public updateCart(product: any, quantity: number) {
-
     }
 }

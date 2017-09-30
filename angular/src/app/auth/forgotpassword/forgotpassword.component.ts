@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppState } from '../../app.service';

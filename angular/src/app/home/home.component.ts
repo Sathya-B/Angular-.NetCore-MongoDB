@@ -1,11 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppState } from '../app.service';
 import { Title } from './title';
 import { CartService } from '../../services/cart.service';
 import { ApiService } from '../../services/api.service';
-import { XLargeDirective } from './x-large';
 import { CategoryComponent } from './category';
-import { ICarouselConfig, AnimationConfig } from 'angular4-carousel';
 
 @Component({
   /**
@@ -47,18 +45,26 @@ export class HomeComponent implements OnInit {
     '../assets/img/sliderhome/mobile/600X600_3.jpg',
     '../assets/img/sliderhome/mobile/600X600_4.jpg'
   ];
-  public config: ICarouselConfig = {
-    verifyBeforeLoad: false,
-    log: false,
-    animation: true,
-    animationType: AnimationConfig.SLIDE,
-    autoplay: true,
-    autoplayDelay: 3000,
-    stopAutoplayMinWidth: 1200
+  public swipeconfig: any = {
+    prevButton:'.swiper-button-prev',
+    nextButton:'.swiper-button-next',
+    loop: true,
+    autoplay: 3000,
+    autoplayDisableOnInteraction: false,
+    autoplayStopOnLast: false,
+    loopedSlides: 20,
+    loopAdditionalSlides: 20
   };
+  public mobileconfig: any = {
+    prevButton:'.swiper-button-prev',
+    nextButton:'.swiper-button-next',
+    loop:true
+  };
+
 
   public category: any[] = [];
   public imgStyle: any = 'block';
+
   /**
    * TypeScript public modifiers
    */
@@ -82,4 +88,30 @@ export class HomeComponent implements OnInit {
   public onCloseImg(){
    this.imgStyle = 'none';
   }
+
+// private swipeCoord?: [number, number];
+// private swipeTime?: number;
+//   swipe(e: TouchEvent, when: string): void {
+//   const coord: [number, number] = [e.changedTouches[0].pageX, e.changedTouches[0].pageY];
+//   const time = new Date().getTime();
+
+//   if (when === 'start') {
+//     this.swipeCoord = coord;
+//     this.swipeTime = time;
+//   }
+
+//   else if (when === 'end') {
+//     const direction = [coord[0] - this.swipeCoord[0], coord[1] - this.swipeCoord[1]];
+//     const duration = time - this.swipeTime;
+
+//     if (duration < 1000 //Short enough
+//       && Math.abs(direction[1]) < Math.abs(direction[0]) //Horizontal enough
+//       && Math.abs(direction[0]) > 30) {  //Long enough
+//     const swipe = direction[0] < 0 ? 'next' : 'previous';
+//     //Do whatever you want with swipe
+//     console.log('boom');   
+//     this.slider.onChangeSlide('next');
+//   }
+// }
+// }
 }

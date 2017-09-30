@@ -12,7 +12,6 @@ export class AddressItemComponent {
 @Input() itemIndex: number;
 
 constructor(private addressService: AddressService, private toastmsg: ToastMsgService){
-
 }
 
 public removeItem() {

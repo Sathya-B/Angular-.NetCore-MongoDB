@@ -23,12 +23,10 @@ public isAddressAvailable(){
 }
 public check(type: boolean){
 this.newDeliveryAddress = type;
-console.log(this.newDeliveryAddress);
 }
 
 public checkBilling(type: boolean){
 this.sameAsDeliveryAddress = type;
-console.log(this.sameAsDeliveryAddress);
 }
 
 public addNewAddressClicked(addNew: boolean) {

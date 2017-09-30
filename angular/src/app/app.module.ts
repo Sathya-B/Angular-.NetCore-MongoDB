@@ -16,6 +16,7 @@ import { AppState, InternalStateType } from './app.service';
 import { HomeComponent } from './home';
 import { HeaderComponent } from './header';
 import { FooterComponent } from './footer';
+import { AuthGuard } from './auth/authguard/authguard';
 import { LoginRegisterComponent } from './auth/loginregister/loginregister.component';
 import { CreateAccountComponent } from './auth/createaccount/createaccount.component';
 import { CheckEmailComponent } from './auth/createaccount/checkemail/checkemail.component';
@@ -49,7 +50,6 @@ import { ToastMsgService } from '../services/toastmsg.service';
 import { FilterPipe } from '../pipes/filterpipe.component';
 import { CategoryComponent } from './home/category';
 import { NoContentComponent } from './no-content';
-import { XLargeDirective } from './home/x-large';
 import { CarouselModule } from 'angular4-carousel';
 import { ToasterModule, ToasterService, ToasterConfig } from 'angular2-toaster';
 import { AboutComponent } from './policies/about/about.component';
@@ -63,6 +63,10 @@ import { AddedToCartComponent } from './message/addedtocart/addedtocart';
 import { AddedToWishListComponent } from './message/addedtowishlist/addedtowishlist';
 import { SpinnerModule } from 'angular-spinners';
 import { SpinnerService } from 'angular-spinners';
+import { SwiperModule } from 'ngx-swiper-wrapper';
+import { SwiperConfigInterface } from 'ngx-swiper-wrapper';
+import { LazyLoadImageModule } from 'ng-lazyload-image';
+
 import '../styles/styles.scss';
 import '../styles/headings.css';
 
@@ -71,6 +75,12 @@ const APP_PROVIDERS = [
   ...APP_RESOLVER_PROVIDERS,
   AppState
 ];
+
+const SWIPER_CONFIG: SwiperConfigInterface = {
+  direction: 'horizontal',
+  // slidesPerView: 'auto',
+  // keyboardControl: true
+};
 
 type StoreType = {
   state: InternalStateType,
@@ -122,8 +132,7 @@ type StoreType = {
     AddedToCartComponent,
     AddedToWishListComponent,
     NoContentComponent,
-    FilterPipe,
-    XLargeDirective
+    FilterPipe
   ],
   /**
    * Import Angular's modules.
@@ -137,6 +146,8 @@ type StoreType = {
     ToasterModule,
     SpinnerModule,
     BrowserAnimationsModule,
+    LazyLoadImageModule,
+    SwiperModule.forRoot(SWIPER_CONFIG),
     RouterModule.forRoot(ROUTES, { useHash: true, preloadingStrategy: PreloadAllModules })
   ],
   /**
@@ -152,6 +163,7 @@ type StoreType = {
     TokenService,
     ToastMsgService,
     SpinnerService,
+    AuthGuard,
     {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}
   ]
 })

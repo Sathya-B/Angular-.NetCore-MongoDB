@@ -3,8 +3,7 @@
 /**
  * Polyfills
  */
-import 'zone.js';
-import 'reflect-metadata';
+//import 'reflect-metadata';
 /* import 'ie-shim'; *//* Internet Explorer 9 support */
 
 /* import 'core-js/es6'; */
@@ -46,6 +45,6 @@ if ('production' === ENV) {
   Error.stackTraceLimit = Infinity;
 
   /* tslint:disable no-var-requires */
-  require('zone.js/dist/long-stack-trace-zone');
+//  require('zone.js/dist/long-stack-trace-zone');
 
 }

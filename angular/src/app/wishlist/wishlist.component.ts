@@ -11,7 +11,7 @@ export class WishListComponent implements OnInit, OnDestroy {
 
 public wishListItems: any;
 
-constructor(private wishListService: WishListService) {
+constructor(public wishListService: WishListService) {
 
 }
 

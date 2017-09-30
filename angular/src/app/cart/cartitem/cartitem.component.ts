@@ -14,9 +14,8 @@ export class CartItemComponent {
 
 @Input() public itemIndex: number;
 
-constructor(private cartService: CartService, private wishListService: WishListService,
+constructor(public cartService: CartService, public wishListService: WishListService,
             private router: Router) {
-console.log(this.item);
 }
 public totalAmount() {
   return this.item.productQuantity * this.item.productPrice;

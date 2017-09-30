@@ -1,4 +1,4 @@
-import './polyfills.browser';
+//import './polyfills.browser';
 /**
  * Angular bootstrapping
  */

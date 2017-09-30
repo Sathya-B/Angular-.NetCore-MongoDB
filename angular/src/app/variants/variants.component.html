@@ -26,7 +26,7 @@
                         <a class="wishLIstBtn"><span class="fa fa-heart-o"></span> Add to Wish List</a>
                         </div>
                         <div class="singlePageBtnsWrap">
-                            <button type="submit" class="" (click)="addToCart()" [disabled]="!(this.css.remainingQty >= 1)">Add to Shopping Bag <span class="iconShopBtn-Bag fa fa-shopping-bag"></span></button>
+                            <button type="submit" class="" (click)="addToCart()" [disabled]="isBagDisabled()">Add to Shopping Bag <span class="iconShopBtn-Bag fa fa-shopping-bag"></span></button>
                             <a href="#prdDetails" class="viewProductDetailsCustom">Product Details</a>
                         </div>
                         <div class="productMetaWrap">

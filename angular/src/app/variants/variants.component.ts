@@ -14,25 +14,13 @@ import * as WishListModel from '../../models/wishlist.model';
 
 @Component({
   selector: 'variants',
-  /**
-   * We need to tell Angular's Dependency Injection which providers are in our app.
-   */
   providers: [
   ],
-  /**
-   * Our list of styles in our component. We may add more to compose many styles together.
-   */
   styleUrls: ['./variants.component.css'],
-  /**
-   * Every Angular template is first compiled by the browser before Angular runs it's compiler.
-   */
   templateUrl: './variants.component.html'
 
 })
 export class VariantsComponent implements OnInit {
-  /**
-   * Set our default values
-   */
   public localState = { value: '' };
 
   public variants: any;
@@ -51,10 +39,6 @@ export class VariantsComponent implements OnInit {
 
   public relatedItems: any;
 
-  /**
-   * TypeScript public modifiers
-   */
-
   @ViewChild(ColorSizeStockComponent) public css: ColorSizeStockComponent;
 
   constructor(private cartService: CartService, private route: ActivatedRoute,
@@ -67,7 +51,6 @@ export class VariantsComponent implements OnInit {
 
 public ngOnInit() {
 this.variants = JSON.parse(localStorage.getItem(this.for + '-' + this.type + '-' + this.design));
-console.log(this.variants);
 this.initItem = this.variants;
 this.relatedItems = findLocalItems(this.for);
 }
@@ -75,8 +58,6 @@ this.relatedItems = findLocalItems(this.for);
 public checked(event: any, svariant?: any) {
   this.selectedColor = event.target.id;
   this.selectedVariant = svariant;
-  console.log('checked');
-  console.log(this.selectedVariant);
 }
 public isChecked(color: string) {
   if (this.selectedColor === color) {
@@ -100,8 +81,6 @@ public addToCart() {
   this.cartService.cartItems.listOfProducts.push(cartItem);
   this.router.navigate(['/addedtocart']);
   if (localStorage.getItem('UserName') !== undefined) {
-    console.log('cart');
-    console.log(cartItem);
     this.cartService.refreshCart();
   }
 }
@@ -113,13 +92,19 @@ public addToWishList() {
   wishListItem.productQuantity = 1;
   this.wishListService.wishListItems.listOfProducts.push(wishListItem);  
   if (localStorage.getItem('UserName') !== undefined) {
-    console.log('wishlist');
-    console.log(wishListItem);
     this.wishListService.refreshList();
   }
   this.router.navigate(['/addedtowishlist']);
   } else {
     this.toastMsg.popToast('info','Info','Please Select a Colour and Size.')
+  }
+}
+public isBagDisabled() {
+  if (!(Number(this.css.remainingQty) >= 1)) {
+    return true;
+  }
+  else {
+    return false;
   }
 }
 }

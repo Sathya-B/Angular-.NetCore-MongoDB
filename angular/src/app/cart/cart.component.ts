@@ -11,13 +11,11 @@ export class CartComponent implements OnInit, OnDestroy {
 
 public cartItems: any;
 
-constructor(private cartService: CartService, private route: Router) {
-
+constructor(public cartService: CartService, private route: Router) {
 }
 
 public ngOnInit() {
  this.cartItems = this.cartService.cartItems.listOfProducts;
-
 }
 public ngOnDestroy() {
     this.cartService.refreshCart();

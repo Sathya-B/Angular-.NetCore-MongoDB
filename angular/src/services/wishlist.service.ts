@@ -19,8 +19,11 @@ export class WishListService {
         console.log('wishlist of ' + userName);
         this.apiService.get('user/wishlist/' + userName, { useAuth: true }).then(
             (response: any) => {
-                this.wishListItems.listOfProducts = response.data;
-                console.log(this.wishListItems);
+                if( response.data != null) {
+                response.data.forEach((wishListItem) => {
+                this.wishListItems.listOfProducts.push(wishListItem)    
+            });
+            }
             })
             .catch((error: any) => {
                 console.log(error);
@@ -29,12 +32,14 @@ export class WishListService {
     public refreshList() {
         let userName = localStorage.getItem('UserName');
         if (userName !== undefined) {
-            this.apiService.put('user/wishlist/' + userName, this.wishListItems , { useAuth: true }).then(
+        return  this.apiService.put('user/wishlist/' + userName, this.wishListItems , { useAuth: true }).then(
                 (response: any) => {
                     console.log(response);
+                    return true;
                 })
                 .catch((error: any) => {
                     console.log(error);
+                    return false;
                 });
         }
     }

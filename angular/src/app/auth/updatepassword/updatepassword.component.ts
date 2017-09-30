@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppState } from '../../app.service';
@@ -25,11 +24,9 @@ constructor(private apiService: ApiService, private toastmsg: ToastMsgService,
 public onSubmit(form: NgForm) {
     this.newPassword.Password = form.value.Password;
     this.newPassword.userName = this.userName;
-    console.log(this.newPassword);
     this.apiService.post('/forgotpassword/changepassword',
                          this.newPassword, undefined, apiUrl.authServer).then(
       (response: any) => {
-        console.log(response);
         if (response.code === '200') {
         this.toastmsg.popToast('success', 'Success', 'Password Changed');
         this.appState.set('loggedIn', true);

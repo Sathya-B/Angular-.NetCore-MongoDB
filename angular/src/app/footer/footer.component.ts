@@ -1,6 +1,7 @@
 import {
   Component
 } from '@angular/core';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'footer',  // <footer></footer>
@@ -11,7 +12,7 @@ import {
 })
 export class FooterComponent {
 
-public onSubscribe(){
-  
+public onSubscribe(form: NgForm){
+console.log(form.value); 
 }
 }

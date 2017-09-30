@@ -27,7 +27,6 @@ public ngOnInit(){
     this.postUrl = '/register/verification/' + this.userName + '/' + this.otp;    
     this.apiService.get(this.postUrl, undefined, apiUrl.authServer).then(
       (response: any) => {
-        console.log(response);
         if (response.value === undefined) {
           throw response.error;
         }
@@ -42,7 +41,6 @@ public ngOnInit(){
       })
       .catch(
       (error: any) => {
-        console.log(error);
         if (error.code === '404') {
           this.toastmsg.popToast('error', 'Error', 'User not Registered');
           this.router.navigate(['/forgotpassword']);

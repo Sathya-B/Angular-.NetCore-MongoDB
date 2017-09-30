@@ -1,17 +1,70 @@
 <div class="sliderWrap">
 	<div id="sliderDesktop" class="flexslider">
-	<div class="slides">
-	<div style="width: 100%; height: 446px;">
-		<span style="text-align: center"><carousel [sources]="imageSources"  [config]="config"></carousel></span>
-	</div>
-	</div>
-	</div>
+		<ul class="slides">
+			<swiper [config]="swipeconfig">
+					<div class="homeSlideContent">
+						<img [src]="imageSources[0]" alt="">
+						<a [routerLink]="['/products/Boys/Tshirt']">
+						<span class="shopBtnHomeSlide">SHOP BOYS'</span>
+					</a>
+					</div>
+					<div class="homeSlideContent">
+						<img [src]="imageSources[1]" alt="">
+						<a [routerLink]="['/products/Women/Tshirt']">
+							<span class="shopBtnHomeSlide">SHOP WOMEN'S</span>
+					</a>
+					</div>
+					<div class="homeSlideContent">
+						<img [src]="imageSources[2]" alt="">
+						
+						<a [routerLink]="['/products/Girls/Tshirt']">
+							<span class="shopBtnHomeSlide">SHOP GIRLS'</span>				
+					</a></div>
+					<div class="homeSlideContent">
+						<img [src]="imageSources[3]" alt="">
+						<a [routerLink]="['/products/Men/Tshirt']">
+							<span class="shopBtnHomeSlide">SHOP MEN'S</span>											
+					</a>
+					</div>
+			</swiper>
+		</ul>
+		</div>
 	<div id="sliderMobile" class="flexslider">
-	<ul class="slides">
-	<div style="width: 100%; height: 400px;">
-		<span style="text-align: center"><carousel [sources]="mobileImageSources"  [config]="config"></carousel></span>
-	</div>
-	</ul>
+		<ul class="slides">
+			<swiper [config]="mobileconfig">
+				<li>
+					<div class="homeSlideContent">
+						<img [src]="mobileImageSources[0]" alt="">
+						<a [routerLink]="['/products/Men/Tshirt']"><span class="shopBtnHomeSlide">SHOP MEN'S</span>
+					</a>
+					</div>
+				</li>
+				<li>
+
+					<div class="homeSlideContent">
+						<img [src]="mobileImageSources[1]" alt="">
+						<a [routerLink]="['/products/Women/Tshirt']">
+							<span class="shopBtnHomeSlide">SHOP WOMEN'S</span>
+					</a>
+					</div>
+				</li>
+				<li>
+					<div class="homeSlideContent">
+						<img [src]="mobileImageSources[2]" alt="">
+						<a [routerLink]="['/products/Women/Tshirt']">
+							<span class="shopBtnHomeSlide">SHOP WOMEN'S</span>				
+					</a></div>
+				</li>
+				<li>
+					<div class="homeSlideContent">
+						<img [src]="mobileImageSources[3]" alt="">
+						<a [routerLink]="['/products/Boys/Tshirt']">
+							<span class="shopBtnHomeSlide">SHOP BOYS'</span>											
+					</a>
+					</div>
+				</li>
+			</swiper>
+		</ul>
 	</div>
 </div>
 <div class="homePageWrap">

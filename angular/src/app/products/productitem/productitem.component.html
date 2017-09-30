@@ -1,7 +1,7 @@
 <a [routerLink]="['./variants', design]" (click)="DesignClicked()">
 <div class="itemsWrapInner">
     <a href="#" class="itemAnchor">
-                                <img [src]="ImgUrl" alt="">
+                            <img [lazyLoad]="ImgUrl" height="427" alt="">
 							<h2>{{design}}</h2><br>
 							<span class="itemPrice">INR {{Price}}</span>
 						</a>

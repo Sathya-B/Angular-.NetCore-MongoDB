@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { AppState } from '../app/app.service';
 import { apiUrl } from '../app/config/configuration';
+import { SpinnerService } from 'angular-spinners';
 import * as Util from '../shared/utils/utils';
 import * as Config from '../app/config/configuration';
 import 'rxjs/Rx';
@@ -16,7 +17,8 @@ import 'rxjs/add/operator/toPromise';
 export class TokenService {
     public authToken: any;
     private http: HttpClient;
-    constructor(http: HttpClient, private router: Router, private appState: AppState) {
+    constructor(http: HttpClient, private router: Router, private appState: AppState,
+                private spinner: SpinnerService) {
         this.http = http;
     }
 public getAuthToken(useAuth?: boolean) {
@@ -54,8 +56,9 @@ public getAuthToken(useAuth?: boolean) {
                 }
             } else if (useAuth) {
                  reject('no JWt');
+                 this.spinner.hide('acSpinner');
                  this.appState.set('loggedIn', false)
-                 this.router.navigate(['/loginregister']);
+//                 this.router.navigate(['/loginregister']);
             } else {
                 resolve('');
             }

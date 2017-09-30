@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppState } from '../../app.service';
@@ -32,10 +31,8 @@ public onSubmit(form: NgForm) {
     }
     const verificationCode = form.value;
     verificationCode.PhoneNumber = this.PhoneNumber;
-    console.log(verificationCode);
     this.apiService.get(this.postUrl, undefined, apiUrl.authServer).then(
       (response: any) => {
-        console.log(response);
         if (response.value === undefined) {
           throw response.error;
         }
@@ -58,7 +55,6 @@ public onSubmit(form: NgForm) {
       })
       .catch(
       (error: any) => {
-        console.log(error);
         if (error.code === '404') {
           this.toastmsg.popToast('error', 'Error', 'User not Registered');
           this.router.navigate(['/forgotpassword']);

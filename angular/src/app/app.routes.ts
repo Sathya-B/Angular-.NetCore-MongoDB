@@ -3,6 +3,7 @@ import { HomeComponent } from './home';
 import { ProductsComponent } from './products/products.component';
 import { VariantsComponent } from './variants/variants.component';
 import { NoContentComponent } from './no-content';
+import { AuthGuard } from './auth/authguard/authguard';
 import { LoginRegisterComponent } from './auth/loginregister/loginregister.component';
 import { CreateAccountComponent } from './auth/createaccount/createaccount.component';
 import { CheckEmailComponent } from './auth/createaccount/checkemail/checkemail.component';
@@ -42,7 +43,7 @@ export const ROUTES: Routes = [
   { path: 'products/:productFor/:productType/variants/:productDesign',
     component: VariantsComponent},
   { path: 'cart', component: CartComponent },
-  { path: 'checkout', component: CheckOutComponent },
+  { path: 'checkout', component: CheckOutComponent, canActivate: [AuthGuard] },
   { path: 'wishlist', component: WishListComponent },
   { path: 'cancellation', component: CancellationComponent },
   { path: 'delivery', component: DeliveryComponent },

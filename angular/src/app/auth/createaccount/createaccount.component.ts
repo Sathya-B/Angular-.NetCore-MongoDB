@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
@@ -11,24 +11,16 @@ import { apiUrl } from '../../config/configuration';
   templateUrl: './createaccount.component.html',
   styleUrls: ['./createaccount.component.scss']
 })
-export class CreateAccountComponent implements OnInit {
-
+export class CreateAccountComponent {
 public userLocation: string;
 public dialCode: string;
   constructor(private apiService: ApiService, private route: ActivatedRoute,
               private router: Router, private toastmsg: ToastMsgService) {
   this.userLocation = localStorage.getItem('Country');
   this.dialCode = localStorage.getItem('IsdCode');
-  console.log(this.dialCode);
   }
 
-public ngOnInit(){
-
-
-}
-
 public onSubmit(form: NgForm) {
-
     let userDetails: any = {};
     userDetails = form.value;    
     this.apiService.post('/register', userDetails, undefined, apiUrl.authServer).then(

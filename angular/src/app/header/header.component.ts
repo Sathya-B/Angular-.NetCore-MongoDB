@@ -17,6 +17,7 @@ export class HeaderComponent implements OnInit {
 
   public menuOpened: boolean = false;
   public scrolled: boolean = false;
+  public mobile: boolean = false;
   public loggedIn: { 'loggedIn': boolean } = { loggedIn: false};
   public wishlistCount: number = 0;
   public cartCount: number = 0;
@@ -27,11 +28,14 @@ export class HeaderComponent implements OnInit {
     this.loggedIn = this.appState.get('loggedIn');
     window.onscroll = () => {
       zone.run(() => {
-      if (window.pageYOffset > 0) {
+      if (window.pageYOffset > 0 && window.screen.width > 600) {
         this.scrolled = true;
         } else {
         this.scrolled = false;
-        }
+      }
+      if ( window.screen.width < 600) {
+        this.mobile = true;
+      }
       });
   };
 }
@@ -42,7 +46,6 @@ public ngOnInit() {
     }
   }
 public openMenu() {
-    console.log('Menu Icon clicked.');
     this.menuOpened = !this.menuOpened;
   }
 public LoginRegister() {
@@ -50,18 +53,22 @@ public LoginRegister() {
       this.router.navigate(['/loginregister']);
     }
   }
-
 public ChangePassword() {
-        this.router.navigate(['/changepassword']);
+    this.router.navigate(['/changepassword']);
   }
 public SignOutClicked() {
+    this.cartService.refreshCart().then((res)=>{
+    this.cartService.cartItems.listOfProducts = [];
+    this.wishListService.refreshList().then((res)=>{
+    this.wishListService.wishListItems.listOfProducts = [];
     localStorage.removeItem('JWT');
+    });    
+    });
     this.appState.set('loggedIn', false);
     this.loggedIn.loggedIn = false;
     this.toastmsg.popToast('success', 'Success', 'Logged Out');
-    this.cartService.cartItems.listOfProducts = [];
-    this.wishListService.wishListItems.listOfProducts = [];
     this.router.navigate(['/']);
+    //localStorage.removeItem('JWT');
   }
 public getUserName(){
   return localStorage.getItem('FirstName');

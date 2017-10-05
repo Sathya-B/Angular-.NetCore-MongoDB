@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.Google;
 
 namespace AuthorizedServer
 {
@@ -41,8 +42,7 @@ namespace AuthorizedServer
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials());
-            });
-
+            });           
 
             services.AddOptions();
             services.Configure<Audience>(Configuration.GetSection("Audience"));
@@ -52,6 +52,13 @@ namespace AuthorizedServer
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseCors("CorsPolicy");
+
+            //app.UseGoogleAuthentication(new GoogleOptions
+            //{
+            //    ClientId = "737899914464-f2vheiv2t0a02b1los4jl7n774jl4krp.apps.googleusercontent.com",
+            //    ClientSecret = "Yng3Xtq1XocGigU3zaXMzZiP"
+            //});
+            
             app.UseMvc();
         }
     }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
+using AuthorizedServer.Logger;
 
 namespace AuthorizedServer.Helper
 {
@@ -13,12 +14,14 @@ namespace AuthorizedServer.Helper
     {
         public static string GetCredentials(string key)
         {
-            var result = GlobalHelper.ReadXML().Elements("amazonses").Where(x => x.Element("current").Value.Equals("test")).Descendants(key);
+            var result = GlobalHelper.ReadXML().Elements("amazonses").Where(x => x.Element("current").Value.Equals("Yes")).Descendants(key);
             return result.First().Value;
         }
 
         public static async Task<string> SendEmail(string fullname,string emailReceiver, string link)
         {
+            var cc = GetCredentials("accesskey");
+            var ss = GetCredentials("secretkey");
             string emailSender = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsender").First().Value;
             using (var client = new AmazonSimpleEmailServiceClient(GetCredentials("accesskey"), GetCredentials("secretkey"), Amazon.RegionEndpoint.USWest2))
             {
@@ -42,6 +45,7 @@ namespace AuthorizedServer.Helper
                 }
                 catch (Exception ex)
                 {
+                    LoggerDataAccess.CreateLog("EmailHelper", "SendEmail", "SendEmail", ex.Message);
                     return ex.Message;
                 }
             }

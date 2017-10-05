@@ -26,9 +26,12 @@ namespace Arthur_Clive.Controllers
                 var addressFilter = Builders<Address>.Filter.Eq("UserName", username);
                 var addressCollection = _db.GetCollection<Address>("UserInfo");
                 var result = addressCollection.DeleteManyAsync(addressFilter).Result;
-                data.ListOfAddress.ToList().ForEach(c => c.UserName = username);
-                var authCollection = _db.GetCollection<Address>("UserInfo");
-                await authCollection.InsertManyAsync(data.ListOfAddress);
+                if (data.ListOfAddress.Count > 0)
+                {
+                    data.ListOfAddress.ToList().ForEach(c => c.UserName = username);
+                    var authCollection = _db.GetCollection<Address>("UserInfo");
+                    await authCollection.InsertManyAsync(data.ListOfAddress);
+                }
                 return Ok(new ResponseData
                 {
                     Code = "200",
@@ -112,9 +115,12 @@ namespace Arthur_Clive.Controllers
                 var cartFilter = Builders<Cart>.Filter.Eq("UserName", username);
                 var cartCollection = _db.GetCollection<Cart>("Cart");
                 var result = cartCollection.DeleteManyAsync(cartFilter).Result;
-                data.ListOfProducts.ToList().ForEach(c => c.UserName = username);
-                var authCollection = _db.GetCollection<Cart>("Cart");
-                await authCollection.InsertManyAsync(data.ListOfProducts);
+                if (data.ListOfProducts.Count > 0)
+                {
+                    data.ListOfProducts.ToList().ForEach(c => c.UserName = username);
+                    var authCollection = _db.GetCollection<Cart>("Cart");
+                    await authCollection.InsertManyAsync(data.ListOfProducts);
+                }
                 return Ok(new ResponseData
                 {
                     Code = "200",
@@ -177,9 +183,12 @@ namespace Arthur_Clive.Controllers
                 var wishlistFilter = Builders<WishList>.Filter.Eq("UserName", username);
                 var wishlistCollection = _db.GetCollection<WishList>("WishList");
                 var result = wishlistCollection.DeleteManyAsync(wishlistFilter).Result;
-                data.ListOfProducts.ToList().ForEach(c => c.UserName = username);
-                var authCollection = _db.GetCollection<WishList>("WishList");
-                await authCollection.InsertManyAsync(data.ListOfProducts);
+                if (data.ListOfProducts.Count > 0)
+                {
+                    data.ListOfProducts.ToList().ForEach(c => c.UserName = username);
+                    var authCollection = _db.GetCollection<WishList>("WishList");
+                    await authCollection.InsertManyAsync(data.ListOfProducts);
+                }
                 return Ok(new ResponseData
                 {
                     Code = "200",

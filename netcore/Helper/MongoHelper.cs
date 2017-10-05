@@ -14,7 +14,13 @@ namespace Arthur_Clive.Helper
 
         public static MongoClient GetClient()
         {
-            return new MongoClient(GlobalHelper.ReadXML().Elements("mongoclient").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("host").First().Value);
+            var ip = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("ip").First().Value;
+            var user = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("user").First().Value;
+            var password = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("password").First().Value;
+            var db = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("db").First().Value;
+            var connectionString = "mongodb://"+user+":"+password+"@"+ip+":27017/"+ db;
+            var mongoClient = new MongoClient(connectionString);
+            return mongoClient;
         }
 
         public static async Task<BsonDocument> GetSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName)

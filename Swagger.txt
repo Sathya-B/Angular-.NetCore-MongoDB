@@ -505,6 +505,10 @@ paths:
           description: "Invalid User Infomation & response"
           schema:
               $ref: "#/definitions/ResponseData"
+        402:
+          description: "User Not Verified"
+          schema:
+              $ref: "#/definitions/ResponseData"
         404:
           description: "User Not Found"
           schema:

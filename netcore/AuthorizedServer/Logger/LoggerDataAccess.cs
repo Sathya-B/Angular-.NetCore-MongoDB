@@ -17,7 +17,7 @@ namespace AuthorizedServer.Logger
                     Method = method,
                     Description = errorDescription
                 };
-            var collection = _db.GetCollection<ApplicationLogger>("testLog");
+            var collection = _db.GetCollection<ApplicationLogger>("ServerLog");
             collection.InsertOneAsync(logger);
         }
     }

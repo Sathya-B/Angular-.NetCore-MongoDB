@@ -3588,6 +3588,20 @@
           "lib/netstandard1.5/StackExchange.Redis.StrongName.dll": {}
         }
       },
+      "Stripe.net/10.4.0": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Newtonsoft.Json": "9.0.1",
+          "System.Security.Cryptography.Algorithms": "4.3.0"
+        },
+        "compile": {
+          "lib/netstandard1.2/Stripe.net.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.2/Stripe.net.dll": {}
+        }
+      },
       "Swashbuckle.AspNetCore/1.0.0": {
         "type": "package",
         "dependencies": {
@@ -5598,7 +5612,8 @@
           "Microsoft.AspNetCore.All": "2.0.0",
           "Microsoft.AspNetCore.Mvc.Core": "2.0.0",
           "Microsoft.NETCore.App": "2.0.0",
-          "Minio.NetCore": "1.0.1",
+          "Minio.NetCore": "1.0.2",
+          "Stripe.net": "10.4.0",
           "Swashbuckle.AspNetCore": "1.0.0",
           "Swashbuckle.AspNetCore.Swagger": "1.0.0",
           "Swashbuckle.AspNetCore.SwaggerGen": "1.0.0",
@@ -5620,6 +5635,7 @@
           "AWSSDK.SimpleEmail": "3.3.3",
           "AWSSDK.SimpleNotificationService": "3.3.0.21",
           "Microsoft.AspNetCore.All": "2.0.0",
+          "Microsoft.AspNetCore.Authentication.Google": "2.0.0",
           "Microsoft.NETCore.App": "2.0.0",
           "MongoDB.Driver": "2.4.4"
         },
@@ -9482,6 +9498,17 @@
         "lib/netstandard1.5/StackExchange.Redis.StrongName.xml",
         "stackexchange.redis.strongname.1.2.4.nupkg.sha512",
         "stackexchange.redis.strongname.nuspec"
+      ]
+    },
+    "Stripe.net/10.4.0": {
+      "sha512": "V0SrilaUUw6KoHwmbuv+mxbnBTEMcl8K0H0ccT6WA3ry/ckDNStBd1Amzn5w/CQ3sb+HrJp05GdQIDiB02XECA==",
+      "type": "package",
+      "path": "stripe.net/10.4.0",
+      "files": [
+        "lib/net45/Stripe.net.dll",
+        "lib/netstandard1.2/Stripe.net.dll",
+        "stripe.net.10.4.0.nupkg.sha512",
+        "stripe.net.nuspec"
       ]
     },
     "Swashbuckle.AspNetCore/1.0.0": {

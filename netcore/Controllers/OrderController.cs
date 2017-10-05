@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using MongoDB.Driver.Builders;
 using MH = Arthur_Clive.Helper.MongoHelper;
 
 namespace Arthur_Clive.Controllers
@@ -17,453 +16,643 @@ namespace Arthur_Clive.Controllers
     {
         public IMongoDatabase _db = MH._client.GetDatabase("UserInfo");
         public IMongoDatabase order_db = MH._client.GetDatabase("OrderDB");
+        public IMongoDatabase product_db = MH._client.GetDatabase("ProductDB");
         public UpdateDefinition<BsonDocument> updateDefinition;
 
-        //    [HttpPost("placeorder")]
-        //    public async Task<ActionResult> PlaceOrder([FromBody]OrderInfo data)
-        //    {
-        //        try
-        //        {
-        //            var collection = _db.GetCollection<Cart>("Cart");
-        //            var filter = Builders<Cart>.Filter.Eq("UserName", data.UserName);
-        //            IAsyncCursor<Cart> cursor = await collection.FindAsync(filter);
-        //            var products = cursor.ToList();
-        //            if (products != null)
-        //            {
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            LoggerDataAccess.CreateLog("OrderController", "PlaceOrder", "PlaceOrder", ex.Message);
-        //            return BadRequest(new ResponseData
-        //            {
-        //                Code = "400",
-        //                Message = "Failed",
-        //                Data = ex.Message
-        //            });
-        //        }
-        //    }
+        [HttpPost("placeorder/{username}")]
+        public async Task<ActionResult> PlaceOrder([FromBody]OrderInfo data, string username)
+        {
+            try
+            {
+                if (data.PaymentMethod != null)
+                {
+                    IAsyncCursor<Address> userCursor = await _db.GetCollection<Address>("UserInfo").FindAsync(Builders<Address>.Filter.Eq("UserName", username));
+                    var users = userCursor.ToList();
+                    if (users.Count > 0)
+                    {
+                        IAsyncCursor<Cart> cartCursor = await _db.GetCollection<Cart>("Cart").FindAsync(Builders<Cart>.Filter.Eq("UserName", username));
+                        var cartDatas = cartCursor.ToList();
+                        if (cartDatas.Count > 0)
+                        {
+                            var orders = await GetOrders(username);
+                            if (orders == null)
+                            {
+                                data.OrderId = 1;
+                            }
+                            else
+                            {
+                                data.OrderId = orders.Count + 1;
+                            }
+                            data.UserName = username;
+                            PaymentMethod paymentMethod = new PaymentMethod();
+                            paymentMethod.Method = data.PaymentMethod;
+                            List<StatusCode> paymentStatus = new List<StatusCode>();
+                            if (data.PaymentMethod == "Cash On Delivery")
+                            {
+                                paymentStatus.Add(new StatusCode { StatusId = 1, Date = DateTime.UtcNow, Description = "Payment Pending" });
+                            }
+                            else
+                            {
+                                paymentStatus.Add(new StatusCode { StatusId = 1, Date = DateTime.UtcNow, Description = "Payment Service Initiated" });
+                            }
+                            paymentMethod.Status = paymentStatus;
+                            data.PaymentDetails = paymentMethod;
+                            List<Address> addressList = new List<Address>();
+                            foreach (var address in users)
+                            {
+                                if (address.DefaultAddress == true)
+                                {
+                                    addressList.Add(address);
+                                }
+                            }
+                            data.Address = addressList;
+                            if (data.Address.Count == 0)
+                            {
+                                return BadRequest(new ResponseData
+                                {
+                                    Code = "405",
+                                    Message = "No default address found",
+                                    Data = null
+                                });
+                            }
+                            List<ProductDetails> productList = new List<ProductDetails>();
+                            foreach (var cart in cartDatas)
+                            {
+                                foreach (var product in GetProducts(cart.ProductSKU).Result)
+                                {
+                                    if (product.ProductStock < cart.ProductQuantity)
+                                    {
+                                        return BadRequest(new ResponseData
+                                        {
+                                            Code = "403",
+                                            Message = "Order quantity is higher than the product stock.",
+                                            Data = cart
+                                        });
+                                    }
+                                    ProductDetails productDetails = new ProductDetails();
+                                    productDetails.ProductSKU = cart.ProductSKU;
+                                    productDetails.Status = "Order Placed";
+                                    List<StatusCode> productStatus = new List<StatusCode>();
+                                    productStatus.Add(new StatusCode { StatusId = 1, Date = DateTime.UtcNow, Description = "OrderPlaced" });
+                                    productDetails.StatusCode = productStatus;
+                                    productDetails.ProductInCart = cart;
+                                    productList.Add(productDetails);
+                                }
+                            }
+                            data.ProductDetails = productList;
+                            await order_db.GetCollection<OrderInfo>("OrderInfo").InsertOneAsync(data);
+                            foreach (var cart in cartDatas)
+                            {
+                                foreach (var product in GetProducts(cart.ProductSKU).Result)
+                                {
+                                    var update = Builders<BsonDocument>.Update.Set("ProductStock", product.ProductStock - cart.ProductQuantity);
+                                    var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", cart.ProductSKU), "ProductDB", "Product", update).Result;
+                                }
+                                var response = MH.DeleteSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", cart.ProductSKU), "UserInfo", "Cart");
+                            }
+                            return Ok(new ResponseData
+                            {
+                                Code = "200",
+                                Message = "Order Placed",
+                                Data = data
+                            });
+                        }
+                        else
+                        {
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "402",
+                                Message = "Cart not found",
+                                Data = null
+                            });
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "401",
+                            Message = "UserInfo not found",
+                            Data = null
+                        });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "Provide a payment method",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("OrderController", "PlaceOrder", "PlaceOrder", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
 
+        [HttpGet("vieworder/{username}")]
+        public ActionResult GetOrdersOfUser(string username)
+        {
+            try
+            {
+                var orders = GetOrders(username);
+                return Ok(new ResponseData
+                {
+                    Code = "200",
+                    Message = "Success",
+                    Data = orders
+                });
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("OrderController", "GetOrdersOfUser", "GetOrdersOfUser", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
 
+        [HttpGet("vieworder")]
+        public async Task<ActionResult> GetAllOrders()
+        {
+            try
+            {
+                IAsyncCursor<OrderInfo> cursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Empty);
+                var orders = cursor.ToList();
+                return Ok(new ResponseData
+                {
+                    Code = "200",
+                    Message = "Success",
+                    Data = orders
+                });
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("OrderController", "GetOrdersOfUser", "GetOrdersOfUser", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
 
-        //    [HttpPost("placeorder")]
-        //    public async Task<ActionResult> PlaceOrder([FromBody]OrderInfo data)
-        //    {
-        //        try
-        //        {
-        //            var collection = _db.GetCollection<Cart>("Cart");
-        //            var filter = Builders<Cart>.Filter.Eq("UserName", data.UserName);
-        //            IAsyncCursor<Cart> cursor = await collection.FindAsync(filter);
-        //            var products = cursor.ToList();
-        //            if (products != null)
-        //            {
-        //                var userCollection = _db.GetCollection<Address>("UserInfo");
-        //                var userFilter = Builders<Address>.Filter.Eq("UserName", data.UserName);
-        //                IAsyncCursor<Address> userCursor = await userCollection.FindAsync(userFilter);
-        //                var userInfo = cursor.ToList();
-        //                foreach(var user in userInfo)
+        [HttpPost("cancle/{username}/{productSKU}")]
+        public async Task<ActionResult> CancleOrder([FromBody]OrderInfo data, string username, string productSKU)
+        {
+            try
+            {
+                var orders = GetOrders(username).Result;
+                if (orders == null)
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "401",
+                        Message = "No orders found",
+                        Data = null
+                    });
+                }
+                else
+                {
+                    IAsyncCursor<OrderInfo> orderCursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("UserName", username) & Builders<OrderInfo>.Filter.Eq("OrderId", data.OrderId));
+                    var order = orderCursor.FirstOrDefaultAsync().Result;
+                    if (order == null)
+                    {
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "403",
+                            Message = "Order Not Found",
+                            Data = "Product SKU = " + productSKU + "& OrderId = " + data.OrderId
+                        });
+                    }
+                    foreach (var productDetails in order.ProductDetails)
+                    {
+                        if (productDetails.Status == "Cancled" || productDetails.Status == "Refunded" || productDetails.Status == "Replaced" || productDetails.Status == "Delivered")
+                        {
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "402",
+                                Message = "Order Cancle Request Failed",
+                                Data = "Product Status is " + productDetails.Status
+                            });
+                        }
+                        else
+                        {
+                            PaymentMethod paymentMethod = new PaymentMethod();
+                            paymentMethod.Method = order.PaymentMethod;
+                            List<StatusCode> paymentList = new List<StatusCode>();
+                            int i = 1;
+                            foreach (var status in order.PaymentDetails.Status)
+                            {
+                                paymentList.Add(status);
+                                i++;
+                            }
+                            StatusCode paymentStatus = new StatusCode();
+                            paymentStatus.StatusId = i;
+                            paymentStatus.Date = DateTime.UtcNow;
+                            if (data.PaymentMethod == "Cash On Delivery") { paymentStatus.Description = "Payment Cancled"; }
+                            else { paymentStatus.Description = "Refund Initiated"; }
+                            paymentList.Add(paymentStatus);
+                            paymentMethod.Status = paymentList;
+                            var paymentUpdate = Builders<BsonDocument>.Update.Set("PaymentDetails", paymentMethod);
+                            var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username) & Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", paymentUpdate).Result;
+                            List<ProductDetails> productDetailsList = new List<ProductDetails>();
+                            foreach (var product in order.ProductDetails)
+                            {
+                                if (product.ProductSKU == productSKU)
+                                {
+                                    ProductDetails details = new ProductDetails();
+                                    details.ProductSKU = productSKU;
+                                    details.Status = "Cancled";
+                                    List<StatusCode> productStatusList = new List<StatusCode>();
+                                    int j = 1;
+                                    foreach (var status in product.StatusCode)
+                                    {
+                                        productStatusList.Add(status);
+                                        j++;
+                                    }
+                                    StatusCode productStatus = new StatusCode { StatusId = j, Date = DateTime.UtcNow, Description = "Cancled" };
+                                    productStatusList.Add(productStatus);
+                                    details.StatusCode = productStatusList;
+                                    details.ProductInCart = product.ProductInCart;
+                                    productDetailsList.Add(details);
+                                }
+                                else
+                                {
+                                    productDetailsList.Add(product);
+                                }
+                            }
+                            var productUpdate = Builders<BsonDocument>.Update.Set("ProductDetails", productDetailsList);
+                            var responce = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username) & Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", productUpdate).Result;
+                        }
+                    }
+                    IAsyncCursor<OrderInfo> orderCursorAfterUpdate = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("UserName", username) & Builders<OrderInfo>.Filter.Eq("OrderId", data.OrderId));
+                    var orderAfterUpdate = orderCursorAfterUpdate.FirstOrDefaultAsync().Result;
+                    foreach (var product in orderAfterUpdate.ProductDetails)
+                    {
+                        if (product.ProductSKU == productSKU)
+                        {
+                            IAsyncCursor<Product> productCursor = await product_db.GetCollection<Product>("Product").FindAsync(Builders<Product>.Filter.Eq("ProductSKU", productSKU));
+                            var productData = productCursor.FirstOrDefaultAsync().Result;
+                            var productUpdate = Builders<BsonDocument>.Update.Set("ProductStock", productData.ProductStock + product.ProductInCart.ProductQuantity);
+                            var responce = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", productSKU), "ProductDB", "Product", productUpdate).Result;
+                        }
+                    }
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Success",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("OrderController", "CancleOrder", "CancleOrder", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
 
-        //                if (userInfo != null)
-        //                {
-        //                    foreach (var product in products)
-        //                    {
-        //                        var productFilter = Builders<BsonDocument>.Filter.Eq("Product_SKU", product.ProductSKU);
-        //                        var productData = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(productFilter, "ProductDB", "Product").Result);
-        //                        if (productData != null)
-        //                        {
-        //                            if (productData.ProductStock < product.ProductQuantity)
-        //                            {
-        //                                return BadRequest(new ResponseData
-        //                                {
-        //                                    Code = "401",
-        //                                    Message = "Product Stock Does Not Match the Required Order Quantity",
-        //                                    Data = product.ProductSKU
-        //                                });
-        //                            }
-        //                            var update = Builders<BsonDocument>.Update.Set("Product_Stock", productData.ProductStock - product.ProductQuantity);
-        //                            var result = MH.UpdateSingleObject(productFilter, "ProductDB", "Product", update).Result;
-        //                        }
-        //                        else
-        //                        {
-        //                            return BadRequest(new ResponseData
-        //                            {
-        //                                Code = "303",
-        //                                Message = "Product not Found",
-        //                                Data = null
-        //                            });
-        //                        }
-        //                    }
-        //                    int i = 0;
-        //                    foreach (var address in user.ShippingAddress)
-        //                    {
-        //                        if (address.Default == true)
-        //                        {
-        //                            data.ShippingAddress = user.ShippingAddress[i];
-        //                        }
-        //                        i++;
-        //                    }
-        //                    int j = 0;
-        //                    foreach (var address in user.BillingAddress)
-        //                    {
-        //                        if (address.Default == true)
-        //                        {
-        //                            data.BillingAddress = user.BillingAddress[j];
-        //                        }
-        //                        j++;
-        //                    }
-        //                    var orderCollection = order_db.GetCollection<OrderInfo>("OrderInfo");
-        //                    var orderFilter = Builders<OrderInfo>.Filter.Eq("UserName", data.UserName);
-        //                    IAsyncCursor<OrderInfo> orderCursor = await orderCollection.FindAsync(orderFilter);
-        //                    var orders = orderCursor.ToList();
-        //                    int k = 0;
-        //                    if (orders != null)
-        //                    {
-        //                        foreach (var order in orders)
-        //                        {
-        //                            k++;
-        //                        }
-        //                    }
-        //                    data.OrderId = k + 1;
-        //                    PaymentMethod paymentMethod = new PaymentMethod();
-        //                    paymentMethod.Description = data.PaymentMethod;
-        //                    List<StatusCode> paymentStatusCode = new List<StatusCode>();
-        //                    if (data.PaymentMethod == "Cash On Delivery")
-        //                    {
-        //                        paymentStatusCode.Add(new StatusCode { StatusId = 1, Description = "Payment Pending", Date = DateTime.UtcNow });
-        //                    }
-        //                    if (data.PaymentMethod == "Net Banking")
-        //                    {
-        //                        paymentStatusCode.Add(new StatusCode { StatusId = 2, Description = "Payment Through Net Banking is Initiated", Date = DateTime.UtcNow });
-        //                    }
-        //                    if (data.PaymentMethod == "Card")
-        //                    {
-        //                        paymentStatusCode.Add(new StatusCode { StatusId = 2, Description = "Payment Through Credit/Debit/ATM Card is Initiated", Date = DateTime.UtcNow });
-        //                    }
-        //                    paymentMethod.Status = paymentStatusCode;
-        //                    data.PaymentDetails = paymentMethod;
-        //                    List<ProductDetails> productDetailsList = new List<ProductDetails>();
-        //                    foreach (var product in products)
-        //                    {
-        //                        ProductDetails productDetails = new ProductDetails();
-        //                        productDetails.ProductSKU = product.ProductSKU;
-        //                        productDetails.Status = "Order Placed";
-        //                        List<StatusCode> statusCodeList = new List<StatusCode>();
-        //                        statusCodeList.Add(new StatusCode { StatusId = 1, Description = "Order Placed", Date = DateTime.UtcNow });
-        //                        productDetails.StatusCode = statusCodeList;
-        //                        productDetails.ProductInCart = product;
-        //                        productDetailsList.Add(productDetails);
-        //                    }
-        //                    data.ProductDetails = productDetailsList;
-        //                    await orderCollection.InsertOneAsync(data);
-        //                    var query = Query<Cart>.EQ(e => e.UserName, data.UserName);
-        //                    foreach (var product in products)
-        //                    {
-        //                        var cartFilter = Builders<BsonDocument>.Filter.Eq("_id", product.Id);
-        //                        MH.DeleteSingleObject(cartFilter, "UserInfo", "Cart");
-        //                    }
-        //                    return Ok(new ResponseData
-        //                    {
-        //                        Code = "200",
-        //                        Message = "Order Placed",
-        //                        Data = null
-        //                    });
-        //                }
-        //                else
-        //                {
-        //                    return BadRequest(new ResponseData
-        //                    {
-        //                        Code = "302",
-        //                        Message = "User Info not Found",
-        //                        Data = null
-        //                    });
-        //                }
-        //            }
-        //            else
-        //            {
-        //                return BadRequest(new ResponseData
-        //                {
-        //                    Code = "301",
-        //                    Message = "Cart is Empty",
-        //                    Data = null
-        //                });
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            LoggerDataAccess.CreateLog("OrderController", "PlaceOrder", "PlaceOrder", ex.Message);
-        //            return BadRequest(new ResponseData
-        //            {
-        //                Code = "400",
-        //                Message = "Failed",
-        //                Data = ex.Message
-        //            });
-        //        }
-        //    }
+        [HttpPost("{request}/{username}/{productSKU}")]
+        public async Task<ActionResult> ReturnProduct([FromBody]OrderInfo data, string request, string username, string productSKU)
+        {
+            try
+            {
+                if (request == "refund" || request == "replace")
+                {
+                    var orders = GetOrders(username).Result;
+                    if (orders == null)
+                    {
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "401",
+                            Message = "No orders found",
+                            Data = null
+                        });
+                    }
+                    else
+                    {
+                        IAsyncCursor<OrderInfo> orderCursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("UserName", username) & Builders<OrderInfo>.Filter.Eq("OrderId", data.OrderId));
+                        var order = orderCursor.FirstOrDefaultAsync().Result;
+                        if (order == null)
+                        {
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "406",
+                                Message = "Order Not Found",
+                                Data = "Product SKU = " + productSKU + "& OrderId = " + data.OrderId
+                            });
+                        }
+                        foreach (var productDetails in order.ProductDetails)
+                        {
+                            if (productDetails.ProductSKU == productSKU)
+                            {
+                                var productData = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", productSKU), "ProductDB", "Product").Result);
+                                if (productDetails.Status != "Delivered")
+                                {
+                                    return BadRequest(new ResponseData
+                                    {
+                                        Code = "402",
+                                        Message = "Order Return Request Failed",
+                                        Data = "Product Status is " + productDetails.Status
+                                    });
+                                }
+                                else
+                                {
+                                    if (request == "refund")
+                                    {
+                                        if (productData.RefundApplicable == false)
+                                        {
+                                            return BadRequest(new ResponseData
+                                            {
+                                                Code = "403",
+                                                Message = "Refund not applicable for this product",
+                                                Data = productData
+                                            });
+                                        }
+                                    }
+                                    if (request == "replace")
+                                    {
+                                        if (productData.ReplacementApplicable == false)
+                                        {
+                                            return BadRequest(new ResponseData
+                                            {
+                                                Code = "404",
+                                                Message = "Replacement not applicable for this product",
+                                                Data = productData
+                                            });
+                                        }
+                                    }
+                                    PaymentMethod paymentMethod = new PaymentMethod();
+                                    paymentMethod.Method = order.PaymentMethod;
+                                    List<StatusCode> paymentList = new List<StatusCode>();
+                                    int i = 1;
+                                    foreach (var status in order.PaymentDetails.Status)
+                                    {
+                                        paymentList.Add(status);
+                                        i++;
+                                    }
+                                    StatusCode paymentStatus = new StatusCode();
+                                    paymentStatus.StatusId = i;
+                                    paymentStatus.Date = DateTime.UtcNow;
+                                    if (request == "refund")
+                                    {
+                                        paymentStatus.Description = "Refund Initiated";
+                                    }
+                                    if (request == "replace")
+                                    {
+                                        paymentStatus.Description = "Replacement Initiated";
+                                    }
+                                    paymentList.Add(paymentStatus);
+                                    paymentMethod.Status = paymentList;
+                                    var paymentUpdate = Builders<BsonDocument>.Update.Set("PaymentDetails", paymentMethod);
+                                    var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username) & Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", paymentUpdate).Result;
+                                    List<ProductDetails> productDetailsList = new List<ProductDetails>();
+                                    foreach (var product in order.ProductDetails)
+                                    {
+                                        if (product.ProductSKU == productSKU)
+                                        {
+                                            ProductDetails details = new ProductDetails();
+                                            details.ProductSKU = productSKU;
+                                            details.Status = "Refund Initiated";
+                                            List<StatusCode> productStatusList = new List<StatusCode>();
+                                            int j = 1;
+                                            foreach (var status in product.StatusCode)
+                                            {
+                                                productStatusList.Add(status);
+                                                j++;
+                                            }
+                                            StatusCode productStatus = new StatusCode();
+                                            productStatus.StatusId = j;
+                                            productStatus.Date = DateTime.UtcNow;
+                                            if (request == "refund")
+                                            {
+                                                productStatus.Description = "Refund Initiated";
+                                            }
+                                            if (request == "replace")
+                                            {
+                                                productStatus.Description = "Replacement Initiated";
+                                            }
+                                            productStatusList.Add(productStatus);
+                                            details.StatusCode = productStatusList;
+                                            details.ProductInCart = product.ProductInCart;
+                                            productDetailsList.Add(details);
+                                        }
+                                        else
+                                        {
+                                            productDetailsList.Add(product);
+                                        }
+                                    }
+                                    var productUpdate = Builders<BsonDocument>.Update.Set("ProductDetails", productDetailsList);
+                                    var responce = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username) & Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", productUpdate).Result;
+                                }
+                            }
+                        }
+                        return Ok(new ResponseData
+                        {
+                            Code = "200",
+                            Message = "Success",
+                            Data = null
+                        });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "405",
+                        Message = "Invalid Request",
+                        Data = "Request = " + request
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("OrderController", "ReturnProduct", "ReturnProduct", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
 
-        //    [HttpPost("view")]
-        //    public async Task<ActionResult> ViewOrders([FromBody]OrderRequest data, string request)
-        //    {
-        //        try
-        //        {
-        //            var collection = order_db.GetCollection<OrderInfo>("OrderInfo");
-        //            var filter = Builders<OrderInfo>.Filter.Eq("UserName", data.UserName);
-        //            IAsyncCursor<OrderInfo> cursor = await collection.FindAsync(filter);
-        //            var orders = cursor.ToList();
-        //            if (orders != null)
-        //            {
-        //                if (request == "View")
-        //                {
-        //                    return Ok(new ResponseData
-        //                    {
-        //                        Code = "200",
-        //                        Message = "Success",
-        //                        Data = orders
-        //                    });
-        //                }
-        //            }
-        //            return BadRequest(new ResponseData
-        //            {
-        //                Code = "401",
-        //                Message = "No orders Found",
-        //                Data = null
-        //            });
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            LoggerDataAccess.CreateLog("OrderController", "ViewOrders", "ViewOrders", ex.Message);
-        //            return BadRequest(new ResponseData
-        //            {
-        //                Code = "400",
-        //                Message = "Failed",
-        //                Data = ex.Message
-        //            });
-        //        }
-        //    }
+        [HttpPost("updatestatus/{username}/{productSKU}")]
+        public async Task<ActionResult> UpdateOrder([FromBody]StatusUpdate data, string username, string productSKU)
+        {
+            try
+            {
+                if (data.Status == null)
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "401",
+                        Message = "Status cannot be empty",
+                        Data = null
+                    });
+                }
+                IAsyncCursor<OrderInfo> orderCursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("UserName", username) & Builders<OrderInfo>.Filter.Eq("OrderId", data.OrderId));
+                var order = orderCursor.FirstOrDefaultAsync().Result;
+                if (order == null)
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "403",
+                        Message = "Order Not Found",
+                        Data = "Product SKU = " + productSKU + "& OrderId = " + data.OrderId
+                    });
+                }
+                PaymentMethod paymentMethod = new PaymentMethod();
+                List<StatusCode> statusList = new List<StatusCode>();
+                List<ProductDetails> productList = new List<ProductDetails>();
+                if (data.Status == "Delivered")
+                {
+                    paymentMethod.Method = data.Status;
+                    int i = 1;
+                    foreach (var status in order.PaymentDetails.Status)
+                    {
+                        statusList.Add(status);
+                        i++;
+                    }
+                    if (order.PaymentDetails.Method == "Cash On Delivery")
+                    {
+                        statusList.Add(new StatusCode { StatusId = i, Date = DateTime.UtcNow, Description = "Payment Received" });
+                    }
+                    paymentMethod.Status = statusList;
 
-        //    [HttpPost("{request}")]
-        //    public async Task<ActionResult> StatusUpdate([FromBody]OrderRequest data, string request)
-        //    {
-        //        try
-        //        {
-        //            var collection = order_db.GetCollection<OrderInfo>("OrderInfo");
-        //            var filter = Builders<OrderInfo>.Filter.Eq("UserName", data.UserName);
-        //            IAsyncCursor<OrderInfo> cursor = await collection.FindAsync(filter);
-        //            var orders = cursor.ToList();
-        //            if (orders != null)
-        //            {
-        //                if (request == "Cancel" || request == "Refund" || request == "Return")
-        //                {
-        //                    foreach (var order in orders)
-        //                    {
-        //                        if (order.OrderId == data.OrderId)
-        //                        {
-        //                            if (request == "Cancel")
-        //                            {
-        //                                List<ProductDetails> productDetailsList = new List<ProductDetails>();
-        //                                foreach (var product in order.ProductDetails)
-        //                                {
-        //                                    if (product.Status == "Canceled")
-        //                                    {
-        //                                        return BadRequest(new ResponseData
-        //                                        {
-        //                                            Code = "303",
-        //                                            Message = "Order Already Canceled",
-        //                                            Data = order
-        //                                        });
-        //                                    }
-        //                                    if (product.Status == "Order Placed")
-        //                                    {
-        //                                        if (product.ProductSKU == data.ProductSKU)
-        //                                        {
-        //                                            ProductDetails productDetails = new ProductDetails();
-        //                                            productDetails.Status = "Canceled";
-        //                                            productDetails.ProductInCart = product.ProductInCart;
-        //                                            List<StatusCode> statusCodeList = new List<StatusCode>();
-        //                                            StatusCode statusCode = new StatusCode();
-        //                                            foreach (var status in product.StatusCode)
-        //                                            {
-        //                                                statusCodeList.Add(status);
-        //                                            }
-        //                                            statusCode.StatusId = 2;
-        //                                            statusCode.Description = "Canceled";
-        //                                            statusCode.Date = DateTime.UtcNow;
-        //                                            statusCodeList.Add(statusCode);
-        //                                            productDetails.StatusCode = statusCodeList;
-        //                                            productDetailsList.Add(productDetails);
-        //                                        }
-        //                                    }
-        //                                    else
-        //                                    {
-        //                                        productDetailsList.Add(product);
-        //                                    }
-        //                                }
-        //                                updateDefinition = Builders<BsonDocument>.Update.Set("ProductDetails", productDetailsList);
-        //                                var updateFilter = Builders<BsonDocument>.Filter.Eq("UserName", data.UserName) & Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId);
-        //                                await MH.UpdateSingleObject(updateFilter, "OrderDB", "OrderInfo", updateDefinition);
-        //                                if (order.PaymentMethod == "Cash On Delivery")
-        //                                {
-        //                                    return Ok(new ResponseData
-        //                                    {
-        //                                        Code = "201",
-        //                                        Message = "Order Canceled",
-        //                                        Data = orders
-        //                                    });
-        //                                }
-        //                                return Ok(new ResponseData
-        //                                {
-        //                                    Code = "202",
-        //                                    Message = "Payment Refund Initiated",
-        //                                    Data = orders
-        //                                });
-        //                            }
-        //                            if (request == "Return")
-        //                            {
-        //                                List<ProductDetails> productDetailsList = new List<ProductDetails>();
-        //                                foreach (var product in order.ProductDetails)
-        //                                {
-        //                                    if (product.Status == "Delivered")
-        //                                    {
-        //                                        var productFilter = Builders<BsonDocument>.Filter.Eq("Product_SKU", data.ProductSKU);
-        //                                        var productData = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(productFilter, "ProductDB", "Product").Result);
-        //                                        if (request == "Refund")
-        //                                        {
-        //                                            if (productData.RefundApplicable == true)
-        //                                            {
-        //                                                if (product.ProductSKU == data.ProductSKU)
-        //                                                {
-        //                                                    ProductDetails productDetails = new ProductDetails();
-        //                                                    productDetails.Status = "Refund Initiated";
-        //                                                    productDetails.ProductInCart = product.ProductInCart;
-        //                                                    List<StatusCode> statusCodeList = new List<StatusCode>();
-        //                                                    StatusCode statusCode = new StatusCode();
-        //                                                    foreach (var status in product.StatusCode)
-        //                                                    {
-        //                                                        statusCodeList.Add(status);
-        //                                                    }
-        //                                                    statusCode.StatusId = 4;
-        //                                                    statusCode.Description = "Refund Initiated";
-        //                                                    statusCode.Date = DateTime.UtcNow;
-        //                                                    statusCodeList.Add(statusCode);
-        //                                                    productDetails.StatusCode = statusCodeList;
-        //                                                    productDetailsList.Add(productDetails);
-        //                                                }
+                    foreach (var product in order.ProductDetails)
+                    {
+                        if (product.ProductSKU == productSKU)
+                        {
+                            ProductDetails details = new ProductDetails();
+                            details.ProductSKU = productSKU;
+                            details.Status = order.PaymentDetails.Method;
+                            List<StatusCode> productStatusList = new List<StatusCode>();
+                            int j = 1;
+                            foreach (var status in product.StatusCode)
+                            {
+                                productStatusList.Add(status);
+                                j++;
+                            }
+                            StatusCode productStatus = new StatusCode { StatusId = j, Date = DateTime.UtcNow, Description = data.Status };
+                            productStatusList.Add(productStatus);
+                            details.StatusCode = productStatusList;
+                            details.ProductInCart = product.ProductInCart;
+                            productList.Add(details);
+                        }
+                        else
+                        {
+                            productList.Add(product);
+                        }
+                    }
+                }
+                else if (data.Status == "Refunded" || data.Status == "Replaced" || data.Status == "Refund Failed" || data.Status == "Replacement Failed"
+                            || data.Status == "Refund Cancle" || data.Status == "Replacement Cancled")
+                {
+                    paymentMethod.Method = data.Status;
+                    int i = 1;
+                    foreach (var status in order.PaymentDetails.Status)
+                    {
+                        statusList.Add(status);
+                        i++;
+                    }
+                    if (order.PaymentDetails.Method == "Cash On Delivery")
+                    {
+                        if (data.Status == "Refunded")
+                        {
+                            statusList.Add(new StatusCode { StatusId = i, Date = DateTime.UtcNow, Description = "Payment Refund Initiated" });
+                        }
+                    }
+                    paymentMethod.Status = statusList;
 
-        //                                                else
-        //                                                {
-        //                                                    productDetailsList.Add(product);
-        //                                                }
-        //                                            }
-        //                                            else
-        //                                            {
-        //                                                return BadRequest(new ResponseData
-        //                                                {
-        //                                                    Code = "304",
-        //                                                    Message = "Refund Not Applicable",
-        //                                                    Data = productData
-        //                                                });
-        //                                            }
-        //                                        }
-        //                                        if (request == "Replace")
-        //                                        {
-        //                                            if (productData.ReplacementApplicable == true)
-        //                                            {
-        //                                                if (product.ProductSKU == data.ProductSKU)
-        //                                                {
-        //                                                    ProductDetails productDetails = new ProductDetails();
-        //                                                    productDetails.Status = "Return Initiated";
-        //                                                    productDetails.ProductInCart = product.ProductInCart;
-        //                                                    List<StatusCode> statusCodeList = new List<StatusCode>();
-        //                                                    StatusCode statusCode = new StatusCode();
-        //                                                    foreach (var status in product.StatusCode)
-        //                                                    {
-        //                                                        statusCodeList.Add(status);
-        //                                                    }
-        //                                                    statusCode.StatusId = 7;
-        //                                                    statusCode.Description = "Return Initiated";
-        //                                                    statusCode.Date = DateTime.UtcNow;
-        //                                                    statusCodeList.Add(statusCode);
-        //                                                    productDetails.StatusCode = statusCodeList;
-        //                                                    productDetailsList.Add(productDetails);
-        //                                                }
+                    foreach (var product in order.ProductDetails)
+                    {
+                        if (product.ProductSKU == productSKU)
+                        {
+                            ProductDetails details = new ProductDetails();
+                            details.ProductSKU = productSKU;
+                            details.Status = order.PaymentDetails.Method;
+                            List<StatusCode> productStatusList = new List<StatusCode>();
+                            int j = 1;
+                            foreach (var status in product.StatusCode)
+                            {
+                                productStatusList.Add(status);
+                                j++;
+                            }
+                            StatusCode productStatus = new StatusCode { StatusId = j, Date = DateTime.UtcNow, Description = data.Status };
+                            productStatusList.Add(productStatus);
+                            details.StatusCode = productStatusList;
+                            details.ProductInCart = product.ProductInCart;
+                            productList.Add(details);
+                        }
+                        else
+                        {
+                            productList.Add(product);
+                        }
+                    }
+                }
+                var paymentUpdate = Builders<BsonDocument>.Update.Set("PaymentDetails", paymentMethod);
+                var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username) & Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", paymentUpdate).Result;
+                var productUpdate = Builders<BsonDocument>.Update.Set("ProductDetails", productList);
+                var responce = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username) & Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", productUpdate).Result;
+                return Ok(new ResponseData
+                {
+                    Code = "200",
+                    Message = "Success",
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("OrderController", "UpdateOrder", "UpdateOrder", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
 
-        //                                                else
-        //                                                {
-        //                                                    productDetailsList.Add(product);
-        //                                                }
-        //                                            }
-        //                                            else
-        //                                            {
-        //                                                return BadRequest(new ResponseData
-        //                                                {
-        //                                                    Code = "305",
-        //                                                    Message = "Replacement Not Applicable",
-        //                                                    Data = productData
-        //                                                });
-        //                                            }
-        //                                        }
-        //                                    }
-        //                                    else
-        //                                    {
-        //                                        return BadRequest(new ResponseData
-        //                                        {
-        //                                            Code = "303",
-        //                                            Message = "Request Cannot be Processed as The Product is not Delivered Yet",
-        //                                            Data = null
-        //                                        });
-        //                                    }
-        //                                }
-        //                                updateDefinition = Builders<BsonDocument>.Update.Set("ProductDetails", productDetailsList);
-        //                                var updateFilter = Builders<BsonDocument>.Filter.Eq("UserName", data.UserName) & Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId);
-        //                                await MH.UpdateSingleObject(updateFilter, "OrderDB", "OrderInfo", updateDefinition);
-        //                                if (request == "Refund")
-        //                                {
-        //                                    return Ok(new ResponseData
-        //                                    {
-        //                                        Code = "202",
-        //                                        Message = "Refund Initiated",
-        //                                        Data = null
-        //                                    });
-        //                                }
-        //                                if (request == "Return")
-        //                                {
-        //                                    return Ok(new ResponseData
-        //                                    {
-        //                                        Code = "203",
-        //                                        Message = "Return Initiated",
-        //                                        Data = null
-        //                                    });
-        //                                }
-        //                            }
-        //                        }
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    return BadRequest(new ResponseData
-        //                    {
-        //                        Code = "302",
-        //                        Message = "Request Not Valid",
-        //                        Data = null
-        //                    });
-        //                }
-        //            }
-        //            return BadRequest(new ResponseData
-        //            {
-        //                Code = "301",
-        //                Message = "No orders Found",
-        //                Data = null
-        //            });
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            LoggerDataAccess.CreateLog("OrderController", "UpdateStatus", "UpdateStatus", ex.Message);
-        //            return BadRequest(new ResponseData
-        //            {
-        //                Code = "400",
-        //                Message = "Failed",
-        //                Data = null
-        //            });
-        //        }
-        //    }
+        public async Task<List<OrderInfo>> GetOrders(string username)
+        {
+            IAsyncCursor<OrderInfo> cursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("UserName", username));
+            var orders = cursor.ToList();
+            if (orders == null)
+            {
+                return null;
+            }
+            else
+            {
+                return orders;
+            }
+        }
+
+        public async Task<List<Product>> GetProducts(string productSKU)
+        {
+            IAsyncCursor<Product> productCursor = await product_db.GetCollection<Product>("Product").FindAsync(Builders<Product>.Filter.Eq("ProductSKU", productSKU));
+            var products = productCursor.ToList();
+            return products;
+        }
+
     }
 }

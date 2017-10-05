@@ -11,6 +11,8 @@ using MongoDB.Bson.Serialization;
 using AuthorizedServer.Repositories;
 using Microsoft.Extensions.Options;
 using AuthorizedServer.Logger;
+using System.Net.Http;
+using Newtonsoft;
 
 namespace AuthorizedServer.Controllers
 {
@@ -29,7 +31,7 @@ namespace AuthorizedServer.Controllers
             this._settings = settings;
             this._repo = repo;
         }
-        
+
         [HttpPost("register")]
         public async Task<ActionResult> Register([FromBody]RegisterModel data)
         {
@@ -68,7 +70,7 @@ namespace AuthorizedServer.Controllers
                         {
                             OTP = Guid.NewGuid().ToString();
                             string link = GlobalHelper.GetIpConfig() + data.UserName + "/" + OTP + "/no";
-                            await EmailHelper.SendEmail(data.FullName, data.Email, link);
+                            var result = await EmailHelper.SendEmail(data.FullName, data.Email, link);
                         }
                         data.VerificationCode = smsHasher.HashPassword(smsModel, OTP);
                         data.Status = "Registered";
@@ -114,7 +116,7 @@ namespace AuthorizedServer.Controllers
         }
 
         [HttpGet("register/verification/{username}/{otp}")]
-        public ActionResult RegisterVerification(string username,string otp)
+        public ActionResult RegisterVerification(string username, string otp)
         {
             try
             {
@@ -124,13 +126,13 @@ namespace AuthorizedServer.Controllers
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(checkUser);
                     if (verifyUser.OTPExp > DateTime.UtcNow)
                     {
-                        VerificationModel smsModel = new VerificationModel { UserName = username,VerificationCode= otp };
+                        VerificationModel smsModel = new VerificationModel { UserName = username, VerificationCode = otp };
                         if (smsHasher.VerifyHashedPassword(smsModel, verifyUser.VerificationCode, otp).ToString() == "Success")
                         {
                             var update = Builders<BsonDocument>.Update.Set("Status", "Verified");
                             var filter = Builders<BsonDocument>.Filter.Eq("UserName", username);
                             var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
-                            Parameters parameters = new Parameters { username = username ,fullname = verifyUser.FullName};
+                            Parameters parameters = new Parameters { username = username, fullname = verifyUser.FullName };
                             return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
                         }
                         else
@@ -185,36 +187,48 @@ namespace AuthorizedServer.Controllers
                 if (checkUser != null)
                 {
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(checkUser);
-                    RegisterModel registerModel = new RegisterModel();
-                    registerModel.UserName = user.UserName;
-                    registerModel.Password = user.Password;
-                    if (passwordHasher.VerifyHashedPassword(registerModel, verifyUser.Password, user.Password).ToString() == "Success")
+                    if (verifyUser.Status == "Verified")
                     {
-                        Parameters parameters = new Parameters();
-                        parameters.username = user.UserName;
-                        parameters.fullname = verifyUser.FullName;
-                        return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
+                        RegisterModel registerModel = new RegisterModel();
+                        registerModel.UserName = user.UserName;
+                        registerModel.Password = user.Password;
+                        if (passwordHasher.VerifyHashedPassword(registerModel, verifyUser.Password, user.Password).ToString() == "Success")
+                        {
+                            Parameters parameters = new Parameters();
+                            parameters.username = user.UserName;
+                            parameters.fullname = verifyUser.FullName;
+                            return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
+                        }
+                        else
+                        {
+                            var filter = Builders<BsonDocument>.Filter.Eq("UserName", user.UserName);
+                            string response = RecordLoginAttempts(filter);
+                            if (response != "Failed")
+                                return BadRequest(new ResponseData
+                                {
+                                    Code = "401",
+                                    Message = "Invalid User Infomation" + " & " + response,
+                                    Data = null
+                                });
+                            else
+                            {
+                                return BadRequest(new ResponseData
+                                {
+                                    Code = "400",
+                                    Message = "Failed",
+                                    Data = null
+                                });
+                            }
+                        }
                     }
                     else
                     {
-                        var filter = Builders<BsonDocument>.Filter.Eq("UserName", user.UserName);
-                        string response = RecordLoginAttempts(filter);
-                        if (response != "Failed")
-                            return BadRequest(new ResponseData
-                            {
-                                Code = "401",
-                                Message = "Invalid User Infomation" + " & " + response,
-                                Data = null
-                            });
-                        else
+                        return BadRequest(new ResponseData
                         {
-                            return BadRequest(new ResponseData
-                            {
-                                Code = "400",
-                                Message = "Failed",
-                                Data = null
-                            });
-                        }
+                            Code = "402",
+                            Message = "User Not Verified",
+                            Data = null
+                        });
                     }
                 }
                 else
@@ -289,7 +303,7 @@ namespace AuthorizedServer.Controllers
                     {
                         OTP = Guid.NewGuid().ToString();
                         string link = GlobalHelper.GetIpConfig() + data.UserName + "/" + OTP + "/yes";
-                        await EmailHelper.SendEmail(userData.FullName,data.UserName, link);
+                        await EmailHelper.SendEmail(userData.FullName, data.UserName, link);
                     }
                     var update = Builders<BsonDocument>.Update.Set("Status", "Not Verified").Set("OTPExp", DateTime.UtcNow.AddMinutes(2))
                                                               .Set("VerificationCode", smsHasher.HashPassword(smsModel, OTP));
@@ -324,7 +338,7 @@ namespace AuthorizedServer.Controllers
         }
 
         [HttpGet("forgotpassword/verification/{username}/{otp}")]
-        public ActionResult ForgotPasswordVerification(string username,string otp)
+        public ActionResult ForgotPasswordVerification(string username, string otp)
         {
             try
             {
@@ -335,7 +349,7 @@ namespace AuthorizedServer.Controllers
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(user);
                     if (verifyUser.OTPExp > DateTime.UtcNow)
                     {
-                        VerificationModel model = new VerificationModel { UserName = username ,VerificationCode = otp};
+                        VerificationModel model = new VerificationModel { UserName = username, VerificationCode = otp };
                         if (smsHasher.VerifyHashedPassword(model, verifyUser.VerificationCode, otp).ToString() == "Success")
                         {
                             var update = Builders<BsonDocument>.Update.Set("Status", "Verified");
@@ -554,6 +568,164 @@ namespace AuthorizedServer.Controllers
             catch (Exception ex)
             {
                 LoggerDataAccess.CreateLog("AuthController", "DeactivateAccount", "DeactivateAccount", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
+            }
+        }
+
+        [HttpPost("externallogin/google")]
+        public async Task<ActionResult> GoogleLogin([FromBody]SocialLoginModel data)
+        {
+            try
+            {
+                if (data.Token != null)
+                {
+                    string textResult;
+                    using (var client = new HttpClient())
+                    {
+                        var uri = new Uri("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + data.Token);
+
+                        var response = await client.GetAsync(uri);
+
+                        textResult = await response.Content.ReadAsStringAsync();
+                    }
+                    if (textResult.Contains("Invalid Value"))
+                    {
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "402",
+                            Message = "Invalid token",
+                            Data = null
+                        });
+                    }
+                    else
+                    {
+                        var result = BsonSerializer.Deserialize<GoogleVerificationModel>(textResult);
+                        if (result.sub == data.ID)
+                        {
+                            var checkUser = MH.CheckForDatas("UserName", result.email, null, null, "Authentication", "Authentication");
+                            if (checkUser == null)
+                            {
+                                RegisterModel registerModel = new RegisterModel();
+                                registerModel.UserName = result.email;
+                                registerModel.FullName = result.name;
+                                registerModel.Status = "Verified";
+                                registerModel.Email = result.email;
+                                var authCollection = _db.GetCollection<RegisterModel>("Authentication");
+                                await authCollection.InsertOneAsync(registerModel);
+                            }
+                            Parameters parameters = new Parameters();
+                            parameters.username = result.email;
+                            parameters.fullname = result.name; ;
+                            return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
+                        }
+                        else
+                        {
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "403",
+                                Message = "ID mismatch",
+                                Data = null
+                            });
+                        }
+                    }
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "401",
+                        Message = "Token is empty",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AuthController", "GoogleLogin", "GoogleLogin", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
+            }
+        }
+
+        [HttpPost("externallogin/facebook")]
+        public async Task<ActionResult> FaceBookLogin([FromBody]SocialLoginModel data)
+        {
+            try
+            {
+                if (data.Token != null)
+                {
+                    string textResult;
+                    using (var client = new HttpClient())
+                    {
+                        var uri = new Uri("https://graph.facebook.com/me?locale=en_US&fields=id,name&access_token=" + data.Token);
+
+                        var response = await client.GetAsync(uri);
+
+                        textResult = await response.Content.ReadAsStringAsync();
+                    }
+                    if (textResult.Contains("An active access token must be used to query information about the current user") || textResult.Contains("Malformed access token"))
+                    {
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "402",
+                            Message = "Invalid token",
+                            Data = null
+                        });
+                    }
+                    else
+                    {
+                        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<FacebookVerificationModel>(textResult);
+                        var checkUser = MH.CheckForDatas("UserName", data.Email, null, null, "Authentication", "Authentication");
+                        if (checkUser == null)
+                        {
+                            if (result.id == data.ID)
+                            {
+                                RegisterModel registerModel = new RegisterModel();
+                                registerModel.UserName = data.Email;
+                                registerModel.FullName = result.name;
+                                registerModel.Status = "Verified";
+                                registerModel.Email = data.Email;
+                                var authCollection = _db.GetCollection<RegisterModel>("Authentication");
+                                await authCollection.InsertOneAsync(registerModel);
+                            }
+                            Parameters parameters = new Parameters();
+                            parameters.username = data.Email;
+                            parameters.fullname = result.name; ;
+                            return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
+                        }
+                        else
+                        {
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "403",
+                                Message = "ID mismatch",
+                                Data = null
+                            });
+                        }
+                    }
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "401",
+                        Message = "Token is empty",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AuthController", "GoogleLogin", "GoogleLogin", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

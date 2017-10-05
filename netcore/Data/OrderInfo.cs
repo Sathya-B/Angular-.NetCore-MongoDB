@@ -11,7 +11,7 @@ namespace Arthur_Clive.Data
         public string UserName { get; set; }
         public string PaymentMethod { get; set; }
         public PaymentMethod PaymentDetails { get; set; }
-        public Address Address { get; set; }
+        public List<Address> Address { get; set; }
         public List<ProductDetails> ProductDetails { get; set; }
     }
 
@@ -32,7 +32,7 @@ namespace Arthur_Clive.Data
 
     public class PaymentMethod
     {
-        public string Description { get; set; }
+        public string Method { get; set; }
         public List<StatusCode> Status { get; set; }
     }
 
@@ -44,4 +44,9 @@ namespace Arthur_Clive.Data
         public string ProductSKU { get; set; }
     }
 
+    public class StatusUpdate
+    {
+        public string Status { get; set; }
+        public int OrderId { get; set; }
+    }
 }

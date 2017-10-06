@@ -5,6 +5,7 @@ import { NgZone } from '@angular/core';
 import { ToastMsgService } from '../../services/toastmsg.service';
 import { CartService } from '../../services/cart.service';
 import { WishListService } from '../../services/wishlist.service';
+import { LoginLogoutService } from '../../services/loginlogout.service'; 
 
 @Component({
   selector: 'header',  // <header></header>
@@ -24,7 +25,8 @@ export class HeaderComponent implements OnInit {
 
   constructor(private router: Router, public appState: AppState,
               zone: NgZone, private toastmsg: ToastMsgService,
-              private cartService: CartService, private wishListService: WishListService) {
+              private cartService: CartService, private wishListService: WishListService,
+              private loginLogout: LoginLogoutService) {
     this.loggedIn = this.appState.get('loggedIn');
     window.onscroll = () => {
       zone.run(() => {
@@ -57,18 +59,8 @@ public ChangePassword() {
     this.router.navigate(['/changepassword']);
   }
 public SignOutClicked() {
-    this.cartService.refreshCart().then((res)=>{
-    this.cartService.cartItems.listOfProducts = [];
-    this.wishListService.refreshList().then((res)=>{
-    this.wishListService.wishListItems.listOfProducts = [];
-    localStorage.removeItem('JWT');
-    });    
-    });
-    this.appState.set('loggedIn', false);
     this.loggedIn.loggedIn = false;
-    this.toastmsg.popToast('success', 'Success', 'Logged Out');
-    this.router.navigate(['/']);
-    //localStorage.removeItem('JWT');
+    this.loginLogout.Logout();
   }
 public getUserName(){
   return localStorage.getItem('FirstName');

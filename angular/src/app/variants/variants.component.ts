@@ -62,6 +62,8 @@ public checked(event: any, svariant?: any) {
 public isChecked(color: string) {
   if (this.selectedColor === color) {
     return true;
+  } else if (this.variants.topItem.productColour == color) { 
+
   } else {
     return false;
   }

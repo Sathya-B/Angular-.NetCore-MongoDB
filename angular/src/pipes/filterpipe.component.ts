@@ -18,6 +18,7 @@ public transform(items: any[], conditions: string): any[] {
                 newValue.push(topofgroup);
             }
         }
+        console.log(newValue);
         return newValue;
     }
 private static deepFind(obj, path) {

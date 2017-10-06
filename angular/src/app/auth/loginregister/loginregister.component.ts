@@ -1,11 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
-import { CartService } from '../../../services/cart.service';
-import { WishListService } from '../../../services/wishlist.service';
+import { LoginLogoutService } from '../../../services/loginlogout.service';
 import { ToastMsgService } from '../../../services/toastmsg.service';
-import { ActivatedRoute, Params, Router, ParamMap } from '@angular/router';
-import { AppState } from '../../app.service';
 import { apiUrl } from '../../config/configuration';
 
 @Component({
@@ -16,10 +13,8 @@ import { apiUrl } from '../../config/configuration';
 export class LoginRegisterComponent implements OnInit {
 
 public userLocation: string;
-  constructor(private appState: AppState, private cartService: CartService,
-              private apiService: ApiService, private route: ActivatedRoute,
-              private router: Router, private toastmsg: ToastMsgService,
-              private wishListService: WishListService) {
+  constructor(private apiService: ApiService, private toastmsg: ToastMsgService,
+              private loginLogout: LoginLogoutService) {
   }
 
 public ngOnInit(){
@@ -33,14 +28,8 @@ public  onSignin(form: NgForm) {
           throw response.error;
         }
         if (response.value.code === '999') {
-          this.toastmsg.popToast('success', 'Success', 'Welcome!');
-          localStorage.setItem('JWT', response.value.data);
-          localStorage.setItem('FirstName', response.value.content.FirstName);
-          localStorage.setItem('UserName', loginDetails.UserName);
-          this.appState.set('loggedIn', true);
-          this.cartService.getCartItems(loginDetails.UserName);
-          this.wishListService.getWishListItems(loginDetails.UserName);
-          this.router.navigate(['/']);
+          let loginModel = { accessToken: response.value.data, firstName: response.value.content.FirstName, userName: loginDetails.UserName}
+          this.loginLogout.Login(loginModel);          
         }
       })
       .catch(

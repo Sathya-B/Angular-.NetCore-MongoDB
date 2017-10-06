@@ -18,6 +18,9 @@ import { HeaderComponent } from './header';
 import { FooterComponent } from './footer';
 import { AuthGuard } from './auth/authguard/authguard';
 import { LoginRegisterComponent } from './auth/loginregister/loginregister.component';
+import { GoogleSigninComponent } from './auth/loginregister/google/googlesignin.component';
+import { FaceBookSigninComponent } from './auth/loginregister/facebook/facebooksignin.component';
+import { GetEmailComponent } from './auth/loginregister/facebook/getemail/getemail.component';
 import { CreateAccountComponent } from './auth/createaccount/createaccount.component';
 import { CheckEmailComponent } from './auth/createaccount/checkemail/checkemail.component';
 import { VerifyEmailComponent } from './auth/createaccount/verifyemail/verifyemail.component';
@@ -45,6 +48,7 @@ import { AddressService } from '../services/address.service';
 import { WishListService } from '../services/wishlist.service';
 import { ApiService } from '../services/api.service';
 import { TokenService } from '../services/token.service';
+import { LoginLogoutService } from '../services/loginlogout.service';
 import { AuthInterceptor } from '../shared/auth.interceptor';
 import { ToastMsgService } from '../services/toastmsg.service';
 import { FilterPipe } from '../pipes/filterpipe.component';
@@ -102,6 +106,9 @@ type StoreType = {
     VariantsComponent,
     CategoryComponent,
     LoginRegisterComponent,
+    GoogleSigninComponent,
+    FaceBookSigninComponent,
+    GetEmailComponent,
     CreateAccountComponent,
     CheckEmailComponent,
     VerifyEmailComponent,
@@ -163,6 +170,7 @@ type StoreType = {
     TokenService,
     ToastMsgService,
     SpinnerService,
+    LoginLogoutService,
     AuthGuard,
     {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}
   ]

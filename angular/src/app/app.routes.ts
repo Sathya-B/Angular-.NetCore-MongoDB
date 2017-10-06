@@ -12,6 +12,7 @@ import { VerificationComponent } from './auth/verification/verification.componen
 import { ForgotPasswordComponent } from './auth/forgotpassword/forgotpassword.component';
 import { UpdatePasswordComponent } from './auth/updatepassword/updatepassword.component';
 import { ChangePasswordComponent } from './auth/changepassword/changepassword.component';
+import { GetEmailComponent } from './auth/loginregister/facebook/getemail/getemail.component';
 import { CartComponent } from './cart/cart.component';
 import { CheckOutComponent } from './checkout/checkout.component';
 import { WishListComponent } from './wishlist/wishlist.component';
@@ -37,6 +38,7 @@ export const ROUTES: Routes = [
   { path: 'verifyemail/:userName/:otp/:update', component: VerifyEmailComponent },
   { path: 'forgotpassword', component: ForgotPasswordComponent },
   { path: 'changepassword', component: ChangePasswordComponent },
+  { path: 'getemail', component: GetEmailComponent},
   { path: 'verify/:PhoneNumber/:action', component: VerificationComponent },
   { path: 'updatepassword/:userName', component: UpdatePasswordComponent },
   { path: 'products/:productFor/:productType', component: ProductsComponent },

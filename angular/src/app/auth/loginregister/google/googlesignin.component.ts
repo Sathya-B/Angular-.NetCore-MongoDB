@@ -12,7 +12,7 @@ declare const gapi: any;
 })
 export class GoogleSigninComponent implements AfterViewInit {
 
-  private clientId: string = '737899914464-f2vheiv2t0a02b1los4jl7n774jl4krp.apps.googleusercontent.com';
+  private clientId: string = '761077619522-0t83hdhpc9h8ms3uf78cs3gu02bg6vjt.apps.googleusercontent.com';
 
   private scope = [
     'profile',

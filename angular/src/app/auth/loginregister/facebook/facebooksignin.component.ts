@@ -46,7 +46,6 @@ export class FaceBookSigninComponent implements OnInit {
             let postLogin = { ID: loginresp.authResponse.userID, Token: loginresp.authResponse.accessToken };
             that.apiService.post('/externallogin/facebook/check', postLogin, undefined, apiUrl.authServer).then(
                 (response: any) => {
-                    console.log(response)
                     if (response.value === undefined) {
                         throw response;
                     }
@@ -54,11 +53,9 @@ export class FaceBookSigninComponent implements OnInit {
                         let loginModel = { accessToken: response.value.data, firstName: response.value.content.FirstName, userName: response.value.content.UserName }
                         that.loginLogout.Login(loginModel);
                     }
-                    console.log(response);
                 })
                 .catch(
                 (error: any) => {
-                    console.log(error);
                     if (error.code === '201') {
                         that.appState.set('registerFB', postLogin);
                         that.router.navigate(['./getemail']);
@@ -69,7 +66,6 @@ export class FaceBookSigninComponent implements OnInit {
     }
 
     statusChangeCallback(resp) {
-        console.log('change');
         console.log(resp);
         if (resp.status === 'connected') {
             this.getUserFacebookProfile(resp.authResponse.accessToken);
@@ -83,15 +79,12 @@ export class FaceBookSigninComponent implements OnInit {
     ngOnInit() {
         FB.getLoginStatus(response => {
             this.fbResponse = response;
-            console.log('Init');
-            console.log(response);
             this.statusChangeCallback(response);
         });
     }
     getUserFacebookProfile(accessToken: string) {
         var fields = ['id', 'email', 'first_name', 'last_name', 'link', 'name', 'picture.type(small)'];
         var graphApiUrl = 'me?fields=' + fields.join(',');
-
         FB.api(graphApiUrl + '&access_token=' + accessToken + '', function (response) {
             console.log('api');
             console.log(response);

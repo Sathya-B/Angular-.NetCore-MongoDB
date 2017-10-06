@@ -50,5 +50,4 @@ D:\Arthur_Clive\netcore\AuthorizedServer\obj\Debug\netcoreapp2.0\AuthorizedServe
 D:\Arthur_Clive\netcore\AuthorizedServer\obj\Debug\netcoreapp2.0\AuthorizedServer.AssemblyInfo.cs
 D:\Arthur_Clive\netcore\AuthorizedServer\obj\Debug\netcoreapp2.0\AuthorizedServer.dll
 D:\Arthur_Clive\netcore\AuthorizedServer\obj\Debug\netcoreapp2.0\AuthorizedServer.pdb
-D:\Arthur_Clive\netcore\AuthorizedServer\obj\Debug\netcoreapp2.0\AuthorizedServer.csprojResolveAssemblyReference.cache
 D:\Arthur_Clive\netcore\AuthorizedServer\obj\Debug\netcoreapp2.0\UserSecretsAssemblyInfo.cs

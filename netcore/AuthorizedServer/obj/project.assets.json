@@ -13172,6 +13172,9 @@
   },
   "project": {
     "version": "1.0.0",
+    "restoreSettings": {
+      "hideWarningsAndErrors": true
+    },
     "restore": {
       "projectUniqueName": "D:\\Arthur_Clive\\netcore\\AuthorizedServer\\AuthorizedServer.csproj",
       "projectName": "AuthorizedServer",
@@ -13208,34 +13211,34 @@
     "frameworks": {
       "netcoreapp2.0": {
         "dependencies": {
-          "Microsoft.NETCore.App": {
-            "target": "Package",
-            "version": "2.0.0",
-            "autoReferenced": true
-          },
           "AWSSDK.Core": {
             "target": "Package",
             "version": "3.3.17.9"
+          },
+          "MongoDB.Driver": {
+            "target": "Package",
+            "version": "2.4.4"
           },
           "AWSSDK.SimpleEmail": {
             "target": "Package",
             "version": "3.3.3"
           },
-          "AWSSDK.SimpleNotificationService": {
+          "Microsoft.NETCore.App": {
             "target": "Package",
-            "version": "3.3.0.21"
-          },
-          "Microsoft.AspNetCore.All": {
-            "target": "Package",
-            "version": "2.0.0"
+            "version": "2.0.0",
+            "autoReferenced": true
           },
           "Microsoft.AspNetCore.Authentication.Google": {
             "target": "Package",
             "version": "2.0.0"
           },
-          "MongoDB.Driver": {
+          "Microsoft.AspNetCore.All": {
             "target": "Package",
-            "version": "2.4.4"
+            "version": "2.0.0"
+          },
+          "AWSSDK.SimpleNotificationService": {
+            "target": "Package",
+            "version": "3.3.0.21"
           }
         },
         "imports": [

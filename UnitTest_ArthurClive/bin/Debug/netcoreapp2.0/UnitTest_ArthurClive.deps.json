@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.0",
-    "signature": "4ee35e170cfa521933b8f53c5b2f553ee72b9849"
+    "signature": "a45de2746f20f58a08d3bc6908acc0425ece6a3d"
   },
   "compilationOptions": {},
   "targets": {
@@ -2535,6 +2535,15 @@
           "lib/netstandard1.5/StackExchange.Redis.StrongName.dll": {}
         }
       },
+      "Stripe.net/10.4.0": {
+        "dependencies": {
+          "Newtonsoft.Json": "10.0.2",
+          "System.Security.Cryptography.Algorithms": "4.3.0"
+        },
+        "runtime": {
+          "lib/netstandard1.2/Stripe.net.dll": {}
+        }
+      },
       "Swashbuckle.AspNetCore/1.0.0": {
         "dependencies": {
           "Swashbuckle.AspNetCore.Swagger": "1.0.0",
@@ -3860,6 +3869,7 @@
           "Microsoft.AspNetCore.All": "2.0.0",
           "Microsoft.AspNetCore.Mvc.Core": "2.0.0",
           "Minio.NetCore": "1.0.2",
+          "Stripe.net": "10.4.0",
           "Swashbuckle.AspNetCore": "1.0.0",
           "Swashbuckle.AspNetCore.Swagger": "1.0.0",
           "Swashbuckle.AspNetCore.SwaggerGen": "1.0.0",
@@ -3876,6 +3886,7 @@
           "AWSSDK.SimpleEmail": "3.3.3",
           "AWSSDK.SimpleNotificationService": "3.3.0.21",
           "Microsoft.AspNetCore.All": "2.0.0",
+          "Microsoft.AspNetCore.Authentication.Google": "2.0.0",
           "MongoDB.Driver": "2.4.4"
         },
         "runtime": {
@@ -5359,6 +5370,13 @@
       "sha512": "sha512-qrfSB1BnmM17V20A4yvvNA0HNiDgnBd/CcjaeMKMA4qtup1uuBUMyhl20oj31fRVo71E/fXTbmQCuM9ytBJs6w==",
       "path": "stackexchange.redis.strongname/1.2.4",
       "hashPath": "stackexchange.redis.strongname.1.2.4.nupkg.sha512"
+    },
+    "Stripe.net/10.4.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-V0SrilaUUw6KoHwmbuv+mxbnBTEMcl8K0H0ccT6WA3ry/ckDNStBd1Amzn5w/CQ3sb+HrJp05GdQIDiB02XECA==",
+      "path": "stripe.net/10.4.0",
+      "hashPath": "stripe.net.10.4.0.nupkg.sha512"
     },
     "Swashbuckle.AspNetCore/1.0.0": {
       "type": "package",

@@ -612,6 +612,7 @@ namespace AuthorizedServer.Controllers
                             {
                                 RegisterModel registerModel = new RegisterModel();
                                 registerModel.UserName = result.email;
+                                registerModel.SocialId = result.sub;
                                 registerModel.FullName = result.name;
                                 registerModel.Status = "Verified";
                                 registerModel.Email = result.email;
@@ -684,13 +685,14 @@ namespace AuthorizedServer.Controllers
                     else
                     {
                         var result = Newtonsoft.Json.JsonConvert.DeserializeObject<FacebookVerificationModel>(textResult);
-                        var checkUser = MH.CheckForDatas("UserName", data.Email, null, null, "Authentication", "Authentication");
-                        if (checkUser == null)
+                        if (result.id == data.ID)
                         {
-                            if (result.id == data.ID)
+                            var checkUser = MH.CheckForDatas("SocialId", data.ID, null, null, "Authentication", "Authentication");
+                            if (checkUser == null)
                             {
                                 RegisterModel registerModel = new RegisterModel();
-                                registerModel.UserName = data.Email;
+                                registerModel.UserName = result.id;
+                                registerModel.SocialId = result.id;
                                 registerModel.FullName = result.name;
                                 registerModel.Status = "Verified";
                                 registerModel.Email = data.Email;
@@ -698,7 +700,7 @@ namespace AuthorizedServer.Controllers
                                 await authCollection.InsertOneAsync(registerModel);
                             }
                             Parameters parameters = new Parameters();
-                            parameters.username = data.Email;
+                            parameters.username = result.id;
                             parameters.fullname = result.name; ;
                             return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
                         }
@@ -710,6 +712,76 @@ namespace AuthorizedServer.Controllers
                                 Message = "ID mismatch",
                                 Data = null
                             });
+                        }
+                    }
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "401",
+                        Message = "Token is empty",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AuthController", "FaceBookLogin", "FaceBookLogin", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
+            }
+        }
+
+        [HttpPost("externallogin/facebook/check")]
+        public async Task<ActionResult> FaceBookLoginCheck([FromBody]SocialLoginModel data)
+        {
+            try
+            {
+                if (data.Token != null)
+                {
+                    string textResult;
+                    using (var client = new HttpClient())
+                    {
+                        var uri = new Uri("https://graph.facebook.com/me?locale=en_US&fields=id,name&access_token=" + data.Token);
+
+                        var response = await client.GetAsync(uri);
+
+                        textResult = await response.Content.ReadAsStringAsync();
+                    }
+                    if (textResult.Contains("An active access token must be used to query information about the current user") || textResult.Contains("Malformed access token"))
+                    {
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "402",
+                            Message = "Invalid token",
+                            Data = null
+                        });
+                    }
+                    else
+                    {
+                        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<FacebookVerificationModel>(textResult);
+                        var checkUser = MH.CheckForDatas("SocialId", result.id, null, null, "Authentication", "Authentication");
+                        if (checkUser == null)
+                        {
+                            return Ok(new ResponseData
+                            {
+                                Code = "201",
+                                Message = "User not found",
+                                Data = null
+                            });
+                        }
+                        else
+                        {
+                            var user = BsonSerializer.Deserialize<RegisterModel>(checkUser);
+                            Parameters parameters = new Parameters();
+                            parameters.username = result.id;
+                            parameters.fullname = user.FullName; ;
+                            return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
                         }
                     }
                 }

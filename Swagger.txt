@@ -30,6 +30,7 @@ tags:
   description: "Register, Login, Forgot Password, Change Password and Deactivate Account"
 - name: "Register"
 - name: "Login"
+- name: "SocialLogin"
 - name: "ForgotPassword"
 - name: "ChangePassword"
 - name: "Deactivate Account"
@@ -511,6 +512,96 @@ paths:
               $ref: "#/definitions/ResponseData"
         404:
           description: "User Not Found"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        400:
+          description: "Failed"
+          schema:
+              $ref: "#/definitions/ResponseData"
+  /api/auth/externallogin/google:
+    post:
+      tags:
+      - "SocialLogin"
+      summary: "Login with Google"
+      description: ""
+      operationId: "googleLogin"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Token, Email and ID of the user"
+        required: true
+        schema:
+          $ref: "#/definitions/SocialLoginModel"
+      responses:
+        999:
+          description: "Logged In"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        909:
+          description: "can not add token to database"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        401:
+          description: "Token is empty"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        402:
+          description: "Invalid Token"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        404:
+          description: "ID mismatch"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        400:
+          description: "Failed"
+          schema:
+              $ref: "#/definitions/ResponseData"
+  /api/auth/externallogin/facebook:
+    post:
+      tags:
+      - "SocialLogin"
+      summary: "Login with Facebook"
+      description: ""
+      operationId: "facebookLogin"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Token, Email and ID of the user"
+        required: true
+        schema:
+          $ref: "#/definitions/SocialLoginModel"
+      responses:
+        999:
+          description: "Logged In"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        909:
+          description: "can not add token to database"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        401:
+          description: "Token is empty"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        402:
+          description: "Invalid Token"
+          schema:
+              $ref: "#/definitions/ResponseData"
+        404:
+          description: "ID mismatch"
           schema:
               $ref: "#/definitions/ResponseData"
         400:
@@ -1112,6 +1203,59 @@ definitions:
       UserName:
         type: "string"
       Password:
+        type: "string"
+  SocialLoginModel:
+    type: "object"
+    properties:
+      Token: 
+        type: "string"
+      Email:
+        type: "string"
+      ID:
+        type: "string"
+  GoogleVerificationModel:
+    type: "object"
+    properties:
+      name: 
+        type: "string"
+      email:
+        type: "string"
+      email_verified:
+        type: "boolean"
+      azp:
+        type: "string"
+      aud:
+        type: "string"
+      sub:
+        type: "string"
+      at_hash:
+        type: "string"
+      iss:
+        type: "string"
+      jti:
+        type: "string"
+      iat:
+        type: "string"
+      exp:
+        type: "string"
+      picture:
+        type: "string"
+      given_name:
+        type: "string"
+      family_name:
+        type: "string"
+      locale:
+        type: "string"
+      alg:
+        type: "string"
+      kid:
+        type: "string"
+  FacebookVerificationModel:
+    type: "object"
+    properties:
+      id: 
+        type: "string"
+      name:
         type: "string"
   ForgotPassword:
     type: "object"

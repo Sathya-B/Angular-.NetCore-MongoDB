@@ -27,6 +27,7 @@ namespace AuthorizedServer.Helper
             {
                 dynamic UserInfo = new System.Dynamic.ExpandoObject();
                 UserInfo.FirstName = parameters.fullname;
+                UserInfo.UserName = parameters.username;
                 return new ResponseData
                 {
                     Code = "999",

@@ -12,6 +12,7 @@ namespace AuthorizedServer.Models
         public string DialCode { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
+        public string SocialId { get; set; }
         public string Password { get; set; }
         public string UserLocation { get; set; }
         public string VerificationCode { get; set; }

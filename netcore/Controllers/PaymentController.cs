@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Arthur_Clive.Helper;
 using System;
+using System.Collections;
+using System.Text;
+using Arthur_Clive.Data;
+using PU = Arthur_Clive.Helper.PayUHelper;
+using Arthur_Clive.Logger;
 using System.Linq;
 using System.Xml.Linq;
-using System.Collections;
-using System.Net;
+using Microsoft.AspNetCore.Http;
 
 namespace Arthur_Clive.Controllers
 {
@@ -12,67 +16,28 @@ namespace Arthur_Clive.Controllers
     public class PaymentController : Controller
     {
         [HttpPost]
-        public ActionResult Payment([FromBody]PayentModel model)
+        public ActionResult MakePayment([FromBody]PaymentModel model)
         {
             try
             {
-                Random random = new Random();
-                string strHash = PayUHelper.GenerateHash(random.ToString() + DateTime.Now);
-                string txnId = strHash.ToString().Substring(0, 20);
-                string[] hashSequence = ("key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5|udf6|udf7|udf8|udf9|udf10").Split('|'); 
-                string hash_string = "";
-                foreach (string hash_var in hashSequence)
-                {
-                    if (hash_var == "key")
-                    {
-                        hash_string = hash_string + GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Test")).Descendants("merchantkey").First().Value;
-                        hash_string = hash_string + '|';
-                    }
-                    else if (hash_var == "txnid")
-                    {
-                        hash_string = hash_string + txnId;
-                        hash_string = hash_string + '|';
-                    }
-                    else if (hash_var == "amount")
-                    {
-                        hash_string = hash_string + model.Amount;
-                        hash_string = hash_string + '|';
-                    }
-                    else if(hash_var == "productinfo")
-                    {
-                        hash_string = hash_string + model.ProductInfo;
-                        hash_string = hash_string + '|';
-                    }
-                    else if (hash_var == "firstname")
-                    {
-                        hash_string = hash_string + model.ProductInfo;
-                        hash_string = hash_string + '|';
-                    }
-                    else if (hash_var == "email")
-                    {
-                        hash_string = hash_string + model.Email;
-                        hash_string = hash_string + '|';
-                    }
-                    else
-                    {
-                        hash_string = hash_string + "";
-                        hash_string = hash_string + '|';
-                    }
-                }
-                hash_string += GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Test")).Descendants("saltkey").First().Value;
-                string hash = PayUHelper.GenerateHash(hash_string).ToLower();
-                string action = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Test")).Descendants("url").First().Value + "/_payment";
-                Hashtable data = new Hashtable(); 
+                string SuccessUrl = "http://localhost:5001/api/payment/success";
+                string FailureUrl = "http://localhost:5001/api/payment/failed";
+                string txnId = PU.GetTxnId();
+                string hashString = PU.GetHashString(txnId,model);
+                string hash = PU.Generatehash512(hashString).ToLower();
+                string action = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("url").First().Value + "/_payment";
+                Hashtable data = new Hashtable();
                 data.Add("hash", hash);
                 data.Add("txnid", txnId);
-                data.Add("key", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Test")).Descendants("merchantkey").First().Value);
-                data.Add("amount", model.Amount);
-                data.Add("firstname", model.FullName);
+                data.Add("key", "gtKFFx");
+                string AmountForm = Convert.ToDecimal(model.Amount).ToString("g29");
+                data.Add("amount", AmountForm);
+                data.Add("firstname", model.FirstName);
                 data.Add("email", model.Email);
                 data.Add("phone", model.PhoneNumber);
                 data.Add("productinfo", model.ProductInfo);
-                data.Add("surl", model.SuccessURL);
-                data.Add("furl", model.FailureURL);
+                data.Add("surl", SuccessUrl);
+                data.Add("furl", FailureUrl);
                 data.Add("lastname", model.LastName);
                 data.Add("curl", "");
                 data.Add("address1", model.AddressLine1);
@@ -87,13 +52,50 @@ namespace Arthur_Clive.Controllers
                 data.Add("udf4", "");
                 data.Add("udf5", "");
                 data.Add("pg", "");
-                data.Add("service_provider", "");
-                var form = PayUHelper.PreparePOSTForm(action, data);
-                return Ok(form);
+                data.Add("service_provider", "PayUMoney");
+                StringBuilder strForm = PU.PreparePOSTForm(action, data);
+                var form = PU.PreparePOSTForm(action, data);
+                return Ok(new ResponseData
+                {
+                    Code = "200",
+                    Form = form,
+                    Data = null
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                LoggerDataAccess.CreateLog("PaymentController", "MakePayment", "MakePayment", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
+            }
+        }
+
+        [HttpPost("{responce}")]
+        public ActionResult Return([FromBody]FormCollection data,string responce)
+        {
+            try
+            {
+                //string[] hashSequence = PU.SplitHashSequence();
+                return Ok(new ResponseData
+                {
+                    Code = "200",
+                    Form = null,
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("PaymentController", "Return", "Return", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
             }
         }
     }

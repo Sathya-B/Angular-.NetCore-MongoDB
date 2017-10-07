@@ -11,8 +11,9 @@ declare const gapi: any;
   templateUrl: './googlesignin.component.html'
 })
 export class GoogleSigninComponent implements AfterViewInit {
-
-  private clientId: string = '761077619522-0t83hdhpc9h8ms3uf78cs3gu02bg6vjt.apps.googleusercontent.com';
+  public auth2: any;
+  private clientId: string =
+  '761077619522-0t83hdhpc9h8ms3uf78cs3gu02bg6vjt.apps.googleusercontent.com';
 
   private scope = [
     'profile',
@@ -26,11 +27,9 @@ export class GoogleSigninComponent implements AfterViewInit {
               private loginLogout: LoginLogoutService, private toastmsg: ToastMsgService) {
   console.log('ElementRef: ', this.element);
 }
-
-  public auth2: any;
   public googleInit() {
     let that = this;
-    gapi.load('auth2', function () {
+    gapi.load('auth2', () => {
       that.auth2 = gapi.auth2.init({
         client_id: that.clientId,
         cookiepolicy: 'single_host_origin',
@@ -42,25 +41,21 @@ export class GoogleSigninComponent implements AfterViewInit {
   public attachSignin(element) {
     let that = this;
     this.auth2.attachClickHandler(element, {},
-      function (googleUser) {
-
+      (googleUser) => {
         let profile = googleUser.getBasicProfile();
-        console.log('Token || ' + googleUser.getAuthResponse().id_token);
-        console.log('ID: ' + profile.getId());
-        console.log('Name: ' + profile.getName());
-        console.log('Image URL: ' + profile.getImageUrl());
-        console.log('Email: ' + profile.getEmail());
-
-        //YOUR CODE HERE
-        let postLogin = { ID: profile.getId(), Email: profile.getEmail(), Token: googleUser.getAuthResponse().id_token };
-        that.apiService.post('/externallogin/google', postLogin, undefined, apiUrl.authServer).then(
+        let postLogin = { ID: profile.getId(), Email: profile.getEmail(),
+                          Token: googleUser.getAuthResponse().id_token };
+        that.apiService.post('/externallogin/google', postLogin, undefined,
+                             apiUrl.authServer).then(
           (response: any) => {
             if (response.value === undefined) {
               throw response.error;
             }
             if (response.value.code === '999') {
-            let loginModel = { accessToken: response.value.data, firstName: response.value.content.FirstName, userName: profile.getEmail()}
-            that.loginLogout.Login(loginModel);          
+            let loginModel = { accessToken: response.value.data,
+                               firstName: response.value.content.FirstName,
+                               userName: profile.getEmail()};
+            that.loginLogout.Login(loginModel);
             }
           })
           .catch(
@@ -73,13 +68,12 @@ export class GoogleSigninComponent implements AfterViewInit {
             }
           }
           );
-      }, function(error) {
+      }, (error) => {
     console.log(error);
-    console.log(JSON.stringify(error, undefined, 2));
   });
 }
 
-ngAfterViewInit() {
+public ngAfterViewInit() {
   this.googleInit();
 }
 }

@@ -12,27 +12,28 @@ import { apiUrl } from '../../config/configuration';
   styleUrls: ['./createaccount.component.scss']
 })
 export class CreateAccountComponent {
-public userLocation: string;
-public dialCode: string;
+  public userLocation: string;
+  public dialCode: string;
   constructor(private apiService: ApiService, private route: ActivatedRoute,
               private router: Router, private toastmsg: ToastMsgService) {
-  this.userLocation = localStorage.getItem('Country');
-  this.dialCode = localStorage.getItem('IsdCode');
+    this.userLocation = localStorage.getItem('Country');
+    this.dialCode = localStorage.getItem('IsdCode');
   }
 
-public onSubmit(form: NgForm) {
+  public onSubmit(form: NgForm) {
     let userDetails: any = {};
-    userDetails = form.value;    
+    userDetails = form.value;
     this.apiService.post('/register', userDetails, undefined, apiUrl.authServer).then(
       (response: any) => {
         if (response.message === 'User Registered') {
           this.toastmsg.popToast('success', 'Success', 'Account Created');
           localStorage.setItem('UserName', userDetails.PhoneNumber);
-          if(this.userLocation == 'IN') {
-          this.router.navigate(['../verify', userDetails.PhoneNumber, 'createaccount'],
-            { relativeTo: this.route });} else {
-              this.router.navigate(['../checkemail']);
-            }
+          if (this.userLocation === 'IN') {
+            this.router.navigate(['../verify', userDetails.PhoneNumber, 'createaccount'],
+              { relativeTo: this.route });
+          } else {
+            this.router.navigate(['../checkemail']);
+          }
         } else {
           throw response.error;
         }

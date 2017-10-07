@@ -8,7 +8,7 @@ import 'rxjs/add/operator/map';
 @Injectable()
 export class AddressService {
 
-    public addressItems: { 'listOfAddress': any[]} = { 'listOfAddress': [] };
+    public addressItems: { listOfAddress: any[]} = { listOfAddress: [] };
 
     public addressUpdated: EventEmitter<boolean> = new EventEmitter();
 
@@ -31,7 +31,8 @@ export class AddressService {
     public refreshAddressList() {
         let userName = localStorage.getItem('UserName');
         if (userName !== undefined) {
-            this.apiService.post('user/userinfo/' + userName, this.addressItems, { useAuth: true }, undefined).then(
+            this.apiService.post('user/userinfo/' + userName,
+                                 this.addressItems, { useAuth: true }, undefined).then(
                 (response: any) => {
                     if (response.code === '200') {
                         this.addressUpdated.emit(true);

@@ -30,7 +30,7 @@ public onSubmit(form: NgForm) {
         }
         if (response.message === 'Success') {
          localStorage.setItem('UserName', phoneNumber.userName);
-         if(this.userLocation == 'IN') {
+         if (this.userLocation === 'IN') {
          this.router.navigate(['../verify', phoneNumber.userName, 'forgotpassword'],
                               { relativeTo: this.activatedRoute});
          } else {

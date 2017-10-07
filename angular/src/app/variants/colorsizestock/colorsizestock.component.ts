@@ -20,16 +20,15 @@ export class ColorSizeStockComponent implements OnInit, OnChanges {
   @Input() public selectedVariant: any;
   @Input() public initItem: any;
   public topItem: any = {};
- constructor(private toastMsg: ToastMsgService) {
- 
- }
+  constructor(private toastMsg: ToastMsgService) {
+  }
   public ngOnInit() {
     this.isDataLoaded = true;
     this.topItem = this.initItem.topItem;
     console.log('init');
     console.log(this.selectedVariant);
-    if(this.topItem.productSize == "") {
-      this.checked("");
+    if (this.topItem.productSize === '') {
+      this.checked('');
     }
   }
 
@@ -37,15 +36,15 @@ export class ColorSizeStockComponent implements OnInit, OnChanges {
     if (this.selectedSize !== '') {
       this.checked(this.selectedSize);
     }
-    if (this.remainingQty === this.selectColor  && this.selectedVariant) {
+    if (this.remainingQty === this.selectColor && this.selectedVariant) {
       this.checked(this.selectedSize);
     }
     this.quantity = 1;
   }
   public isAvailable(size: any) {
     if (this.selectedVariant) {
-      let index = this.selectedVariant.variants.findIndex( (myObj) =>
-                                                            myObj['productSize'] === size);
+      let index = this.selectedVariant.variants.findIndex((myObj) =>
+        myObj['productSize'] === size);
       if (this.selectedVariant.variants[index].productStock > 0) {
         return false;
       } else {
@@ -56,9 +55,9 @@ export class ColorSizeStockComponent implements OnInit, OnChanges {
   public checked(size: string) {
     this.selectedSize = size;
     if (this.selectedVariant) {
-      let index = this.selectedVariant.variants.findIndex( (myObj) =>
-                                                            myObj['productSize'] === size);
-      if (this.selectedVariant.variants[index].productStock == 0) {
+      let index = this.selectedVariant.variants.findIndex((myObj) =>
+        myObj['productSize'] === size);
+      if (this.selectedVariant.variants[index].productStock === 0) {
         this.selectedSize = null;
         this.remainingQty = this.selectSize;
       } else {
@@ -68,20 +67,21 @@ export class ColorSizeStockComponent implements OnInit, OnChanges {
         console.log(this.itemToCart);
       }
     } else {
+      console.log('doom');
       this.remainingQty = this.selectColor;
     }
     this.quantity = 1;
   }
   public addOne() {
     if (this.quantity < 10 && this.quantity < Number(this.remainingQty)) {
-    this.quantity++;
+      this.quantity++;
     } else {
-     this.toastMsg.popToast('info','Info','Please Select a Colour and Size.')
+      this.toastMsg.popToast('info', 'Info', 'Please Select a Colour and Size.');
     }
   }
   public reduceOne() {
     if (this.quantity > 1) {
-    this.quantity--;
+      this.quantity--;
     }
   }
 }

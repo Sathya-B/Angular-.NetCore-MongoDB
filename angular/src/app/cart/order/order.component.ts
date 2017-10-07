@@ -7,8 +7,7 @@ import { CartService } from '../../../services/cart.service';
 })
 export class OrderComponent {
 
-constructor(private cartService: CartService){
-    
+constructor(private cartService: CartService) {
 }
 public getCartTotal() {
       return this.cartService.cartItems.listOfProducts.reduce((acc, item) => {

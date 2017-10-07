@@ -9,26 +9,26 @@ import { ToastMsgService } from '../../../services/toastmsg.service';
 })
 export class NewAddressComponent {
 
-@Input() defaultAddress: boolean;
-@Input() shippingAddress: boolean;
-@Input() billingAddress: boolean;
-@Output() addressAdded: EventEmitter<boolean> = new EventEmitter();
-constructor(private addressService: AddressService, private toastmsg: ToastMsgService){
+  @Input() public defaultAddress: boolean;
+  @Input() public shippingAddress: boolean;
+  @Input() public billingAddress: boolean;
+  @Output() public addressAdded: EventEmitter<boolean> = new EventEmitter();
+  constructor(private addressService: AddressService, private toastmsg: ToastMsgService) {
 
-}
+  }
 
-onSubmit(form: NgForm ){
+  public onSubmit(form: NgForm) {
     console.log(form.value);
-    if(form.value.billingAddress == true) {
-    this.addressService.addressItems.listOfAddress.forEach((add)=>{
-     add.billingAddress = false;           
-    }); 
+    if (form.value.billingAddress === true) {
+      this.addressService.addressItems.listOfAddress.forEach((add) => {
+        add.billingAddress = false;
+      });
     }
-    this.addressService.addressItems.listOfAddress.forEach((add)=>{
-     add.shippingAddress = false;
+    this.addressService.addressItems.listOfAddress.forEach((add) => {
+      add.shippingAddress = false;
     });
     this.addressService.addressItems.listOfAddress.push(form.value);
     this.addressService.refreshAddressList();
-    this.addressAdded.emit(true);   
-}
+    this.addressAdded.emit(true);
+  }
 }

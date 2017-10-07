@@ -36,19 +36,19 @@ public getAuthToken(useAuth?: boolean) {
                     return this.http.get(apiUrl.tokenServer +
                     'token/auth?grant_type=refresh_token&client_id=' +
                     userName + '&refresh_token=' + token.refresh_token, {}).timeout(30000)
-                    .map((res) => { 
+                    .map((res) => {
                         console.log('response');
                         console.log(res);
                         return res['data']; } )
                         .subscribe((response) => {
                             console.log(response);
-                            if(response != null) {
+                            if (response != null) {
                             localStorage.setItem('JWT', (response));
                             }
                             return resolve(JSON.parse(localStorage.getItem('JWT')).access_token);
                         }, (err) => {
                                 reject('problem');
-                                this.appState.set('loggedIn', false)
+                                this.appState.set('loggedIn', false);
                                 localStorage.removeItem('JWT');
                                 localStorage.removeItem('UserName');
                                 this.router.navigate(['/loginregister']);
@@ -57,7 +57,7 @@ public getAuthToken(useAuth?: boolean) {
             } else if (useAuth) {
                  reject('no JWt');
                  this.spinner.hide('acSpinner');
-                 this.appState.set('loggedIn', false)
+                 this.appState.set('loggedIn', false);
 //                 this.router.navigate(['/loginregister']);
             } else {
                 resolve('');

@@ -46,8 +46,8 @@ export class HomeComponent implements OnInit {
     '../assets/img/sliderhome/mobile/600X600_4.jpg'
   ];
   public swipeconfig: any = {
-    prevButton:'.swiper-button-prev',
-    nextButton:'.swiper-button-next',
+    prevButton: '.swiper-button-prev',
+    nextButton: '.swiper-button-next',
     loop: true,
     autoplay: 3000,
     autoplayDisableOnInteraction: false,
@@ -56,11 +56,10 @@ export class HomeComponent implements OnInit {
     loopAdditionalSlides: 20
   };
   public mobileconfig: any = {
-    prevButton:'.swiper-button-prev',
-    nextButton:'.swiper-button-next',
-    loop:true
+    prevButton: '.swiper-button-prev',
+    nextButton: '.swiper-button-next',
+    loop: true
   };
-
 
   public category: any[] = [];
   public imgStyle: any = 'block';
@@ -77,41 +76,15 @@ export class HomeComponent implements OnInit {
   }
 
   public GetCategories() {
-    this.apiService.get('category', {useAuth : false}).then(
+    this.apiService.get('category', { useAuth: false }).then(
       (response: any) => {
-      this.category = response.data;
+        this.category = response.data;
       })
       .catch((error: any) => {
-      console.log(error);
-    });
+        console.log(error);
+      });
   }
-  public onCloseImg(){
-   this.imgStyle = 'none';
+  public onCloseImg() {
+    this.imgStyle = 'none';
   }
-
-// private swipeCoord?: [number, number];
-// private swipeTime?: number;
-//   swipe(e: TouchEvent, when: string): void {
-//   const coord: [number, number] = [e.changedTouches[0].pageX, e.changedTouches[0].pageY];
-//   const time = new Date().getTime();
-
-//   if (when === 'start') {
-//     this.swipeCoord = coord;
-//     this.swipeTime = time;
-//   }
-
-//   else if (when === 'end') {
-//     const direction = [coord[0] - this.swipeCoord[0], coord[1] - this.swipeCoord[1]];
-//     const duration = time - this.swipeTime;
-
-//     if (duration < 1000 //Short enough
-//       && Math.abs(direction[1]) < Math.abs(direction[0]) //Horizontal enough
-//       && Math.abs(direction[0]) > 30) {  //Long enough
-//     const swipe = direction[0] < 0 ? 'next' : 'previous';
-//     //Do whatever you want with swipe
-//     console.log('boom');   
-//     this.slider.onChangeSlide('next');
-//   }
-// }
-// }
 }

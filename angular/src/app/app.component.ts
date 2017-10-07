@@ -33,7 +33,7 @@ export class AppComponent implements OnInit {
   public config: any;
   constructor(public appState: AppState, private router: Router,
               private toastmsg: ToastMsgService, private apiService: ApiService) {
-    this.config = toastmsg.config;
+              this.config = toastmsg.config;
   }
 
   public ngOnInit() {
@@ -50,16 +50,15 @@ export class AppComponent implements OnInit {
       }
       window.scrollTo(0, 0);
     });
-   
-   
-     this.apiService.get('', undefined, 'https://ipapi.co/json/').then(
+    this.apiService.get('', undefined, 'https://ipapi.co/json/').then(
       (response: any) => {
-      localStorage.setItem('Country', response.country);
-      let countryCode = Config.isdCodes.filter((country) => {return country.code === response.country})[0];
-      localStorage.setItem('IsdCode', countryCode['dial_code']);
+        localStorage.setItem('Country', response.country);
+        let countryCode = Config.isdCodes.filter((country) => {
+        return country.code === response.country; })[0];
+        localStorage.setItem('IsdCode', countryCode['dial_code']);
       })
       .catch((error: any) => {
-      console.log(error);
-    });   
+        console.log(error);
+      });
   }
 }

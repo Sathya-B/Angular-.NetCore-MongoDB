@@ -6,6 +6,21 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class FilterPipe implements PipeTransform {
 
+private static deepFind(obj, path) {
+        let paths = path.toString().split(/[\.\[\]]/);
+        let current = obj;
+        for (let i = 0; i < paths.length; ++i) {
+            if (paths[i] !== '') {
+                if (current[paths[i]] === undefined) {
+                    return undefined;
+                } else {
+                    current = current[paths[i]];
+                }
+            }
+        }
+        return current;
+    }
+
 public transform(items: any[], conditions: string): any[] {
         let newValue = [];
         for (let i = 0; i < items.length; i++) {
@@ -20,19 +35,5 @@ public transform(items: any[], conditions: string): any[] {
         }
         console.log(newValue);
         return newValue;
-    }
-private static deepFind(obj, path) {
-        let paths = path.toString().split(/[\.\[\]]/);
-        let current = obj;
-        for (let i = 0; i < paths.length; ++i) {
-            if (paths[i] !== '') {
-                if (current[paths[i]] === undefined) {
-                    return undefined;
-                } else {
-                    current = current[paths[i]];
-                }
-            }
-        }
-        return current;
     }
 }

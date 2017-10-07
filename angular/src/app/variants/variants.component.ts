@@ -49,73 +49,77 @@ export class VariantsComponent implements OnInit {
     this.design = route.snapshot.paramMap.get('productDesign');
   }
 
-public ngOnInit() {
-this.variants = JSON.parse(localStorage.getItem(this.for + '-' + this.type + '-' + this.design));
-this.initItem = this.variants;
-this.relatedItems = findLocalItems(this.for);
-}
+  public ngOnInit() {
+    this.variants = JSON.parse(localStorage.getItem(this.for + '-' +
+                                                    this.type + '-' + this.design));
+    this.initItem = this.variants;
+    this.relatedItems = findLocalItems(this.for);
+  }
 
-public checked(event: any, svariant?: any) {
-  this.selectedColor = event.target.id;
-  this.selectedVariant = svariant;
-}
-public isChecked(color: string) {
-  if (this.selectedColor === color) {
-    return true;
-  } else if (this.variants.topItem.productColour == color) { 
+  public checked(event: any, svariant?: any) {
+    this.selectedColor = event.target.id;
+    this.selectedVariant = svariant;
+  }
+  public isChecked(color: string, svariant?: any) {
+    if (this.selectedColor === color) {
+      return true;
+    } else if (this.variants.topItem.productColour === color) {
+      this.selectedColor = color;
+      let newVariants = this.variants;
+      newVariants.variants = this.variants.variants.filter((p) => p.productColour === color);
+      this.css.selectedVariant = newVariants;
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-  } else {
-    return false;
+  public variantItemClicked(variantItem: any) {
+    this.variants = variantItem;
+    this.selectedVariant = null;
+    this.selectedColor = null;
+    this.css.selectedSize = null;
   }
-}
 
-public variantItemClicked(variantItem: any) {
-this.variants = variantItem;
-this.selectedVariant = null;
-this.selectedColor = null;
-this.css.selectedSize = null;
-}
+  public addToCart() {
+    let cartItem: CartModel.CartItem;
+    cartItem = this.css.itemToCart;
+    cartItem.productQuantity = this.css.quantity;
+    this.cartService.cartItems.listOfProducts.push(cartItem);
+    this.router.navigate(['/addedtocart']);
+    if (localStorage.getItem('UserName') !== undefined) {
+      this.cartService.refreshCart();
+    }
+  }
 
-public addToCart() {
-  let cartItem: CartModel.CartItem;
-  cartItem = this.css.itemToCart;
-  cartItem.productQuantity = this.css.quantity;
-  this.cartService.cartItems.listOfProducts.push(cartItem);
-  this.router.navigate(['/addedtocart']);
-  if (localStorage.getItem('UserName') !== undefined) {
-    this.cartService.refreshCart();
+  public addToWishList() {
+    let wishListItem: WishListModel.WishListItem;
+    wishListItem = this.css.itemToCart;
+    if (wishListItem !== undefined) {
+      wishListItem.productQuantity = 1;
+      this.wishListService.wishListItems.listOfProducts.push(wishListItem);
+      if (localStorage.getItem('UserName') !== undefined) {
+        this.wishListService.refreshList();
+      }
+      this.router.navigate(['/addedtowishlist']);
+    } else {
+      this.toastMsg.popToast('info', 'Info', 'Please Select a Colour and Size.');
+    }
+  }
+  public isBagDisabled() {
+    if (!(Number(this.css.remainingQty) >= 1)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
-
-public addToWishList() {
-  let wishListItem: WishListModel.WishListItem;
-  wishListItem = this.css.itemToCart;
-  if( wishListItem !== undefined) {
-  wishListItem.productQuantity = 1;
-  this.wishListService.wishListItems.listOfProducts.push(wishListItem);  
-  if (localStorage.getItem('UserName') !== undefined) {
-    this.wishListService.refreshList();
-  }
-  this.router.navigate(['/addedtowishlist']);
-  } else {
-    this.toastMsg.popToast('info','Info','Please Select a Colour and Size.')
-  }
-}
-public isBagDisabled() {
-  if (!(Number(this.css.remainingQty) >= 1)) {
-    return true;
-  }
-  else {
-    return false;
-  }
-}
-}
-function findLocalItems (query) {
+function findLocalItems(query) {
   let results = [];
   for (let i in localStorage) {
     if (localStorage.hasOwnProperty(i)) {
       if (i.match(query) || (!query && typeof i === 'string')) {
-        results.push({key: i, val: JSON.parse(localStorage.getItem(i))});
+        results.push({ key: i, val: JSON.parse(localStorage.getItem(i)) });
       }
     }
   }

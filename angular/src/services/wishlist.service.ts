@@ -19,9 +19,9 @@ export class WishListService {
         console.log('wishlist of ' + userName);
         this.apiService.get('user/wishlist/' + userName, { useAuth: true }).then(
             (response: any) => {
-                if( response.data != null) {
+                if ( response.data != null) {
                 response.data.forEach((wishListItem) => {
-                this.wishListItems.listOfProducts.push(wishListItem)    
+                this.wishListItems.listOfProducts.push(wishListItem);
             });
             }
             })
@@ -32,7 +32,8 @@ export class WishListService {
     public refreshList() {
         let userName = localStorage.getItem('UserName');
         if (userName !== undefined) {
-        return  this.apiService.put('user/wishlist/' + userName, this.wishListItems , { useAuth: true }).then(
+        return  this.apiService.put('user/wishlist/' + userName, this.wishListItems ,
+                                    { useAuth: true }).then(
                 (response: any) => {
                     console.log(response);
                     return true;

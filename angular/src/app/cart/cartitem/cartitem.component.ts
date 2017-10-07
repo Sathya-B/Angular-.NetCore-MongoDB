@@ -33,7 +33,7 @@ public reduceOne() {
 public removeItem() {
   this.cartService.cartItems.listOfProducts.splice(this.itemIndex, 1);
 }
-public addToWishList(){
+public addToWishList() {
   this.wishListService.wishListItems.listOfProducts.push(this.item);
   this.removeItem();
   this.router.navigate(['/addedtowishlist']);

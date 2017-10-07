@@ -20,7 +20,7 @@ public ngOnInit() {
 public ngOnDestroy() {
     this.cartService.refreshCart();
 }
-public checkOut(){
+public checkOut() {
 this.route.navigate(['/checkout']);
 }
 }

@@ -17,7 +17,7 @@ public userLocation: string;
               private loginLogout: LoginLogoutService) {
   }
 
-public ngOnInit(){
+public ngOnInit() {
 this.userLocation = localStorage.getItem('Country');
 }
 public  onSignin(form: NgForm) {
@@ -28,8 +28,10 @@ public  onSignin(form: NgForm) {
           throw response.error;
         }
         if (response.value.code === '999') {
-          let loginModel = { accessToken: response.value.data, firstName: response.value.content.FirstName, userName: loginDetails.UserName}
-          this.loginLogout.Login(loginModel);          
+          let loginModel = { accessToken: response.value.data,
+                             firstName: response.value.content.FirstName,
+                             userName: loginDetails.UserName};
+          this.loginLogout.Login(loginModel);
         }
       })
       .catch(

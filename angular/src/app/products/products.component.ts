@@ -23,8 +23,8 @@ export class ProductsComponent implements OnInit {
       this.route.params.subscribe( (params) => {
       this.for = params['productFor'];
       this.type = params['productType'];
-      this.ngOnInit();     
-      })
+      this.ngOnInit();
+      });
   }
 
 public ngOnInit() {

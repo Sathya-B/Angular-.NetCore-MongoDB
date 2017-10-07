@@ -12,7 +12,7 @@ import { NgForm } from '@angular/forms';
 })
 export class FooterComponent {
 
-public onSubscribe(form: NgForm){
-console.log(form.value); 
+public onSubscribe(form: NgForm) {
+console.log(form.value);
 }
 }

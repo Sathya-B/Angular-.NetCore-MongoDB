@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
+import { LoginLogoutService } from '../../../services/loginlogout.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppState } from '../../app.service';
 import { ToastMsgService } from '../../../services/toastmsg.service';
@@ -18,16 +19,18 @@ export class VerificationComponent {
   public postUrl: string;
   constructor(private apiService: ApiService, private toastmsg: ToastMsgService,
               private activatedRoute: ActivatedRoute, private router: Router,
-              public appState: AppState) {
+              public appState: AppState, private loginLogout: LoginLogoutService) {
     this.PhoneNumber = activatedRoute.snapshot.paramMap.get('PhoneNumber');
     this.action = activatedRoute.snapshot.paramMap.get('action');
   }
 
 public onSubmit(form: NgForm) {
     if (this.action === 'createaccount') {
-     this.postUrl = '/register/verification/' + this.PhoneNumber + "/" + form.value.VerificationCode;
+     this.postUrl = '/register/verification/' +
+                    this.PhoneNumber + '/' + form.value.VerificationCode;
     } else if (this.action === 'forgotpassword') {
-    this.postUrl = '/forgotpassword/verification/'  + this.PhoneNumber + "/" + form.value.VerificationCode;;
+    this.postUrl = '/forgotpassword/verification/'  +
+                   this.PhoneNumber + '/' + form.value.VerificationCode;
     }
     const verificationCode = form.value;
     verificationCode.PhoneNumber = this.PhoneNumber;
@@ -37,13 +40,10 @@ public onSubmit(form: NgForm) {
           throw response.error;
         }
         if (response.value.code === '999') {
-          this.JWT = response.value.data;
-          localStorage.setItem('JWT', this.JWT);
-          localStorage.setItem('FirstName', response.value.content.FirstName);
-          localStorage.setItem('UserName', verificationCode.PhoneNumber);
-          this.appState.set('loggedIn', true);
-          this.toastmsg.popToast('success', 'Success', 'Verified!');
-          this.router.navigate(['/']);
+        let loginModel = { accessToken: response.value.data,
+                           firstName: response.value.content.FirstName,
+                           userName: verificationCode.PhoneNumber};
+        this.loginLogout.Login(loginModel);
         } else if (response.value.code === '201') {
           this.JWT = response.value.data;
           localStorage.setItem('JWT', this.JWT);

@@ -4,16 +4,16 @@ import * as Util from '../../../shared/utils/utils';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private router: Router) {}
-  canActivate() {
-    if(JSON.parse(localStorage.getItem('JWT')) != null) {
-    let jwt = JSON.parse(localStorage.getItem('JWT')).access_token;
-    if (!Util.expiredJwt(jwt)) {
-      console.log('true');
-      return true;
+  constructor(private router: Router) { }
+public canActivate() {
+    if (JSON.parse(localStorage.getItem('JWT')) != null) {
+      let jwt = JSON.parse(localStorage.getItem('JWT')).access_token;
+      if (!Util.expiredJwt(jwt)) {
+        console.log('true');
+        return true;
+      }
     }
-  }
-  console.log('false');
+    console.log('false');
     this.router.navigate(['/loginregister']);
     return false;
   }

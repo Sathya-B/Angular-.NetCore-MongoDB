@@ -5,7 +5,7 @@ import { NgZone } from '@angular/core';
 import { ToastMsgService } from '../../services/toastmsg.service';
 import { CartService } from '../../services/cart.service';
 import { WishListService } from '../../services/wishlist.service';
-import { LoginLogoutService } from '../../services/loginlogout.service'; 
+import { LoginLogoutService } from '../../services/loginlogout.service';
 
 @Component({
   selector: 'header',  // <header></header>
@@ -62,7 +62,7 @@ public SignOutClicked() {
     this.loggedIn.loggedIn = false;
     this.loginLogout.Logout();
   }
-public getUserName(){
+public getUserName() {
   return localStorage.getItem('FirstName');
 }
 }

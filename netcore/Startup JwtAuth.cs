@@ -6,8 +6,11 @@ using System.Text;
 
 namespace Arthur_Clive
 {
+    /// <summary></summary>
     public partial class Startup
     {
+        /// <summary></summary>
+        /// <param name="services"></param>
         public void ConfigureJwtAuthService(IServiceCollection services)
         {
             var audienceConfig = Configuration.GetSection("Audience");

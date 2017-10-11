@@ -8,16 +8,25 @@ using AH = Arthur_Clive.Helper.AmazonHelper;
 using WH = Arthur_Clive.Helper.MinioHelper;
 using MH = Arthur_Clive.Helper.MongoHelper;
 using MongoDB.Bson;
+using System.ComponentModel;
 
 namespace Arthur_Clive.Controllers
 {
-    [Route("api/[controller]")]
+    /// <summary>Controller to get, post and delete product category</summary>
     [Produces("application/json")]
+    [Route("api/[controller]")]
     public class CategoryController : Controller
     {
+        /// <summary></summary>
         public IMongoDatabase _db = MH._client.GetDatabase("ProductDB");
 
+        /// <summary>Get categories</summary>
+        /// <remarks>This api gets all the categories</remarks>
+        /// <response code="200">Returns categories</response>
+        /// <response code="404">No categories found</response> 
+        /// <response code="400">Process ran into an exception</response>  
         [HttpGet]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> Get()
         {
             try
@@ -26,19 +35,31 @@ namespace Arthur_Clive.Controllers
                 var filter = FilterDefinition<Category>.Empty;
                 IAsyncCursor<Category> cursor = await collection.FindAsync(filter);
                 var categories = cursor.ToList();
-                foreach (var category in categories)
+                if (categories.Count > 0)
                 {
-                    string objectName = category.ProductFor + "-" + category.ProductType + ".jpg";
-                    //category.MinioObject_URL = WH.GetMinioObject("products", objectName).Result;
-                    //category.MinioObject_URL = AH.GetAmazonS3Object("product-category", objectName);
-                    category.MinioObject_URL = AH.GetS3Object("product-category", objectName);
+                    foreach (var category in categories)
+                    {
+                        string objectName = category.ProductFor + "-" + category.ProductType + ".jpg";
+                        //category.MinioObject_URL = WH.GetMinioObject("products", objectName).Result;
+                        //category.MinioObject_URL = AH.GetAmazonS3Object("product-category", objectName);
+                        category.MinioObject_URL = AH.GetS3Object("product-category", objectName);
+                    }
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Success",
+                        Data = categories
+                    });
                 }
-                return Ok(new ResponseData
+                else
                 {
-                    Code = "200",
-                    Message = "Success",
-                    Data = categories
-                });
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "No categories found",
+                        Data = null
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -52,19 +73,23 @@ namespace Arthur_Clive.Controllers
             }
         }
 
-        #region Unused Post and Delete 
-    
+        /// <summary>Insert new category</summary>
+        /// <remarks>This api inserts a new category</remarks>
+        /// <param name="category">Category to be inserted</param>
+        /// <response code="200">Category inserted successfully</response>
+        /// <response code="400">Process ran into an exception</response>  
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody]Category product)
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public async Task<ActionResult> Post([FromBody]Category category)
         {
             try
             {
-                string objectName = product.ProductFor + "-" + product.ProductType + ".jpg";
+                string objectName = category.ProductFor + "-" + category.ProductType + ".jpg";
                 //product.MinioObject_URL = WH.GetMinioObject("products", objectName).Result;
                 //product.MinioObject_URL = AH.GetAmazonS3Object("product-category", objectName);
-                product.MinioObject_URL = AH.GetS3Object("product-category", objectName);
+                category.MinioObject_URL = AH.GetS3Object("product-category", objectName);
                 var collection = _db.GetCollection<Category>("Category");
-                await collection.InsertOneAsync(product);
+                await collection.InsertOneAsync(category);
                 return Ok(new ResponseData
                 {
                     Code = "200",
@@ -84,7 +109,15 @@ namespace Arthur_Clive.Controllers
             }
         }
 
+        /// <summary>Delete a category</summary>
+        /// <param name="productFor">Whom is the product for</param>
+        /// <param name="productType">Type of product</param>
+        /// <remarks>This api deletes a category</remarks>
+        /// <response code="200">Category deleted</response>
+        /// <response code="404">Category not found</response> 
+        /// <response code="400">Process ran into an exception</response>  
         [HttpDelete("{productFor}/{productType}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult Delete(string productFor, string productType)
         {
             try
@@ -106,7 +139,7 @@ namespace Arthur_Clive.Controllers
                     return BadRequest(new ResponseData
                     {
                         Code = "404",
-                        Message = "Product Not Found",
+                        Message = "Category Not Found",
                         Data = null
                     });
                 }
@@ -118,11 +151,10 @@ namespace Arthur_Clive.Controllers
                 {
                     Code = "400",
                     Message = "Failed",
-                    Data = null
+                    Data = ex.Message
                 });
             }
         }
 
-        #endregion
     }
 }

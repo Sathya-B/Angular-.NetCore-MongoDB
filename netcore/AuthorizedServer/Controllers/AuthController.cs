@@ -12,27 +12,44 @@ using AuthorizedServer.Repositories;
 using Microsoft.Extensions.Options;
 using AuthorizedServer.Logger;
 using System.Net.Http;
-using Newtonsoft;
 
 namespace AuthorizedServer.Controllers
 {
+    /// <summary>Contoller to Authorize user and to perform other task related to user account</summary>
     [Route("api/[controller]")]
     public class AuthController : Controller
     {
+        /// <summary></summary>
         public AuthHelper authHelper = new AuthHelper();
+        /// <summary></summary>
         private IOptions<Audience> _settings;
+        /// <summary></summary>
         private IRTokenRepository _repo;
+        /// <summary></summary>
         public IMongoDatabase _db = MH._client.GetDatabase("Authentication");
+        /// <summary></summary>
         public PasswordHasher<VerificationModel> smsHasher = new PasswordHasher<VerificationModel>();
+        /// <summary></summary>
         public PasswordHasher<RegisterModel> passwordHasher = new PasswordHasher<RegisterModel>();
 
+        /// <summary></summary>
+        /// <param name="settings"></param>
+        /// <param name="repo"></param>
         public AuthController(IOptions<Audience> settings, IRTokenRepository repo)
         {
             this._settings = settings;
             this._repo = repo;
         }
 
+        /// <summary>Register new user</summary>
+        /// <remarks>This api is used to register new user</remarks>
+        /// <param name="data"></param>
+        /// <response code="200">User successfully registered</response>
+        /// <response code="401">User already registered</response>   
+        /// <response code="402">Verification type empty</response>   
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost("register")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> Register([FromBody]RegisterModel data)
         {
             try
@@ -115,7 +132,19 @@ namespace AuthorizedServer.Controllers
             }
         }
 
+        /// <summary>Verify user using SMS or Email</summary>
+        /// <remarks>This api is used to verify registered</remarks>
+        /// <param name="username">UserName of user who needs to get verified</param>
+        /// <param name="otp">OTP sent to user to verify amout</param>
+        /// <response code="999">User is verified and jwt token is returned</response>
+        /// <response code="909">User is verified but some error occured while getting jwt token </response>   
+        /// <response code="401">OTP expired </response>     
+        /// <response code="402">OTP invalid </response>   
+        /// <response code="404">User not found </response> 
+        /// <response code="400">Process ran into an exception</response> 
         [HttpGet("register/verification/{username}/{otp}")]
+        [ProducesResponseType(typeof(JsonResult), 999)]
+        [ProducesResponseType(typeof(JsonResult), 909)]
         public ActionResult RegisterVerification(string username, string otp)
         {
             try
@@ -177,7 +206,18 @@ namespace AuthorizedServer.Controllers
             }
         }
 
+        /// <summary>Login user and to record invalid login attempts</summary>
+        /// <remarks>This api is used to login user</remarks>
+        /// <param name="user">Login details of user</param>
+        /// <response code="999">User is logged in and jwt token is returned</response>
+        /// <response code="909">User is logged in but some error occured while getting jwt token </response>   
+        /// <response code="401">User info is invalid</response>     
+        /// <response code="402">User not verified </response>   
+        /// <response code="404">User not found</response> 
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost("login")]
+        [ProducesResponseType(typeof(JsonResult), 999)]
+        [ProducesResponseType(typeof(JsonResult), 909)]
         public ActionResult Login([FromBody]LoginModel user)
         {
             try
@@ -202,12 +242,12 @@ namespace AuthorizedServer.Controllers
                         else
                         {
                             var filter = Builders<BsonDocument>.Filter.Eq("UserName", user.UserName);
-                            string response = RecordLoginAttempts(filter);
+                            string response = GlobalHelper.RecordLoginAttempts(filter);
                             if (response != "Failed")
                                 return BadRequest(new ResponseData
                                 {
                                     Code = "401",
-                                    Message = "Invalid User Infomation" + " & " + response,
+                                    Message = "Invalid User Infomation",
                                     Data = null
                                 });
                             else
@@ -253,32 +293,14 @@ namespace AuthorizedServer.Controllers
             }
         }
 
-        public string RecordLoginAttempts(FilterDefinition<BsonDocument> filter)
-        {
-            try
-            {
-                var verifyUser = BsonSerializer.Deserialize<RegisterModel>(MH.GetSingleObject(filter, "Authentication", "Authentication").Result);
-                if (verifyUser.WrongAttemptCount < 10)
-                {
-                    var update = Builders<BsonDocument>.Update.Set("WrongAttemptCount", verifyUser.WrongAttemptCount + 1);
-                    var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
-                    return "Login Attempt Recorded";
-                }
-                else
-                {
-                    var update = Builders<BsonDocument>.Update.Set("Status", "Revoked");
-                    var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
-                    return "Account Blocked";
-                }
-            }
-            catch (Exception ex)
-            {
-                LoggerDataAccess.CreateLog("AuthController", "RecordLoginAttempts", "RecordLoginAttempts", ex.Message);
-                return "Failed";
-            }
-        }
-
+        /// <summary>Reset password when the user forgets the current password</summary>
+        /// <remarks>This api is used to change password when the user forgets surrent password</remarks>
+        /// <param name="data">Data required to reset password when user forgets current password</param>
+        /// <response code="200">Request to change password is processed successfully</response>
+        /// <response code="404">User not found</response> 
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost("forgotpassword")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> ForgotPassword([FromBody]ForgotPasswordModel data)
         {
             try
@@ -337,7 +359,17 @@ namespace AuthorizedServer.Controllers
             }
         }
 
+        /// <summary>Verify the user to change password</summary>
+        /// <remarks>This api is used verify user to change password</remarks>
+        /// <param name="username">UserName of user who need to change password</param>
+        /// <param name="otp">OTP sent to user to verify</param>
+        /// <response code="201">User is verified to change password</response> 
+        /// <response code="401">OTP invalid </response>     
+        /// <response code="402">OTP expired </response>   
+        /// <response code="404">User not found</response> 
+        /// <response code="400">Process ran into an exception</response> 
         [HttpGet("forgotpassword/verification/{username}/{otp}")]
+        [ProducesResponseType(typeof(JsonResult), 201)]
         public ActionResult ForgotPasswordVerification(string username, string otp)
         {
             try
@@ -403,7 +435,15 @@ namespace AuthorizedServer.Controllers
             }
         }
 
+        /// <summary>Change the password after the user is verified to change password</summary>
+        /// <remarks>This api is used change password</remarks>
+        /// <param name="data">Data need to change password</param>
+        /// <response code="200">Password successfully changed</response>
+        /// <response code="401">User not found</response>   
+        /// <response code="404">User not found</response> 
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost("forgotpassword/changepassword")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult ChangePassword([FromBody]LoginModel data)
         {
             try
@@ -457,7 +497,17 @@ namespace AuthorizedServer.Controllers
             }
         }
 
+        /// <summary>
+        /// Change password for the user account
+        /// </summary>
+        /// <remarks>This api is used to changepassword when the user knows the current password</remarks>
+        /// <param name="data">Data required to change password</param>
+        /// <response code="200">Password is changed successfully</response> 
+        /// <response code="401">User info invalid</response>     
+        /// <response code="404">User not found</response> 
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost("changepassword")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult ChangePasswordWhenLoggedIn([FromBody]ChangePasswordModel data)
         {
             try
@@ -482,12 +532,12 @@ namespace AuthorizedServer.Controllers
                     }
                     else
                     {
-                        string response = RecordLoginAttempts(filter);
+                        string response = GlobalHelper.RecordLoginAttempts(filter);
                         if (response != "Failed")
                             return BadRequest(new ResponseData
                             {
                                 Code = "401",
-                                Message = "Invalid User Infomation" + " & " + response,
+                                Message = "Invalid User Infomation",
                                 Data = null
                             });
                         else
@@ -522,8 +572,16 @@ namespace AuthorizedServer.Controllers
                 });
             }
         }
-
+        
+        /// <summary>Deactivate account</summary>
+        /// <remarks>This api is used to deactivate account</remarks>
+        /// <param name = "data" >Login data</param>
+        /// <response code="200">Account deactivated successfully</response>
+        /// <response code="401">Invalid username or password</response>     
+        /// <response code="404">User not found</response> 
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost("deactivateaccount")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult DeactivateAccount([FromBody]LoginModel data)
         {
             try
@@ -577,7 +635,18 @@ namespace AuthorizedServer.Controllers
             }
         }
 
+        /// <summary>Login using google</summary>
+        /// <remarks>This api is used to login user using google</remarks>
+        /// <param name="data">Data needed to login user using google</param>
+        /// <response code="999">User is logged in using google and jwt token is returned</response>
+        /// <response code="909">User is logged in using google but some error occured while getting jwt token </response>   
+        /// <response code="401">Token is empty</response>     
+        /// <response code="402">Token is invalid </response>   
+        /// <response code="403">ID mismatch</response> 
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost("externallogin/google")]
+        [ProducesResponseType(typeof(JsonResult), 999)]
+        [ProducesResponseType(typeof(JsonResult), 909)]
         public async Task<ActionResult> GoogleLogin([FromBody]SocialLoginModel data)
         {
             try
@@ -657,7 +726,18 @@ namespace AuthorizedServer.Controllers
             }
         }
 
+        /// <summary>Login using facebook</summary>
+        /// <remarks>This api is used to login user using facebook</remarks>
+        /// <param name="data">Data to login user using facebook</param>
+        /// <response code="999">User is logged in using facebook and jwt token is returned</response>
+        /// <response code="909">User is logged in using facebook but some error occured while getting jwt token </response>   
+        /// <response code="401">Token is empty </response>     
+        /// <response code="402">Token is invalid </response>   
+        /// <response code="403">ID mismatch</response> 
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost("externallogin/facebook")]
+        [ProducesResponseType(typeof(JsonResult), 999)]
+        [ProducesResponseType(typeof(JsonResult), 909)]
         public async Task<ActionResult> FaceBookLogin([FromBody]SocialLoginModel data)
         {
             try
@@ -737,7 +817,17 @@ namespace AuthorizedServer.Controllers
             }
         }
 
+        /// <summary>Chech if the user who logins using facebook is already registered</summary>
+        /// <remarks>This api is used to check the whether the user login in with facebook is already registered or not</remarks>
+        /// <param name="data">Data need to check if user is registered using facebook</param>
+        /// <response code="999">User is logged in using google and jwt token is returned</response>
+        /// <response code="909">User is logged in using google but some error occured while getting jwt token </response>   
+        /// <response code="201">User not registered using facebook</response>     
+        /// <response code="401">Token is empty </response>   
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost("externallogin/facebook/check")]
+        [ProducesResponseType(typeof(JsonResult), 999)]
+        [ProducesResponseType(typeof(JsonResult), 909)]
         public async Task<ActionResult> FaceBookLoginCheck([FromBody]SocialLoginModel data)
         {
             try

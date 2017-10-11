@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v2.0": {
-      "AWSSDK.Core/3.3.17.9": {
+      "AWSSDK.Core/3.3.18": {
         "type": "package",
         "dependencies": {
           "Microsoft.CSharp": "4.0.1",
@@ -30,10 +30,10 @@
           "lib/netstandard1.3/AWSSDK.S3.dll": {}
         }
       },
-      "AWSSDK.SimpleEmail/3.3.3": {
+      "AWSSDK.SimpleEmail/3.3.3.1": {
         "type": "package",
         "dependencies": {
-          "AWSSDK.Core": "[3.3.17, 3.4.0)"
+          "AWSSDK.Core": "[3.3.18, 3.4.0)"
         },
         "compile": {
           "lib/netstandard1.3/AWSSDK.SimpleEmail.dll": {}
@@ -52,6 +52,27 @@
         },
         "runtime": {
           "lib/netstandard1.3/AWSSDK.SimpleNotificationService.dll": {}
+        }
+      },
+      "Castle.Core/4.2.0": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "System.Collections.Specialized": "4.3.0",
+          "System.ComponentModel": "4.3.0",
+          "System.ComponentModel.TypeConverter": "4.3.0",
+          "System.Diagnostics.TraceSource": "4.3.0",
+          "System.Dynamic.Runtime": "4.3.0",
+          "System.Reflection": "4.3.0",
+          "System.Reflection.Emit": "4.3.0",
+          "System.Reflection.TypeExtensions": "4.3.0",
+          "System.Xml.XmlDocument": "4.3.0"
+        },
+        "compile": {
+          "lib/netstandard1.3/Castle.Core.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/Castle.Core.dll": {}
         }
       },
       "Libuv/1.10.0": {
@@ -3128,6 +3149,21 @@
           "lib/netstandard1.5/MongoDB.Driver.Core.dll": {}
         }
       },
+      "Moq/4.7.137": {
+        "type": "package",
+        "dependencies": {
+          "Castle.Core": "4.2.0",
+          "NETStandard.Library": "1.6.1",
+          "System.Linq.Queryable": "4.3.0",
+          "System.Reflection.TypeExtensions": "4.3.0"
+        },
+        "compile": {
+          "lib/netstandard1.3/Moq.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/Moq.dll": {}
+        }
+      },
       "MSTest.TestAdapter/1.2.0-beta3": {
         "type": "package",
         "dependencies": {
@@ -4273,17 +4309,17 @@
           "lib/netstandard1.6/System.Linq.Expressions.dll": {}
         }
       },
-      "System.Linq.Queryable/4.0.1": {
+      "System.Linq.Queryable/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.Collections": "4.0.11",
-          "System.Diagnostics.Debug": "4.0.11",
-          "System.Linq": "4.1.0",
-          "System.Linq.Expressions": "4.1.0",
-          "System.Reflection": "4.1.0",
-          "System.Reflection.Extensions": "4.0.1",
-          "System.Resources.ResourceManager": "4.0.1",
-          "System.Runtime": "4.1.0"
+          "System.Collections": "4.3.0",
+          "System.Diagnostics.Debug": "4.3.0",
+          "System.Linq": "4.3.0",
+          "System.Linq.Expressions": "4.3.0",
+          "System.Reflection": "4.3.0",
+          "System.Reflection.Extensions": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0"
         },
         "compile": {
           "ref/netstandard1.0/System.Linq.Queryable.dll": {}
@@ -5607,8 +5643,8 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
-          "AWSSDK.S3": "3.3.11",
-          "AWSSDK.SimpleEmail": "3.3.3",
+          "AWSSDK.S3": "3.3.11.1",
+          "AWSSDK.SimpleEmail": "3.3.3.1",
           "Microsoft.AspNetCore.All": "2.0.0",
           "Microsoft.AspNetCore.Mvc.Core": "2.0.0",
           "Microsoft.NETCore.App": "2.0.0",
@@ -5637,7 +5673,9 @@
           "Microsoft.AspNetCore.All": "2.0.0",
           "Microsoft.AspNetCore.Authentication.Google": "2.0.0",
           "Microsoft.NETCore.App": "2.0.0",
-          "MongoDB.Driver": "2.4.4"
+          "MongoDB.Driver": "2.4.4",
+          "Moq": "4.7.137",
+          "Swashbuckle.AspNetCore": "1.0.0"
         },
         "compile": {
           "bin/placeholder/AuthorizedServer.dll": {}
@@ -5649,12 +5687,12 @@
     }
   },
   "libraries": {
-    "AWSSDK.Core/3.3.17.9": {
-      "sha512": "7ztkmMvumu1aMR6ETKqZwznLQR4SC/axTj3q4QauyWv5E36Hio6r1UzmDjOOexMUl3Cg4IqQgGfe8oBidSiJuw==",
+    "AWSSDK.Core/3.3.18": {
+      "sha512": "15VZyyB+94JPOBz50hRFx7axCZ1iLHyAJqkGMa3khEayMjEMx4LXEScWMazE1WsbWF1EtHtXi4KL7oOYzVd44w==",
       "type": "package",
-      "path": "awssdk.core/3.3.17.9",
+      "path": "awssdk.core/3.3.18",
       "files": [
-        "awssdk.core.3.3.17.9.nupkg.sha512",
+        "awssdk.core.3.3.18.nupkg.sha512",
         "awssdk.core.nuspec",
         "lib/MonoAndroid10/AWSSDK.Core.XML",
         "lib/MonoAndroid10/AWSSDK.Core.dll",
@@ -5723,13 +5761,13 @@
         "tools/uninstall.ps1"
       ]
     },
-    "AWSSDK.SimpleEmail/3.3.3": {
-      "sha512": "bIL9dF8gbaImhP3sbtYVQnu2drozJqt7wDVAGu9V8k6sqQM7q25MUpyNzgH0NaGO+j7gHFWmFq1VI/vB+iXLqw==",
+    "AWSSDK.SimpleEmail/3.3.3.1": {
+      "sha512": "NfQCeZA0AMsANSPm/a7ws/TspqTpvEy4TuSsv5dTK6hwNChWyn3xcUdFTgfZL6iYg9OTSvljyYbtkarj8C8NVQ==",
       "type": "package",
-      "path": "awssdk.simpleemail/3.3.3",
+      "path": "awssdk.simpleemail/3.3.3.1",
       "files": [
         "analyzers/dotnet/cs/AWSSDK.SimpleEmail.CodeAnalysis.dll",
-        "awssdk.simpleemail.3.3.3.nupkg.sha512",
+        "awssdk.simpleemail.3.3.3.1.nupkg.sha512",
         "awssdk.simpleemail.nuspec",
         "lib/MonoAndroid10/AWSSDK.SimpleEmail.XML",
         "lib/MonoAndroid10/AWSSDK.SimpleEmail.dll",
@@ -5783,6 +5821,23 @@
         "lib/portable-net45+win8+wpa81+wp8/AWSSDK.SimpleNotificationService.pdb",
         "tools/install.ps1",
         "tools/uninstall.ps1"
+      ]
+    },
+    "Castle.Core/4.2.0": {
+      "sha512": "1TtKHYYVfox7aUZ0akCqkULmAjpG8X5ZRzTzTiONY34xtvvaPuUSSdVL1VaF/1/ljRhOkpy+uKOGn6XoFGvorw==",
+      "type": "package",
+      "path": "castle.core/4.2.0",
+      "files": [
+        "ASL - Apache Software Foundation License.txt",
+        "CHANGELOG.md",
+        "LICENSE",
+        "castle.core.4.2.0.nupkg.sha512",
+        "castle.core.nuspec",
+        "lib/net35/Castle.Core.dll",
+        "lib/net40/Castle.Core.dll",
+        "lib/net45/Castle.Core.dll",
+        "lib/netstandard1.3/Castle.Core.dll",
+        "readme.txt"
       ]
     },
     "Libuv/1.10.0": {
@@ -8748,6 +8803,21 @@
         "mongodb.driver.core.nuspec"
       ]
     },
+    "Moq/4.7.137": {
+      "sha512": "CtVIMofBEyHAMPixhup7nSXZO/UG1DCqEI2E816XgQzJ4dkJvi/JaPEvTndLNKBzcfDMfA8yhAwzpRXRn/GBiA==",
+      "type": "package",
+      "path": "moq/4.7.137",
+      "files": [
+        "lib/net45/Moq.dll",
+        "lib/net45/Moq.pdb",
+        "lib/net45/Moq.xml",
+        "lib/netstandard1.3/Moq.dll",
+        "lib/netstandard1.3/Moq.pdb",
+        "lib/netstandard1.3/Moq.xml",
+        "moq.4.7.137.nupkg.sha512",
+        "moq.nuspec"
+      ]
+    },
     "MSTest.TestAdapter/1.2.0-beta3": {
       "sha512": "nDdOwAjr8T6bdcZJ7tVs+A9DgIvhiyfQsPwHHYbccgRIMyCC43QF1FnkiGuRwApwrSLPE93nOjneB8xwNBJOyg==",
       "type": "package",
@@ -11380,10 +11450,10 @@
         "system.linq.expressions.nuspec"
       ]
     },
-    "System.Linq.Queryable/4.0.1": {
-      "sha512": "Yn/WfYe9RoRfmSLvUt2JerP0BTGGykCZkQPgojaxgzF2N0oPo+/AhB8TXOpdCcNlrG3VRtsamtK2uzsp3cqRVw==",
+    "System.Linq.Queryable/4.3.0": {
+      "sha512": "In1Bmmvl/j52yPu3xgakQSI0YIckPUr870w4K5+Lak3JCCa8hl+my65lABOuKfYs4ugmZy25ScFerC4nz8+b6g==",
       "type": "package",
-      "path": "system.linq.queryable/4.0.1",
+      "path": "system.linq.queryable/4.3.0",
       "files": [
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
@@ -11433,7 +11503,7 @@
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._",
-        "system.linq.queryable.4.0.1.nupkg.sha512",
+        "system.linq.queryable.4.3.0.nupkg.sha512",
         "system.linq.queryable.nuspec"
       ]
     },
@@ -14845,5 +14915,16 @@
         "warn": true
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1605",
+      "level": "Error",
+      "message": "Detected package downgrade: AWSSDK.S3 from 3.3.11.1 to 3.3.11. Reference the package directly from the project to select a different version. \r\n UnitTest_ArthurClive (>= 1.0.0) -> Arthur_Clive (>= 1.0.0) -> AWSSDK.S3 (>= 3.3.11.1) \r\n UnitTest_ArthurClive (>= 1.0.0) -> AWSSDK.S3 (>= 3.3.11)",
+      "libraryId": "AWSSDK.S3",
+      "targetGraphs": [
+        ".NETCoreApp,Version=v2.0"
+      ]
+    }
+  ]
 }

@@ -11,8 +11,11 @@ using AuthorizedServer.Logger;
 
 namespace AuthorizedServer.Helper
 {
+    /// <summary>Helper for Amazon SNS service</summary>
     public class SMSHelper
     {
+        /// <summary>Get amazon SNS service credentials from xml file</summary>
+        /// <param name="key"></param>
         public static string GetCredentials(string key)
         {
             var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
@@ -22,6 +25,9 @@ namespace AuthorizedServer.Helper
             return result.First().Value;
         }
 
+        /// <summary>Send sms using amazon SNS service</summary>
+        /// <param name="phoneNumber"></param>
+        /// <param name="otp"></param>
         public static string SendSMS(string phoneNumber, string otp)
         {
             try

@@ -12,14 +12,25 @@ using System.Linq;
 
 namespace Arthur_Clive.Controllers
 {
+    /// <summary>Controller to refresh address, cart and wishlist, to get products in cart and wishlist and to get userinfo of user</summary>
+    [Produces("application/json")]
     [Route("api/[controller]")]
     public class UserController : Controller
     {
+        /// <summary></summary>
         public IMongoDatabase _db = MH._client.GetDatabase("UserInfo");
+        /// <summary></summary>
         public UpdateDefinition<BsonDocument> updateDefinition;
 
+        /// <summary>Refresh address details of user</summary>
+        /// <remarks>This api is uses to refresh userinfo of a user</remarks>
+        /// <param name="data">List of address to be updated</param>
+        /// <param name="username">UserName of user</param>
+        /// <response code="200">Address List of user is refreshed</response>
+        /// <response code="400">Process ran into an exception</response>    
         [HttpPost("userinfo/{username}")]
-        public async Task<ActionResult> RefreshUserInfo([FromBody]UserInfoList data,string username)
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public async Task<ActionResult> RefreshUserInfo([FromBody]UserInfoList data, string username)
         {
             try
             {
@@ -51,35 +62,13 @@ namespace Arthur_Clive.Controllers
             }
         }
         
-        [HttpGet("userinfo/address/{username}")]
-        public async Task<ActionResult> GetAddressOfUser(string username)
-        {
-            try
-            {
-                var userCollection = _db.GetCollection<Address>("UserInfo");
-                var filter = Builders<Address>.Filter.Eq("UserName", username);
-                IAsyncCursor<Address> cursor = await userCollection.FindAsync(filter);
-                var userInfo = cursor.ToList();
-                return Ok(new ResponseData
-                {
-                    Code = "200",
-                    Message = "Success",
-                    Data = userInfo
-                });
-            }
-            catch (Exception ex)
-            {
-                LoggerDataAccess.CreateLog("UserController", "GetAddressOfUser", "GetAddressOfUser", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = null
-                }); 
-            }
-        }
-
+        /// <summary>Get default address of user</summary>
+        /// <param name="username">UserName of user</param>
+        /// <remarks>This api is user to get default address of an user</remarks>
+        /// <response code="200">Returns the default address of the user</response>
+        /// <response code="400">Process ran into an exception</response>  
         [HttpGet("userinfo/{username}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> GetDefaultAddressOfUser(string username)
         {
             try
@@ -102,12 +91,19 @@ namespace Arthur_Clive.Controllers
                 {
                     Code = "400",
                     Message = "Failed",
-                    Data = null
+                    Data = ex.Message
                 }); ;
             }
         }
 
+        /// <summary>Refresh products in cart</summary>
+        /// <remarks>This api is used to refresh products in cart of the user</remarks>
+        /// <param name="data">List of cart details to be updated</param>
+        /// <param name="username">UserName of user</param>
+        /// <response code="200">Cart of user is refreshed succeddfully</response>
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost("cart/{username}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> RefreshCart([FromBody]CartList data, string username)
         {
             try
@@ -140,7 +136,13 @@ namespace Arthur_Clive.Controllers
             }
         }
 
+        /// <summary>Get products in cart of user</summary>
+        /// <param name="username">UserName of user</param>
+        /// <remarks>This api is user to get products in cart of an user</remarks>
+        /// <response code="200">Returns the products in cart</response>
+        /// <response code="400">Process ran into an exception</response> 
         [HttpGet("cart/{username}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> GetProductsInCart(string username)
         {
             try
@@ -175,7 +177,14 @@ namespace Arthur_Clive.Controllers
             }
         }
 
+        /// <summary>Refresh products in wishlist</summary>
+        /// <remarks>This api is used to refresh products in wishlist of the user</remarks>
+        /// <param name="data">List of wishlist details to be updated</param>
+        /// <param name="username">UserName of user</param>
+        /// <response code="200">Wishlist of user is refreshed successfully</response>
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost("wishlist/{username}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> RefreshWishList([FromBody]WishlistList data, string username)
         {
             try
@@ -208,7 +217,13 @@ namespace Arthur_Clive.Controllers
             }
         }
 
+        /// <summary>Get products in wishlist of user</summary>
+        /// <param name="username">UserName of user</param>
+        /// <remarks>This api is user to get products in wishlist of an user</remarks>
+        /// <response code="200">Returns the products in wishlist</response>
+        /// <response code="400">Process ran into an exception</response> 
         [HttpGet("wishlist/{username}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> GetProductsInWishList(string username)
         {
             try

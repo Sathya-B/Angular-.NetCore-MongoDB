@@ -9,9 +9,13 @@ using Newtonsoft.Json;
 
 namespace AuthorizedServer.Helper
 {
+    /// <summary>Helper method for authentication </summary>
     public class AuthHelper
     {
-        //scenario 1 ： get the access-token by username and password
+        /// <summary>Get the access-token by username and password</summary>
+        /// <param name="parameters"></param>
+        /// <param name="_repo"></param>
+        /// <param name="_settings"></param>
         public ResponseData DoPassword(Parameters parameters, IRTokenRepository _repo, IOptions<Audience> _settings)
         {
             var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
@@ -22,7 +26,6 @@ namespace AuthorizedServer.Helper
                 Id = Guid.NewGuid().ToString(),
                 IsStop = 0
             };
-            //store the refresh_token 
             if (_repo.AddToken(rToken).Result)
             {
                 dynamic UserInfo = new System.Dynamic.ExpandoObject();
@@ -47,7 +50,10 @@ namespace AuthorizedServer.Helper
             }
         }
 
-        //scenario 2 ： get the access_token by refresh_token
+        /// <summary>Get the access_token by refresh_token</summary>
+        /// <param name="parameters"></param>
+        /// <param name="_repo"></param>
+        /// <param name="_settings"></param>
         public ResponseData DoRefreshToken(Parameters parameters, IRTokenRepository _repo, IOptions<Audience> _settings)
         {
             var token = _repo.GetToken(parameters.refresh_token, parameters.client_id).Result;
@@ -71,7 +77,6 @@ namespace AuthorizedServer.Helper
             }
             var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
             token.IsStop = 1;
-            //expire the old refresh_token and add a new refresh_token
             var updateFlag = _repo.ExpireToken(token).Result;
             var addFlag = _repo.AddToken(new RToken
             {
@@ -100,6 +105,10 @@ namespace AuthorizedServer.Helper
             }
         }
 
+        /// <summary>Get JWT</summary>
+        /// <param name="client_id"></param>
+        /// <param name="refresh_token"></param>
+        /// <param name="_settings"></param>
         public string GetJwt(string client_id, string refresh_token, IOptions<Audience> _settings)
         {
             var now = DateTime.UtcNow;

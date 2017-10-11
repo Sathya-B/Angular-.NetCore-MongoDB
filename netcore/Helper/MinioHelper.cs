@@ -6,8 +6,10 @@ using Minio;
 
 namespace Arthur_Clive.Helper
 {
+    /// <summary>Helper method for Minio server</summary>
     public class MinioHelper
     {
+        /// <summary>Get Minio client</summary>
         public static MinioClient GetMinioClient()
         {
             return new MinioClient(GlobalHelper.ReadXML().Elements("minioclient").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("host").First().Value,
@@ -15,6 +17,9 @@ namespace Arthur_Clive.Helper
                                     GlobalHelper.ReadXML().Elements("minioclient").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("secretkey").First().Value);
         }
 
+        /// <summary>Get Minio object presigned url</summary>
+        /// <param name="bucketName"></param>
+        /// <param name="objectName"></param>
         public static async Task<string> GetMinioObject(string bucketName, string objectName)
         {
             try

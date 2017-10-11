@@ -3887,7 +3887,8 @@
           "AWSSDK.SimpleNotificationService": "3.3.0.21",
           "Microsoft.AspNetCore.All": "2.0.0",
           "Microsoft.AspNetCore.Authentication.Google": "2.0.0",
-          "MongoDB.Driver": "2.4.4"
+          "MongoDB.Driver": "2.4.4",
+          "Swashbuckle.AspNetCore": "1.0.0"
         },
         "runtime": {
           "AuthorizedServer.dll": {}

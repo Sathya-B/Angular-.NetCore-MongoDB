@@ -6,12 +6,16 @@ using MongoDB.Driver;
 
 namespace Arthur_Clive.Helper
 {
+    /// <summary>Helper method for MongoDB</summary>
     public class MongoHelper
     {
+        /// <summary></summary>
         public static IMongoDatabase _mongodb;
 
+        /// <summary>Client for MongoDB</summary>
         public static MongoClient _client = GetClient();
 
+        /// <summary>Get client for MongoDB</summary>
         public static MongoClient GetClient()
         {
             var ip = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("ip").First().Value;
@@ -23,6 +27,10 @@ namespace Arthur_Clive.Helper
             return mongoClient;
         }
 
+        /// <summary>Get single object from MongoDB</summary>
+        /// <param name="filter"></param>
+        /// <param name="dbName"></param>
+        /// <param name="collectionName"></param>
         public static async Task<BsonDocument> GetSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName)
         {
             _mongodb = _client.GetDatabase(dbName);
@@ -30,7 +38,12 @@ namespace Arthur_Clive.Helper
             IAsyncCursor<BsonDocument> cursor = await collection.FindAsync(filter);
             return cursor.FirstOrDefault();
         }
-
+        
+        /// <summary>Update single object in MongoDB </summary>
+        /// <param name="filter"></param>
+        /// <param name="dbName"></param>
+        /// <param name="collectionName"></param>
+        /// <param name="update"></param>
         public static async Task<bool> UpdateSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName, UpdateDefinition<BsonDocument> update)
         {
             _mongodb = _client.GetDatabase(dbName);
@@ -39,6 +52,10 @@ namespace Arthur_Clive.Helper
             return cursor.ModifiedCount > 0;
         }
 
+        /// <summary>Delete single object from MongoDB</summary>
+        /// <param name="filter"></param>
+        /// <param name="dbName"></param>
+        /// <param name="collectionName"></param>
         public static bool DeleteSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName)
         {
             var data = GetSingleObject(filter, dbName, collectionName).Result;
@@ -47,6 +64,13 @@ namespace Arthur_Clive.Helper
             return response.Result.DeletedCount > 0;
         }
 
+        /// <summary>Check if a data is present in MongoDB</summary>
+        /// <param name="filterField1"></param>
+        /// <param name="filterData1"></param>
+        /// <param name="filterField2"></param>
+        /// <param name="filterData2"></param>
+        /// <param name="dbName"></param>
+        /// <param name="collectionName"></param>
         public static BsonDocument CheckForDatas(string filterField1, string filterData1, string filterField2, string filterData2, string dbName, string collectionName)
         {
             FilterDefinition<BsonDocument> filter;

@@ -8,18 +8,37 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MH = Arthur_Clive.Helper.MongoHelper;
+using GH = Arthur_Clive.Helper.GlobalHelper;
 
 namespace Arthur_Clive.Controllers
 {
+    /// <summary>Controller to view,cancle, return and place orders</summary>
+    [Produces("application/json")]
     [Route("api/[controller]")]
     public class OrderController : Controller
     {
+        /// <summary></summary>
         public IMongoDatabase _db = MH._client.GetDatabase("UserInfo");
+        /// <summary></summary>
         public IMongoDatabase order_db = MH._client.GetDatabase("OrderDB");
+        /// <summary></summary>
         public IMongoDatabase product_db = MH._client.GetDatabase("ProductDB");
+        /// <summary></summary>
         public UpdateDefinition<BsonDocument> updateDefinition;
 
+        /// <summary>Order products added to the cart</summary>
+        /// <remarks>This api is used to place an order</remarks>
+        /// <param name="data">Info needed to place order</param>
+        /// <param name="username">UserName of user who needs to place order</param>
+        /// <response code="200">Order placed successfully</response>
+        /// <response code="401">UserInfo not found</response> 
+        /// <response code="402">Cart not found</response> 
+        /// <response code="403">Order quantity is higher than the product stock</response> 
+        /// <response code="404">Payment method is empty</response> 
+        /// <response code="405">Default address not found</response> 
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost("placeorder/{username}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> PlaceOrder([FromBody]OrderInfo data, string username)
         {
             try
@@ -34,7 +53,7 @@ namespace Arthur_Clive.Controllers
                         var cartDatas = cartCursor.ToList();
                         if (cartDatas.Count > 0)
                         {
-                            var orders = await GetOrders(username);
+                            var orders = await GH.GetOrders(username, order_db);
                             if (orders == null)
                             {
                                 data.OrderId = 1;
@@ -78,7 +97,7 @@ namespace Arthur_Clive.Controllers
                             List<ProductDetails> productList = new List<ProductDetails>();
                             foreach (var cart in cartDatas)
                             {
-                                foreach (var product in GetProducts(cart.ProductSKU).Result)
+                                foreach (var product in GH.GetProducts(cart.ProductSKU, product_db).Result)
                                 {
                                     if (product.ProductStock < cart.ProductQuantity)
                                     {
@@ -86,7 +105,7 @@ namespace Arthur_Clive.Controllers
                                         {
                                             Code = "403",
                                             Message = "Order quantity is higher than the product stock.",
-                                            Data = cart
+                                            Data = null
                                         });
                                     }
                                     ProductDetails productDetails = new ProductDetails();
@@ -103,7 +122,7 @@ namespace Arthur_Clive.Controllers
                             await order_db.GetCollection<OrderInfo>("OrderInfo").InsertOneAsync(data);
                             foreach (var cart in cartDatas)
                             {
-                                foreach (var product in GetProducts(cart.ProductSKU).Result)
+                                foreach (var product in GH.GetProducts(cart.ProductSKU, product_db).Result)
                                 {
                                     var update = Builders<BsonDocument>.Update.Set("ProductStock", product.ProductStock - cart.ProductQuantity);
                                     var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", cart.ProductSKU), "ProductDB", "Product", update).Result;
@@ -114,7 +133,7 @@ namespace Arthur_Clive.Controllers
                             {
                                 Code = "200",
                                 Message = "Order Placed",
-                                Data = data
+                                Data = null
                             });
                         }
                         else
@@ -159,18 +178,37 @@ namespace Arthur_Clive.Controllers
             }
         }
 
+        /// <summary>Get orders placed by a user</summary>
+        /// <param name="username">UserName of user whos orders need to be found</param>
+        /// <remarks>This api is user to view all the orders placed by the user</remarks>
+        /// <response code="200">Returns all the orders placed by the user</response>
+        /// <response code="404">No orders found</response> 
+        /// <response code="400">Process ran into an exception</response> 
+        [ProducesResponseType(typeof(ResponseData), 200)]
         [HttpGet("vieworder/{username}")]
         public ActionResult GetOrdersOfUser(string username)
         {
             try
             {
-                var orders = GetOrders(username);
-                return Ok(new ResponseData
+                var orders = GH.GetOrders(username, order_db);
+                if (orders != null)
                 {
-                    Code = "200",
-                    Message = "Success",
-                    Data = orders
-                });
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Success",
+                        Data = orders
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "No orders found",
+                        Data = null
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -184,19 +222,37 @@ namespace Arthur_Clive.Controllers
             }
         }
 
-        [HttpGet("vieworder")]
+        /// <summary>Get all the orders placed</summary>
+        /// <remarks>This api is user to view all the orders</remarks>
+        /// <response code="200">Returns the all the orders placed</response>
+        /// <response code="404">No orders found</response> 
+        /// <response code="400">Process ran into an exception</response> 
+        [HttpGet("viewallorders")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> GetAllOrders()
         {
             try
             {
                 IAsyncCursor<OrderInfo> cursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Empty);
                 var orders = cursor.ToList();
-                return Ok(new ResponseData
+                if (orders != null)
                 {
-                    Code = "200",
-                    Message = "Success",
-                    Data = orders
-                });
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Success",
+                        Data = orders
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "No orders found",
+                        Data = null
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -210,17 +266,27 @@ namespace Arthur_Clive.Controllers
             }
         }
 
-        [HttpPost("cancle/{username}/{productSKU}")]
-        public async Task<ActionResult> CancleOrder([FromBody]OrderInfo data, string username, string productSKU)
+        /// <summary>Cancle order placed by a user</summary>
+        /// <remarks>This api is user ro cancle a order placed by a user</remarks>
+        /// <param name="data">Info of order which needs to be cancled</param>
+        /// <param name="username">UserName of user who needs to cancle an order</param>
+        /// <param name="productSKU">SKU of product whos order needs to be cancled</param>
+        /// <response code="200">Order successfully cancled</response>
+        /// <response code="404">No orders found</response> 
+        /// <response code="401">Order cancle request failed</response> 
+        /// <response code="400">Process ran into an exception</response> 
+        [HttpPost("cancel/{username}/{productSKU}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public async Task<ActionResult> CancelOrder([FromBody]OrderInfo data, string username, string productSKU)
         {
             try
             {
-                var orders = GetOrders(username).Result;
+                var orders = GH.GetOrders(username, order_db).Result;
                 if (orders == null)
                 {
                     return BadRequest(new ResponseData
                     {
-                        Code = "401",
+                        Code = "404",
                         Message = "No orders found",
                         Data = null
                     });
@@ -233,9 +299,9 @@ namespace Arthur_Clive.Controllers
                     {
                         return BadRequest(new ResponseData
                         {
-                            Code = "403",
+                            Code = "404",
                             Message = "Order Not Found",
-                            Data = "Product SKU = " + productSKU + "& OrderId = " + data.OrderId
+                            Data = null
                         });
                     }
                     foreach (var productDetails in order.ProductDetails)
@@ -244,9 +310,9 @@ namespace Arthur_Clive.Controllers
                         {
                             return BadRequest(new ResponseData
                             {
-                                Code = "402",
+                                Code = "401",
                                 Message = "Order Cancle Request Failed",
-                                Data = "Product Status is " + productDetails.Status
+                                Data = null
                             });
                         }
                         else
@@ -331,19 +397,34 @@ namespace Arthur_Clive.Controllers
             }
         }
 
+        /// <summary>Return a product placed by a user</summary>
+        /// <remarks>This api is user to return a product to get refund or replacement for the product</remarks>
+        /// <param name="data">Data of product which needs to be retuned</param>
+        /// <param name="request">Request needed to process return of product</param>
+        /// <param name="username">UserName of user who need to return a product</param>
+        /// <param name="productSKU">SKU of product which needs to be returned</param>
+        /// <returns></returns>
+        /// <response code="200">Return request successfully initiated for this product</response>
+        /// <response code="404">No orders found</response> 
+        /// <response code="401">Product return request failed</response> 
+        /// <response code="402">Refund not appliccable for this product</response> 
+        /// <response code="403">Replacement not aplicable for this product</response> 
+        /// <response code="405">Resuest is not valid</response> 
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost("{request}/{username}/{productSKU}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> ReturnProduct([FromBody]OrderInfo data, string request, string username, string productSKU)
         {
             try
             {
                 if (request == "refund" || request == "replace")
                 {
-                    var orders = GetOrders(username).Result;
+                    var orders = GH.GetOrders(username, order_db).Result;
                     if (orders == null)
                     {
                         return BadRequest(new ResponseData
                         {
-                            Code = "401",
+                            Code = "404",
                             Message = "No orders found",
                             Data = null
                         });
@@ -356,9 +437,9 @@ namespace Arthur_Clive.Controllers
                         {
                             return BadRequest(new ResponseData
                             {
-                                Code = "406",
+                                Code = "404",
                                 Message = "Order Not Found",
-                                Data = "Product SKU = " + productSKU + "& OrderId = " + data.OrderId
+                                Data = null
                             });
                         }
                         foreach (var productDetails in order.ProductDetails)
@@ -370,9 +451,9 @@ namespace Arthur_Clive.Controllers
                                 {
                                     return BadRequest(new ResponseData
                                     {
-                                        Code = "402",
+                                        Code = "401",
                                         Message = "Order Return Request Failed",
-                                        Data = "Product Status is " + productDetails.Status
+                                        Data = null
                                     });
                                 }
                                 else
@@ -383,9 +464,9 @@ namespace Arthur_Clive.Controllers
                                         {
                                             return BadRequest(new ResponseData
                                             {
-                                                Code = "403",
+                                                Code = "402",
                                                 Message = "Refund not applicable for this product",
-                                                Data = productData
+                                                Data = null
                                             });
                                         }
                                     }
@@ -395,9 +476,9 @@ namespace Arthur_Clive.Controllers
                                         {
                                             return BadRequest(new ResponseData
                                             {
-                                                Code = "404",
+                                                Code = "403",
                                                 Message = "Replacement not applicable for this product",
-                                                Data = productData
+                                                Data = null
                                             });
                                         }
                                     }
@@ -480,7 +561,7 @@ namespace Arthur_Clive.Controllers
                     {
                         Code = "405",
                         Message = "Invalid Request",
-                        Data = "Request = " + request
+                        Data = null
                     });
                 }
             }
@@ -496,7 +577,20 @@ namespace Arthur_Clive.Controllers
             }
         }
 
+        /// <summary>
+        /// Update status of order placed by a user
+        /// </summary>
+        /// <remarks>This api is used to update status of a product</remarks>
+        /// <param name="data">Data required to update status</param>
+        /// <param name="username">UserName of user whoes status needs to be updated</param>
+        /// <param name="productSKU">SKU of product whoes status needs to be updated</param>
+        /// <returns></returns>
+        /// <response code="200">Status for product is updated successfully</response>
+        /// <response code="404">Order not found</response> 
+        /// <response code="401">Status is empty</response> 
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost("updatestatus/{username}/{productSKU}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> UpdateOrder([FromBody]StatusUpdate data, string username, string productSKU)
         {
             try
@@ -516,9 +610,9 @@ namespace Arthur_Clive.Controllers
                 {
                     return BadRequest(new ResponseData
                     {
-                        Code = "403",
+                        Code = "404",
                         Message = "Order Not Found",
-                        Data = "Product SKU = " + productSKU + "& OrderId = " + data.OrderId
+                        Data = null
                     });
                 }
                 PaymentMethod paymentMethod = new PaymentMethod();
@@ -631,27 +725,6 @@ namespace Arthur_Clive.Controllers
                     Data = ex.Message
                 });
             }
-        }
-
-        public async Task<List<OrderInfo>> GetOrders(string username)
-        {
-            IAsyncCursor<OrderInfo> cursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("UserName", username));
-            var orders = cursor.ToList();
-            if (orders == null)
-            {
-                return null;
-            }
-            else
-            {
-                return orders;
-            }
-        }
-
-        public async Task<List<Product>> GetProducts(string productSKU)
-        {
-            IAsyncCursor<Product> productCursor = await product_db.GetCollection<Product>("Product").FindAsync(Builders<Product>.Filter.Eq("ProductSKU", productSKU));
-            var products = productCursor.ToList();
-            return products;
         }
 
     }

@@ -11,12 +11,23 @@ using System.Threading.Tasks;
 
 namespace Arthur_Clive.Controllers
 {
+    /// <summary>Controller to get subcategorised products</summary>
+    [Produces("application/json")]
     [Route("api/[controller]")]
     public class SubCategoryController : Controller
     {
+        /// <summary></summary>
         public IMongoDatabase _db = MH._client.GetDatabase("ProductDB");
 
+        /// <summary>Get the product that matches the filters</summary>
+        /// <param name="productFor">Whom is the product for</param>
+        /// <param name="productType">Type of product</param>
+        /// <remarks>This api is used to get product that falls under the filters productFor and productType</remarks>
+        /// <response code="200">Returns products</response>
+        /// <response code="404">No products found</response> 
+        /// <response code="400">Process ran into an exception</response>  
         [HttpGet("{productFor}/{productType}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> Get(string productFor, string productType)
         {
             try
@@ -25,19 +36,31 @@ namespace Arthur_Clive.Controllers
                 var filter = Builders<Product>.Filter.Eq("ProductFor", productFor) & Builders<Product>.Filter.Eq("ProductType", productType);
                 IAsyncCursor<Product> cursor = await collection.FindAsync(filter);
                 var products = cursor.ToList();
-                foreach (var product in products)
+                if (products.Count > 0)
                 {
-                    string objectName = product.ProductSKU + ".jpg";
-                    //product.MinioObject_URL = WH.GetMinioObject("arthurclive-products", objectName).Result;
-                    //product.MinioObject_URL = AH.GetAmazonS3Object("arthurclive-products", objectName);
-                    product.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
+                    foreach (var product in products)
+                    {
+                        string objectName = product.ProductSKU + ".jpg";
+                        //product.MinioObject_URL = WH.GetMinioObject("arthurclive-products", objectName).Result;
+                        //product.MinioObject_URL = AH.GetAmazonS3Object("arthurclive-products", objectName);
+                        product.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
+                    }
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Success",
+                        Data = products
+                    });
                 }
-                return Ok(new ResponseData
+                else
                 {
-                    Code = "200",
-                    Message = "Success",
-                    Data = products
-                });
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "No products found",
+                        Data = null
+                    });
+                }
             }
             catch (Exception ex)
             {

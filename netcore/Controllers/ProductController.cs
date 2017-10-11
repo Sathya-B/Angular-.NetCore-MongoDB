@@ -13,12 +13,21 @@ using MH = Arthur_Clive.Helper.MongoHelper;
 
 namespace Arthur_Clive.Controllers
 {
+    /// <summary>Controller to get, post and delete products</summary>
+    [Produces("application/json")]
     [Route("api/[controller]")]
     public class ProductController : Controller
     {
+        /// <summary></summary>
         public IMongoDatabase _db = MH._client.GetDatabase("ProductDB");
 
+        /// <summary>Get all the products </summary>
+        /// <remarks>This api is used to get all the products</remarks>
+        /// <response code="200">Returns success message</response>
+        /// <response code="404">No products found</response> 
+        /// <response code="400">Process ran into an exception</response>   
         [HttpGet]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> Get()
         {
             try
@@ -27,19 +36,31 @@ namespace Arthur_Clive.Controllers
                 var filter = FilterDefinition<Product>.Empty;
                 IAsyncCursor<Product> cursor = await collection.FindAsync(filter);
                 var products = cursor.ToList();
-                foreach (var data in products)
+                if (products.Count > 0)
                 {
-                    string objectName = data.ProductSKU + ".jpg";
-                    //data.ObjectURL = WH.GetMinioObject("products", objectName).Result;
-                    //data.ObjectURL = AH.GetAmazonS3Object("arthurclive-products", objectName);
-                    data.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
+                    foreach (var data in products)
+                    {
+                        string objectName = data.ProductSKU + ".jpg";
+                        //data.ObjectURL = WH.GetMinioObject("products", objectName).Result;
+                        //data.ObjectURL = AH.GetAmazonS3Object("arthurclive-products", objectName);
+                        data.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
+                    }
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Success",
+                        Data = products
+                    });
                 }
-                return Ok(new ResponseData
+                else
                 {
-                    Code = "200",
-                    Message = "Success",
-                    Data = products
-                });
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "No products found",
+                        Data = null
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -53,9 +74,68 @@ namespace Arthur_Clive.Controllers
             }
         }
 
-        #region Unused Post and Delete
+        /// <summary>Get products with filter</summary>
+        /// <param name="productFor">For whom is the product</param>
+        /// <param name="productType">type of product</param>
+        /// <param name="productDesign">Design on product</param>
+        /// <response code="200">Returns success message</response>
+        /// <response code="404">No products found</response> 
+        /// <response code="400">Process ran into an exception</response> 
+        [HttpGet("{productFor}/{productType}/{productDesign}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public async Task<ActionResult> GetProductByFilter(string productFor,string productType,string productDesign)
+        {
+            try
+            {
+                var collection = _db.GetCollection<Product>("Product");
+                var filter = Builders<Product>.Filter.Eq("ProductFor", productFor) & Builders<Product>.Filter.Eq("ProductType", productType) & Builders<Product>.Filter.Eq("ProductDesign",productDesign);
+                IAsyncCursor<Product> cursor = await collection.FindAsync(filter);
+                var products = cursor.ToList();
+                if (products.Count > 0)
+                {
+                    foreach (var data in products)
+                    {
+                        string objectName = data.ProductSKU + ".jpg";
+                        //data.ObjectURL = WH.GetMinioObject("products", objectName).Result;
+                        //data.ObjectURL = AH.GetAmazonS3Object("arthurclive-products", objectName);
+                        data.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
+                    }
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Success",
+                        Data = products
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "No products found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("ProductController", "Get", "Get", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
 
+        /// <summary>Insert a new products </summary>
+        /// <remarks>This api is used to insert a new product</remarks>
+        /// <param name="product">Details of product to be inserted</param>
+        /// <response code="200">Product inserted successfully</response>
+        /// <response code="400">Process ran into an exception</response>   
         [HttpPost]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> Post([FromBody]Product product)
         {
             try
@@ -87,7 +167,14 @@ namespace Arthur_Clive.Controllers
             }
         }
 
+        /// <summary>Delete a product</summary>
+        /// <param name="productSKU">SKU of product to be deleted</param>
+        /// <remarks>This api is used to delete a product</remarks>
+        /// <response code="200">Returns delete product details and success message</response>
+        /// <response code="404">No product found</response>   
+        /// <response code="400">Process ran into an exception</response>   
         [HttpDelete("{productSKU}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult Delete(string productSKU)
         {
             try
@@ -126,7 +213,5 @@ namespace Arthur_Clive.Controllers
                 });
             }
         }
-
-        #endregion
     }
 }

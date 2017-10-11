@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.0",
-    "signature": "c98bcc1ed06ce568a3450a464f98cb3af1c091e6"
+    "signature": "9e6c75d5b4ca6105f568b00cb0c400d2d5923891"
   },
   "compilationOptions": {
     "defines": [
@@ -16,15 +16,15 @@
     "optimize": false,
     "keyFile": "",
     "emitEntryPoint": true,
-    "xmlDoc": false,
+    "xmlDoc": true,
     "debugType": "portable"
   },
   "targets": {
     ".NETCoreApp,Version=v2.0": {
       "Arthur_Clive/1.0.0": {
         "dependencies": {
-          "AWSSDK.S3": "3.3.11",
-          "AWSSDK.SimpleEmail": "3.3.3",
+          "AWSSDK.S3": "3.3.11.1",
+          "AWSSDK.SimpleEmail": "3.3.3.1",
           "Microsoft.AspNetCore.All": "2.0.0",
           "Microsoft.AspNetCore.Mvc.Core": "2.0.0",
           "Microsoft.NETCore.App": "2.0.0",
@@ -43,7 +43,7 @@
           "Arthur_Clive.dll": {}
         }
       },
-      "AWSSDK.Core/3.3.17.9": {
+      "AWSSDK.Core/3.3.18": {
         "dependencies": {
           "Microsoft.CSharp": "4.4.0",
           "System.Net.Requests": "4.0.11",
@@ -58,9 +58,9 @@
           "lib/netstandard1.3/AWSSDK.Core.dll": {}
         }
       },
-      "AWSSDK.S3/3.3.11": {
+      "AWSSDK.S3/3.3.11.1": {
         "dependencies": {
-          "AWSSDK.Core": "3.3.17.9"
+          "AWSSDK.Core": "3.3.18"
         },
         "runtime": {
           "lib/netstandard1.3/AWSSDK.S3.dll": {}
@@ -69,9 +69,9 @@
           "lib/netstandard1.3/AWSSDK.S3.dll": {}
         }
       },
-      "AWSSDK.SimpleEmail/3.3.3": {
+      "AWSSDK.SimpleEmail/3.3.3.1": {
         "dependencies": {
-          "AWSSDK.Core": "3.3.17.9"
+          "AWSSDK.Core": "3.3.18"
         },
         "runtime": {
           "lib/netstandard1.3/AWSSDK.SimpleEmail.dll": {}
@@ -4420,26 +4420,26 @@
       "serviceable": false,
       "sha512": ""
     },
-    "AWSSDK.Core/3.3.17.9": {
+    "AWSSDK.Core/3.3.18": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-7ztkmMvumu1aMR6ETKqZwznLQR4SC/axTj3q4QauyWv5E36Hio6r1UzmDjOOexMUl3Cg4IqQgGfe8oBidSiJuw==",
-      "path": "awssdk.core/3.3.17.9",
-      "hashPath": "awssdk.core.3.3.17.9.nupkg.sha512"
+      "sha512": "sha512-15VZyyB+94JPOBz50hRFx7axCZ1iLHyAJqkGMa3khEayMjEMx4LXEScWMazE1WsbWF1EtHtXi4KL7oOYzVd44w==",
+      "path": "awssdk.core/3.3.18",
+      "hashPath": "awssdk.core.3.3.18.nupkg.sha512"
     },
-    "AWSSDK.S3/3.3.11": {
+    "AWSSDK.S3/3.3.11.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-cMe0yG16Jw5jmw5IvGNhs0PsrJXnN9qNkI1hUKqdQBMcUrjy02MRDe4vQ7DDH7xo5vJJJSAWpzbB0UeyV6Q0nw==",
-      "path": "awssdk.s3/3.3.11",
-      "hashPath": "awssdk.s3.3.3.11.nupkg.sha512"
+      "sha512": "sha512-ndu1JUP6KaXhfEa0mJTXF2A6Btau0n/Cw9bJxA7e4hXZIv+TmLP2hy687lFaq7dd5PA6buoJKNegEbEYFYDPzQ==",
+      "path": "awssdk.s3/3.3.11.1",
+      "hashPath": "awssdk.s3.3.3.11.1.nupkg.sha512"
     },
-    "AWSSDK.SimpleEmail/3.3.3": {
+    "AWSSDK.SimpleEmail/3.3.3.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-bIL9dF8gbaImhP3sbtYVQnu2drozJqt7wDVAGu9V8k6sqQM7q25MUpyNzgH0NaGO+j7gHFWmFq1VI/vB+iXLqw==",
-      "path": "awssdk.simpleemail/3.3.3",
-      "hashPath": "awssdk.simpleemail.3.3.3.nupkg.sha512"
+      "sha512": "sha512-NfQCeZA0AMsANSPm/a7ws/TspqTpvEy4TuSsv5dTK6hwNChWyn3xcUdFTgfZL6iYg9OTSvljyYbtkarj8C8NVQ==",
+      "path": "awssdk.simpleemail/3.3.3.1",
+      "hashPath": "awssdk.simpleemail.3.3.3.1.nupkg.sha512"
     },
     "Libuv/1.10.0": {
       "type": "package",

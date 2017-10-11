@@ -12,10 +12,18 @@ using Microsoft.AspNetCore.Http;
 
 namespace Arthur_Clive.Controllers
 {
+    /// <summary>Controller to make payment using PayUMoney and get return responce</summary>
+    [Produces("application/json")]
     [Route("api/[controller]")]
     public class PaymentController : Controller
     {
+        /// <summary>Make payment using PayUMoney</summary>
+        /// <remarks>This api is used to get fprm for making payment using Pay U Money gateway</remarks>
+        /// <param name="model">Contains the data needed to make payment</param>
+        /// <response code="200">Returns the form needed to make the paymnet through PayUMoney gateway</response>
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult MakePayment([FromBody]PaymentModel model)
         {
             try
@@ -55,10 +63,12 @@ namespace Arthur_Clive.Controllers
                 data.Add("service_provider", "PayUMoney");
                 StringBuilder strForm = PU.PreparePOSTForm(action, data);
                 var form = PU.PreparePOSTForm(action, data);
+                dynamic UserInfo = new System.Dynamic.ExpandoObject();
+                UserInfo.form = form;
                 return Ok(new ResponseData
                 {
                     Code = "200",
-                    Form = form,
+                    Content = UserInfo,
                     Data = null
                 });
             }
@@ -74,18 +84,50 @@ namespace Arthur_Clive.Controllers
             }
         }
 
+        /// <summary>
+        /// Get return responce for payment made
+        /// </summary>
+        /// <param name="form">Form returned when payment is made</param>
+        /// <param name="responce">Responce received paument gateway when payment is made</param>
+        /// <remarks>This api returns the responce for the payment made through Pay U Money</remarks>
+        /// <response code="200">Payment is made successfully made</response>
+        /// <response code="401">Payment failed</response> 
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost("{responce}")]
-        public ActionResult Return([FromBody]FormCollection data,string responce)
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public ActionResult Return([FromBody]FormCollection form,string responce)
         {
             try
             {
-                //string[] hashSequence = PU.SplitHashSequence();
-                return Ok(new ResponseData
+                if (form["status"].ToString() == "success")
                 {
-                    Code = "200",
-                    Form = null,
-                    Data = null
-                });
+                    string[] hashSequence = ("key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5|udf6|udf7|udf8|udf9|udf10").Split('|');
+                    Array.Reverse(hashSequence);
+                    string hashString = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("saltkey").First().Value + "|" + form["status"].ToString();
+                    foreach (string data in hashSequence)
+                    {
+                        hashString += "|";
+                        hashString = hashString + (form[data].ToString() != null ? form[data].ToString() : "");
+                    }
+                    //Response.Write(merc_hash_string);
+                    string hash = PU.Generatehash512(hashString).ToLower();
+                    dynamic UserInfo = new System.Dynamic.ExpandoObject();
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Content = null,
+                        Data = null
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "401",
+                        Message = "Payment failed",
+                        Data = null
+                    });
+                }
             }
             catch (Exception ex)
             {

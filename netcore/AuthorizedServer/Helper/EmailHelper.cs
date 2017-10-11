@@ -10,14 +10,21 @@ using AuthorizedServer.Logger;
 
 namespace AuthorizedServer.Helper
 {
+    /// <summary>Helper methos for Amazon SES service for sending email</summary>
     public class EmailHelper
     {
+        /// <summary>Get amazon SES credentials from xml file</summary>
+        /// <param name="key"></param>
         public static string GetCredentials(string key)
         {
             var result = GlobalHelper.ReadXML().Elements("amazonses").Where(x => x.Element("current").Value.Equals("Yes")).Descendants(key);
             return result.First().Value;
         }
 
+        /// <summary>Send email using amason SES service</summary>
+        /// <param name="fullname"></param>
+        /// <param name="emailReceiver"></param>
+        /// <param name="link"></param>
         public static async Task<string> SendEmail(string fullname,string emailReceiver, string link)
         {
             var cc = GetCredentials("accesskey");
@@ -51,6 +58,9 @@ namespace AuthorizedServer.Helper
             }
         }
 
+        /// <summary>Create email body</summary>
+        /// <param name="fullname"></param>
+        /// <param name="link"></param>
         public static string CreateEmailBody(string fullname, string link)
         {
             string emailBody;

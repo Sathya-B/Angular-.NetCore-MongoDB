@@ -9,14 +9,21 @@ using Amazon.SimpleEmail.Model;
 
 namespace Arthur_Clive.Helper
 {
+    /// <summary>Helper method for Amazon SES service</summary>
     public class EmailHelper
     {
+        /// <summary>Get Amazon SES credentials from xml file</summary>
+        /// <param name="key"></param>
         public static string GetCredentials(string key)
         {
             var result = GlobalHelper.ReadXML().Elements("amazonses").Where(x => x.Element("current").Value.Equals("test")).Descendants(key);
             return result.First().Value;
         }
 
+        /// <summary>Send email using Amazon SES service</summary>
+        /// <param name="fullname"></param>
+        /// <param name="emailReceiver"></param>
+        /// <param name="message"></param>
         public static async Task<string> SendEmail(string fullname, string emailReceiver, string message)
         {
             string emailSender = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsender").First().Value;
@@ -48,6 +55,10 @@ namespace Arthur_Clive.Helper
             }
         }
 
+        /// <summary>Create email body       /// </summary>
+        /// <param name="fullname"></param>
+        /// <param name="link"></param>
+        /// <param name="message"></param>
         public static string CreateEmailBody(string fullname, string link, string message)
         {
             string emailBody;

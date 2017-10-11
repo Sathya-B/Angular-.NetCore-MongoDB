@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -7,24 +9,64 @@ using System.Xml.Linq;
 
 namespace Arthur_Clive.Helper
 {
+    /// <summary>Contains to make payment through PayUMoney</summary>
     public class PaymentModel
     {
+        /// <summary>FirstName of user</summary>
+        [Required]
+        [DefaultValue("First Name")]
         public string FirstName { get; set; }
+        /// <summary>LastName of user</summary>
+        [Required]
+        [DefaultValue("Last Name")]
         public string LastName { get; set; }
+        /// <summary>ProductInfo of product from which the payment is made</summary>
+        [Required]
+        [DefaultValue("Product Info")]
         public string ProductInfo { get; set; }
+        /// <summary>Amount to be paid for order</summary>
+        [Required]
+        [DefaultValue("100")]
         public string Amount { get; set; }
+        /// <summary>Email of user</summary>
+        [Required]
+        [DefaultValue("sample@gmail.com")]
         public string Email { get; set; }
+        /// <summary>PhoneNumber of user</summary>
+        [Required]
+        [DefaultValue("12341234")]
         public string PhoneNumber { get; set; }
+        /// <summary>First line of address </summary>
+        [Required]
+        [DefaultValue("No.01")]
         public string AddressLine1 { get; set; }
+        /// <summary>Secound line of address</summary>
+        [Required]
+        [DefaultValue("Street Name")]
         public string AddressLine2 { get; set; }
+        /// <summary>City of user</summary>
+        [Required]
+        [DefaultValue("City Name")]
         public string City { get; set; }
+        /// <summary>State of user </summary>
+        [Required]
+        [DefaultValue("State Name")]
         public string State { get; set; }
+        /// <summary>Country of user </summary>
+        [Required]
+        [DefaultValue("Country")]
         public string Country { get; set; }
+        /// <summary>Zipcode of user location</summary>
+        [Required]
+        [DefaultValue("Zip code")]
         public string ZipCode { get; set; }
     }
 
+    /// <summary>Helper method for PayUMoney service</summary>
     public class PayUHelper
     {
+        /// <summary>Get hash value of random number</summary>
+        /// <param name="text"></param>
         public static string Generatehash512(string text)
         {
             byte[] message = Encoding.UTF8.GetBytes(text);
@@ -40,6 +82,9 @@ namespace Arthur_Clive.Helper
             return hex;
         }
 
+        /// <summary>/// Prepare post form for paymet through PayUMoney</summary>
+        /// <param name="url"></param>
+        /// <param name="data"></param>
         public static StringBuilder PreparePOSTForm(string url, Hashtable data)
         {
             string formID = "PostForm";
@@ -59,6 +104,7 @@ namespace Arthur_Clive.Helper
             return strForm;
         }
 
+        /// <summary>Get TxnId</summary>
         public static string GetTxnId()
         {
             Random random = new Random();
@@ -67,6 +113,9 @@ namespace Arthur_Clive.Helper
             return txnId;
         }
         
+        /// <summary>Get hash string</summary>
+        /// <param name="txnId"></param>
+        /// <param name="model"></param>
         public static string GetHashString(string txnId,PaymentModel model)
         {
             string hashString = "";

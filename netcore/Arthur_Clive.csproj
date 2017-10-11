@@ -2,26 +2,27 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <UserSecretsId>b7a896dc-2f45-4946-949d-2a3f2cab2e87</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile></DocumentationFile>
+    <DocumentationFile>bin\Debug\netcoreapp2.0\Arthur_Clive.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="AuthorizedServer\**" />
+    <Compile Remove="wwwroot\swagger\css\**" />
     <Content Remove="AuthorizedServer\**" />
+    <Content Remove="wwwroot\swagger\css\**" />
     <EmbeddedResource Remove="AuthorizedServer\**" />
+    <EmbeddedResource Remove="wwwroot\swagger\css\**" />
     <None Remove="AuthorizedServer\**" />
+    <None Remove="wwwroot\swagger\css\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="AWSSDK.S3" Version="3.3.11" />
-    <PackageReference Include="AWSSDK.SimpleEmail" Version="3.3.3" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.11.1" />
+    <PackageReference Include="AWSSDK.SimpleEmail" Version="3.3.3.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.0.0" />
     <PackageReference Include="Minio.NetCore" Version="1.0.2" />

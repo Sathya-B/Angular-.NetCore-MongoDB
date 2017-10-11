@@ -1,40 +1,45 @@
-﻿using AuthorizedServer.Repositories;
+﻿using System.IO;
+using AuthorizedServer.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.Extensions.PlatformAbstractions;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace AuthorizedServer
 {
+    /// <summary></summary>
     public class Startup
     {
+        /// <summary></summary>
+        /// <param name="env"></param>
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
             if (env.IsEnvironment("Development"))
             {
-                // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
                 builder.AddApplicationInsightsSettings(developerMode: true);
             }
-
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
         }
 
+        /// <summary></summary>
         public IConfigurationRoot Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary></summary>
+        /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
-        {                    
+        {
+            #region JWT
             services.AddSingleton<IRTokenRepository, RTokenRepository>();
-
+            #endregion
             services.AddMvc();
-            // "Cors!!!"
+            #region Cors
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
@@ -42,23 +47,45 @@ namespace AuthorizedServer
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials());
-            });           
-
+            });
+            #endregion
+            #region Swagger
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info
+                {
+                    Title = "AuthorizedServer",
+                    Version = "v1",
+                    Description = "Controller methods for Authentication and Generation of JWT Token",
+                    TermsOfService = "None",
+                    Contact = null,
+                    License = null
+                });
+                var basePath = PlatformServices.Default.Application.ApplicationBasePath;
+                var xmlPath = Path.Combine(basePath, "AuthorizedServer.xml");
+                c.IncludeXmlComments(xmlPath);
+            });
+            #endregion
             services.AddOptions();
             services.Configure<Audience>(Configuration.GetSection("Audience"));
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary></summary>
+        /// <param name="app"></param>
+        /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseStaticFiles();
+            #region Swagger
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Arthur_Clive");
+            });
+            #endregion
+            #region Cors
             app.UseCors("CorsPolicy");
-
-            //app.UseGoogleAuthentication(new GoogleOptions
-            //{
-            //    ClientId = "737899914464-f2vheiv2t0a02b1los4jl7n774jl4krp.apps.googleusercontent.com",
-            //    ClientSecret = "Yng3Xtq1XocGigU3zaXMzZiP"
-            //});
-            
+            #endregion
             app.UseMvc();
         }
     }

@@ -572,7 +572,7 @@ namespace AuthorizedServer.Controllers
                 });
             }
         }
-        
+
         /// <summary>Deactivate account</summary>
         /// <remarks>This api is used to deactivate account</remarks>
         /// <param name = "data" >Login data</param>

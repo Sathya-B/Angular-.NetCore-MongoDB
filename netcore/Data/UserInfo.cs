@@ -12,7 +12,6 @@ namespace Arthur_Clive.Data
         public ObjectId Id { get; set; }
         /// <summary>UserName of user</summary>
         [Required]
-        [DefaultValue("sample@gmail.com")]
         public string UserName { get; set; }
     }
 
@@ -42,51 +41,39 @@ namespace Arthur_Clive.Data
         public ObjectId Id { get; set; }
         /// <summary>UserName of user</summary>
         [Required]
-        [DefaultValue("sample@gmail.com")]
         public string UserName { get; set; }
         /// <summary>FullName of user</summary>
         [Required]
-        [DefaultValue("Sample")]
         public string Name { get; set; }
         /// <summary>PhoneNumber of user</summary>
         [Required]
-        [DefaultValue("12341234")]
         public string PhoneNumber { get; set; }
         /// <summary>Address Lines of user</summary>
         [Required]
-        [DefaultValue("AddressLines")]
         public string AddressLines { get; set; }
         /// <summary>Post office under which the address of user comes</summary>
         [Required]
-        [DefaultValue("")]
         public string PostOffice { get; set; }
         /// <summary>City in which the user is located</summary>
         [Required]
-        [DefaultValue("Coimbatore")]
         public string City { get; set; }
         /// <summary>State in which the user is located</summary>
         [Required]
-        [DefaultValue("TamilNadu")]
         public string State { get; set; }
         /// <summary>Pincode under which the user address comes</summary>
         [Required]
-        [DefaultValue("641035")]
         public string PinCode { get; set; }
         /// <summary>Lanmark for the address given by the user</summary>
         [Required]
-        [DefaultValue("Near KGISL")]
         public string Landmark { get; set; }
         /// <summary>Billing address of the user</summary>
         [Required]
-        [DefaultValue("true")]
         public bool BillingAddress { get; set; }
         /// <summary>Shipping address of the user</summary>
         [Required]
-        [DefaultValue("true")]
         public bool ShippingAddress { get; set; }
         /// <summary>Flag to note that this is the default address</summary>
         [Required]
-        [DefaultValue("true")]
         public bool DefaultAddress { get; set; }
     }
 

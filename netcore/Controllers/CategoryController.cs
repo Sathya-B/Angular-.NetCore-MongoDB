@@ -7,8 +7,12 @@ using MongoDB.Driver;
 using AH = Arthur_Clive.Helper.AmazonHelper;
 using WH = Arthur_Clive.Helper.MinioHelper;
 using MH = Arthur_Clive.Helper.MongoHelper;
+using GH = Arthur_Clive.Helper.GlobalHelper;
 using MongoDB.Bson;
 using System.ComponentModel;
+using Swashbuckle.AspNetCore.Examples;
+using Arthur_Clive.Swagger;
+using MongoDB.Bson.Serialization;
 
 namespace Arthur_Clive.Controllers
 {
@@ -79,6 +83,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Category inserted successfully</response>
         /// <response code="400">Process ran into an exception</response>  
         [HttpPost]
+        [SwaggerRequestExample(typeof(Category), typeof(InsertCategory))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> Post([FromBody]Category category)
         {
@@ -156,5 +161,68 @@ namespace Arthur_Clive.Controllers
             }
         }
 
+        /// <summary>Update category details</summary>
+        /// <param name="data">Details of category</param>
+        /// <param name="productFor">For whom is the category</param>
+        /// <param name="productType">Type of category</param>
+        /// <response code="200">Category updated successfully</response>
+        /// <response code="404">No category found</response>   
+        /// <response code="400">Process ran into an exception</response>   
+        [HttpPut("{productFor}/{productType}")]
+        [SwaggerRequestExample(typeof(Category), typeof(UpdateCategory))]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public async Task<ActionResult> UpdateCategory([FromBody]Category data, string productFor, string productType)
+        {
+            try
+            {
+                var checkData = MH.CheckForDatas("ProductFor", productFor, "ProductType", productType, "ProductDB", "Category");
+                if (checkData != null)
+                {
+                    var objectId = BsonSerializer.Deserialize<Category>(checkData).Id;
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", objectId);
+                    if(data.ProductFor!= null)
+                    {
+                        var value = BsonSerializer.Deserialize<Category>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Category")).ProductType;
+                        var objectName = data.ProductFor + "-" + value;
+                        GH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor,productType, data.ProductFor, "ProductFor", objectName);
+                    }
+                    if(data.ProductType != null)
+                    {
+                        var value = BsonSerializer.Deserialize<Category>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Category")).ProductFor;
+                        var objectName = value + "-" + data.ProductType;
+                        GH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor, productType, data.ProductType, "ProductType", objectName);
+                    }
+                    if(data.Description != null)
+                    {
+                        var update = await MH.UpdateSingleObject(filter, "ProductDB", "Category", Builders<BsonDocument>.Update.Set("Description", data.Description));
+                    }
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Updated",
+                        Data = null
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "Category not found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("CategoryController", "UpdateCategory", "UpdateCategory", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
     }
 }

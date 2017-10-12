@@ -71,7 +71,7 @@ namespace Arthur_Clive.Helper
         /// <param name="filterData2"></param>
         /// <param name="dbName"></param>
         /// <param name="collectionName"></param>
-        public static BsonDocument CheckForDatas(string filterField1, string filterData1, string filterField2, string filterData2, string dbName, string collectionName)
+        public static BsonDocument CheckForDatas(string filterField1, dynamic filterData1, string filterField2, dynamic filterData2, string dbName, string collectionName)
         {
             FilterDefinition<BsonDocument> filter;
             if (filterField2 == null)

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
+using Swashbuckle.AspNetCore.Examples;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Arthur_Clive
@@ -57,6 +58,7 @@ namespace Arthur_Clive
                 var basePath = PlatformServices.Default.Application.ApplicationBasePath;
                 var xmlPath = Path.Combine(basePath, "Arthur_Clive.xml");
                 c.IncludeXmlComments(xmlPath);
+                c.OperationFilter<ExamplesOperationFilter>();
             });
             #endregion
         }

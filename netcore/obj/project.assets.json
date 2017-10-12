@@ -3323,6 +3323,19 @@
           "lib/netstandard1.6/Swashbuckle.AspNetCore.dll": {}
         }
       },
+      "Swashbuckle.AspNetCore.Examples/2.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Swashbuckle.AspNetCore.SwaggerGen": "1.0.0"
+        },
+        "compile": {
+          "lib/netstandard1.6/Swashbuckle.AspNetCore.Examples.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.6/Swashbuckle.AspNetCore.Examples.dll": {}
+        }
+      },
       "Swashbuckle.AspNetCore.Swagger/1.0.0": {
         "type": "package",
         "dependencies": {
@@ -8793,6 +8806,17 @@
         "swashbuckle.aspnetcore.nuspec"
       ]
     },
+    "Swashbuckle.AspNetCore.Examples/2.3.0": {
+      "sha512": "hiZNEBR26OcMnC3GVQbjjt4QWVQ8Z/3GdTbdA//f3DF4KWx2zHvtIB8kGaju7hu4CHBEz/7ic45QuU4YcykmNA==",
+      "type": "package",
+      "path": "swashbuckle.aspnetcore.examples/2.3.0",
+      "files": [
+        "lib/net461/Swashbuckle.AspNetCore.Examples.dll",
+        "lib/netstandard1.6/Swashbuckle.AspNetCore.Examples.dll",
+        "swashbuckle.aspnetcore.examples.2.3.0.nupkg.sha512",
+        "swashbuckle.aspnetcore.examples.nuspec"
+      ]
+    },
     "Swashbuckle.AspNetCore.Swagger/1.0.0": {
       "sha512": "tzZ6tXjopV6jvcHzOX7PjyYBWqof5mhJUXqxb/kPF17Z5LXxr+uglnTLlYOjWCm5BfvdxWYtU95uJgc14L1Eqw==",
       "type": "package",
@@ -13834,6 +13858,7 @@
       "Minio.NetCore >= 1.0.2",
       "Stripe.net >= 10.4.0",
       "Swashbuckle.AspNetCore >= 1.0.0",
+      "Swashbuckle.AspNetCore.Examples >= 2.3.0",
       "Swashbuckle.AspNetCore.Swagger >= 1.0.0",
       "Swashbuckle.AspNetCore.SwaggerGen >= 1.0.0",
       "Swashbuckle.AspNetCore.SwaggerUi >= 1.0.0",
@@ -13904,6 +13929,10 @@
           "Microsoft.AspNetCore.Mvc.Core": {
             "target": "Package",
             "version": "2.0.0"
+          },
+          "Swashbuckle.AspNetCore.Examples": {
+            "target": "Package",
+            "version": "2.3.0"
           },
           "Microsoft.NETCore.App": {
             "target": "Package",

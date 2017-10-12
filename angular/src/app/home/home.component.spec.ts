@@ -12,6 +12,20 @@ import {
   Http
 } from '@angular/http';
 import { MockBackend } from '@angular/http/testing';
+/**
+ * services
+ */
+import { RouterTestingModule } from '@angular/router/testing';
+import { ToastMsgService } from '../../services/toastmsg.service';
+import { ApiService } from '../../services/api.service';
+import { TokenService } from '../../services/token.service';
+import { LoginLogoutService } from '../../services/loginlogout.service';
+import { CartService } from '../../services/cart.service';
+import { AddressService } from '../../services/address.service';
+import { WishListService } from '../../services/wishlist.service';
+import { ToasterModule, ToasterService, ToasterConfig } from 'angular2-toaster';
+import { HttpClientModule } from '@angular/common/http';
+import { SpinnerService } from 'angular-spinners';
 
 /**
  * Load the implementations that should be tested.
@@ -19,7 +33,6 @@ import { MockBackend } from '@angular/http/testing';
 import { AppState } from '../app.service';
 import { HomeComponent } from './home.component';
 import { Title } from './title';
-import { DataServ } from '../../services/data.service';
 
 describe(`Home`, () => {
   let comp: HomeComponent;
@@ -32,10 +45,14 @@ describe(`Home`, () => {
     TestBed.configureTestingModule({
       declarations: [HomeComponent],
       schemas: [NO_ERRORS_SCHEMA],
+           imports: [RouterTestingModule, ToasterModule, HttpClientModule],
       providers: [
         BaseRequestOptions,
+        AppState, RouterTestingModule,
+        ToastMsgService, ApiService, TokenService,
+        LoginLogoutService, SpinnerService,
+        CartService, WishListService,
         MockBackend,
-        DataServ,
         {
           provide: Http,
           useFactory: (backend: ConnectionBackend, defaultOptions: BaseRequestOptions) => {
@@ -43,8 +60,7 @@ describe(`Home`, () => {
           },
           deps: [MockBackend, BaseRequestOptions]
         },
-        AppState,
-        Title,
+        Title
       ]
     })
     /**

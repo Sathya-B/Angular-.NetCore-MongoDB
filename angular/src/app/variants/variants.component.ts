@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ParamMap } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { WishListService } from '../../services/wishlist.service';
+import { ApiService } from '../../services/api.service';
 import { EventEmitter } from '@angular/core';
 import { RelatedComponent } from './related/related.component';
 import { ColorSizeStockComponent } from './colorsizestock/colorsizestock.component';
@@ -43,15 +44,14 @@ export class VariantsComponent implements OnInit {
 
   constructor(private cartService: CartService, private route: ActivatedRoute,
               private toastMsg: ToastMsgService, private wishListService: WishListService,
-              private router: Router) {
+              private router: Router, private apiService: ApiService) {
     this.for = route.snapshot.paramMap.get('productFor');
     this.type = route.snapshot.paramMap.get('productType');
     this.design = route.snapshot.paramMap.get('productDesign');
   }
 
   public ngOnInit() {
-    this.variants = JSON.parse(localStorage.getItem(this.for + '-' +
-                                                    this.type + '-' + this.design));
+    this.variants = this.route.snapshot.data['item'];
     this.initItem = this.variants;
     this.relatedItems = findLocalItems(this.for);
   }

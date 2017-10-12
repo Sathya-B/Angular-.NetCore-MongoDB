@@ -17,9 +17,8 @@ export class AddressService {
 
     public getAddresses() {
         let userName = localStorage.getItem('UserName');
-        this.apiService.get('user/userinfo/address/' + userName).then(
+        this.apiService.get('user/userinfo/' + userName).then(
             (response: any) => {
-                console.log(response);
                 this.addressItems.listOfAddress = response.data;
                 this.addressUpdated.emit(true);
             },

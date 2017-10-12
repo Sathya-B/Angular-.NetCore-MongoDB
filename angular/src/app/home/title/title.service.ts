@@ -4,7 +4,7 @@ import { Http } from '@angular/http';
 @Injectable()
 export class Title {
 
-  public value = 'Angular 2';
+  public value = 'Arthur Clive';
 
   constructor(
     public http: Http
@@ -17,7 +17,7 @@ export class Title {
      * .map(res => res.json());
      */
     return {
-      value: 'AngularClass'
+      value: 'ArthurClive'
     };
   }
 

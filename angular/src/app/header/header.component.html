@@ -10,7 +10,7 @@
 				<div class="popupAfterLogin" *ngIf="this.appState.get('loggedIn')">
 				<div class="helloUserWrap">Hello, <span>{{getUserName()}}</span></div>
 				<a href="#">My Orders</a>
-				<a href="#">My Account</a>
+				<a [routerLink]="['./myaccount']">My Account</a>
 				<a (click)="SignOutClicked()">Signout</a>
 				</div>
 				<div class="popupAfterLogin" *ngIf="!this.appState.get('loggedIn')">
@@ -37,7 +37,7 @@
 				<div class="popupAfterLogin" *ngIf="this.appState.get('loggedIn')">
 				<div class="helloUserWrap">Hello, <span>{{getUserName()}}</span></div>
 				<a href="#">My Orders</a>
-				<a href="#">My Account</a>
+				<a [routerLink]="['./myaccount']">My Account</a>
 				<a (click)="SignOutClicked()">Signout</a>
 				</div>
 				<div class="popupAfterLogin" *ngIf="!this.appState.get('loggedIn')">

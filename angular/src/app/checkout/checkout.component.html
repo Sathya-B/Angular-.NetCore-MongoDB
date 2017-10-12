@@ -1,3 +1,4 @@
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet">
 <div class="commonPageWrap">
     <div class="wrapper">
         <div class="wrapInner">
@@ -6,9 +7,9 @@
                 <div class="shoppingBagWrapper clearfix">
                     <div class="shoppingBagWrapperInnerLeft">
                         <div class="selectAddressWrapper">
-                            <h2 class="deliveryAddressHeading">Delivery Address</h2>
                             <div class="selectRadioWrapOuter">
                                 <div class="selectAddressRadioWrap">
+                                <h2 class="deliveryAddressHeading">Delivery Address</h2>
                                     <p>
                                         <input type="radio" id="AddNewAddress" name="radio-group-Delivery" [checked]="(newDeliveryAddress)" (change)="check(true)">
                                         <label for="AddNewAddress">Add new Address</label>
@@ -19,6 +20,7 @@
                                     </p>
                                 </div>
                                 <div class="selectDeliveryBillingRadioWrap">
+                                <h2 class="deliveryAddressHeading">Billing Address</h2>
                                     <p>
                                         <input type="radio" id="BillingSameAddress" name="radio-group-Billing" [checked]="(sameAsDeliveryAddress)" (change)="checkBilling(true)">
                                         <label for="BillingSameAddress">Billing address is same as Delivery address</label>

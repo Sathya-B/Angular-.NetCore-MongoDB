@@ -4,7 +4,7 @@
       <div class="itemImageWrap"><a href=""><img [src]="item.minioObject_URL" alt=""></a></div>
       <div class="itemDescColourWrap">
         <div class="itemDescColourWrapInner">
-          <a href=""><span class="itemOderTabHeading">{{item.productFor + ' ' + item.productType}}</span></a>
+          <a (click)="viewItem()" style="cursor: pointer"><span class="itemOderTabHeading">{{item.productFor + ' ' + item.productType}}</span></a>
           <div class="itemColour">Colour : <span>{{item.productColour}}</span></div>
           <div class="itemSize" title="Selected Size" *ngIf="item.productSize !=''">
             <span>{{item.productSize}}</span>

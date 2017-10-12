@@ -38,4 +38,8 @@ public addToWishList() {
   this.removeItem();
   this.router.navigate(['/addedtowishlist']);
 }
+public viewItem(){
+  let viewItemUrl = './products/' + this.item.productFor + '/' + this.item.productType + '/variants/' + this.item.productDesign;
+  this.router.navigate([viewItemUrl]);
+}
 }

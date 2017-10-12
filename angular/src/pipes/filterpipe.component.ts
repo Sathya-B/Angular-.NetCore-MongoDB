@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-    name: 'filter',
+    name: 'myProductFilter',
     pure: true
 })
 export class FilterPipe implements PipeTransform {
@@ -23,6 +23,7 @@ private static deepFind(obj, path) {
 
 public transform(items: any[], conditions: string): any[] {
         let newValue = [];
+        if (items !== null) {
         for (let i = 0; i < items.length; i++) {
             let keyVal = FilterPipe.deepFind(items[i], conditions);
             let index = newValue.findIndex((myObj) => myObj[conditions] === keyVal);
@@ -33,7 +34,7 @@ public transform(items: any[], conditions: string): any[] {
                 newValue.push(topofgroup);
             }
         }
-        console.log(newValue);
+        }
         return newValue;
     }
 }

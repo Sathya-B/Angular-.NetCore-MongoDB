@@ -13,7 +13,7 @@ export function expiredJwt(token: string) {
 }
 
 export function checkOptions(options?: any) {
-  if (options) {
+  if (options !== undefined) {
     if (options.useAuth) {
       return true;
     }

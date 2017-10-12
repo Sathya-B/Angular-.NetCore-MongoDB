@@ -2,33 +2,52 @@
 	<div id="sliderDesktop" class="flexslider">
 		<ul class="slides">
 			<swiper [config]="swipeconfig">
-					<div class="homeSlideContent">
-						<img [src]="imageSources[0]" alt="">
-						<a [routerLink]="['/products/Boys/Tshirt']">
-						<span class="shopBtnHomeSlide">SHOP BOYS'</span>
-					</a>
+				<div class="homeSlideContent">
+					<img [src]="imageSources[0]" alt="">
+					<div class="homeSliderDesktopBtnWrap">
+					<a [routerLink]="['/products/Men/Tshirt']" class="sliderBtn">SHOP MEN's</a>
+					<a [routerLink]="['/products/Women/Tshirt']" class="sliderBtn">SHOP WOMEN's</a>
 					</div>
-					<div class="homeSlideContent">
-						<img [src]="imageSources[1]" alt="">
-						<a [routerLink]="['/products/Women/Tshirt']">
-							<span class="shopBtnHomeSlide">SHOP WOMEN'S</span>
-					</a>
+				</div>
+				<div class="homeSlideContent">
+					<img [src]="imageSources[1]" alt="">
+					<div class="homeSliderDesktopBtnWrap">
+					<a [routerLink]="['/products/Men/Tshirt']" class="sliderBtn">SHOP MEN's</a>
+					<a [routerLink]="['/products/Women/Tshirt']" class="sliderBtn">SHOP WOMEN's</a>
 					</div>
-					<div class="homeSlideContent">
-						<img [src]="imageSources[2]" alt="">
-						
-						<a [routerLink]="['/products/Girls/Tshirt']">
-							<span class="shopBtnHomeSlide">SHOP GIRLS'</span>				
-					</a></div>
-					<div class="homeSlideContent">
-						<img [src]="imageSources[3]" alt="">
-						<a [routerLink]="['/products/Men/Tshirt']">
-							<span class="shopBtnHomeSlide">SHOP MEN'S</span>											
-					</a>
+				</div>
+				<div class="homeSlideContent">
+					<img [src]="imageSources[2]" alt="">
+					<div class="homeSliderDesktopBtnWrap">
+					<a [routerLink]="['/products/Men/Tshirt']" class="sliderBtn">SHOP MEN's</a>
+					<a [routerLink]="['/products/Women/Tshirt']" class="sliderBtn">SHOP WOMEN's</a>
 					</div>
+                </div>
+				<div class="homeSlideContent">
+					<img [src]="imageSources[3]" alt="">
+					<div class="homeSliderDesktopBtnWrap">
+					<a [routerLink]="['/products/Men/Tshirt']" class="sliderBtn">SHOP MEN's</a>
+					<a [routerLink]="['/products/Women/Tshirt']" class="sliderBtn">SHOP WOMEN's</a>
+					</div>
+				</div>
+				<div class="homeSlideContent">
+					<img [src]="imageSources[4]" alt="">
+					<div class="homeSliderDesktopBtnWrap">
+					<a [routerLink]="['/products/Boys/Tshirt']" class="sliderBtn">SHOP BOYS'</a>
+					<a [routerLink]="['/products/Girls/Tshirt']" class="sliderBtn">SHOP GIRLS'</a>
+					</div>
+				</div>
+				<div class="homeSlideContent">
+					<img [src]="imageSources[5]" alt="">
+					<div class="homeSliderDesktopBtnWrap">
+					<a [routerLink]="['/products/Boys/Tshirt']" class="sliderBtn">SHOP BOYS'</a>
+					<a [routerLink]="['/products/Girls/Tshirt']" class="sliderBtn">SHOP GIRS'</a>
+					</div>
+				</div>
+
 			</swiper>
 		</ul>
-		</div>
+	</div>
 	<div id="sliderMobile" class="flexslider">
 		<ul class="slides">
 			<swiper [config]="mobileconfig">
@@ -59,7 +78,7 @@
 					<div class="homeSlideContent">
 						<img [src]="mobileImageSources[3]" alt="">
 						<a [routerLink]="['/products/Boys/Tshirt']">
-							<span class="shopBtnHomeSlide">SHOP BOYS'</span>											
+							<span class="shopBtnHomeSlide">SHOP GIRLS'</span>											
 					</a>
 					</div>
 				</li>

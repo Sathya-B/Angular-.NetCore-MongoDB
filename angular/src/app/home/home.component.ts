@@ -37,7 +37,9 @@ export class HomeComponent implements OnInit {
     '../assets/img/sliderhome/desktop/1200-X-450_B_01.jpg',
     '../assets/img/sliderhome/desktop/1200-X-450_B_02.jpg',
     '../assets/img/sliderhome/desktop/1200-X-450_B_03.jpg',
-    '../assets/img/sliderhome/desktop/1200-X-450_B_04.jpg'
+    '../assets/img/sliderhome/desktop/1200-X-450_B_04.jpg',
+    '../assets/img/sliderhome/desktop/1200-X-450_B_05.jpg',
+    '../assets/img/sliderhome/desktop/1200-X-450_B_06.jpg',
   ];
   public mobileImageSources: string[] = [
     '../assets/img/sliderhome/mobile/600X600_1.jpg',

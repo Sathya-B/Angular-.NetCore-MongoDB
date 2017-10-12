@@ -34,7 +34,6 @@ export class CartService {
          return   this.apiService.put('user/cart/' + userName,
                                       this.cartItems , { useAuth: true }).then(
                 (response: any) => {
-                    console.log(response);
                     return true;
                 })
                 .catch((error: any) => {

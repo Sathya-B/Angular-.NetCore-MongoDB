@@ -41,4 +41,10 @@ export class WishListItemComponent implements OnInit {
     this.removeItem();
     this.router.navigate(['/addedtocart']);
   }
+
+  public viewItem(){
+  let viewItemUrl = './products/' + this.item.productFor + '/' + this.item.productType + '/variants/' + this.item.productDesign;
+  this.router.navigate([viewItemUrl]);
+  }
+
 }

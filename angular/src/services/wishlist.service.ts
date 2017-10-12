@@ -35,7 +35,6 @@ export class WishListService {
         return  this.apiService.put('user/wishlist/' + userName, this.wishListItems ,
                                     { useAuth: true }).then(
                 (response: any) => {
-                    console.log(response);
                     return true;
                 })
                 .catch((error: any) => {

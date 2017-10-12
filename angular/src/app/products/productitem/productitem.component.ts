@@ -32,6 +32,5 @@ this.ImgUrl = this.productitem.topItem.minioObject_URL;
 public DesignClicked() {
     localStorage.setItem(this.for + '-' + this.type + '-' + this.design,
                          JSON.stringify(this.productitem));
-    console.log(this.productitem);
 }
 }

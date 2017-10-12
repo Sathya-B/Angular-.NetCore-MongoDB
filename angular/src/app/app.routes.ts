@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './home';
 import { ProductsComponent } from './products/products.component';
 import { VariantsComponent } from './variants/variants.component';
+import { VariantsResolver } from './variants/variants.resolver';
 import { NoContentComponent } from './no-content';
 import { AuthGuard } from './auth/authguard/authguard';
 import { LoginRegisterComponent } from './auth/loginregister/loginregister.component';
@@ -15,6 +16,7 @@ import { ChangePasswordComponent } from './auth/changepassword/changepassword.co
 import { GetEmailComponent } from './auth/loginregister/facebook/getemail/getemail.component';
 import { CartComponent } from './cart/cart.component';
 import { CheckOutComponent } from './checkout/checkout.component';
+import { MyAccountComponent } from './account/myaccount.component';
 import { WishListComponent } from './wishlist/wishlist.component';
 import { DataResolver } from './app.resolver';
 import { AboutComponent } from './policies/about/about.component';
@@ -43,9 +45,10 @@ export const ROUTES: Routes = [
   { path: 'updatepassword/:userName', component: UpdatePasswordComponent },
   { path: 'products/:productFor/:productType', component: ProductsComponent },
   { path: 'products/:productFor/:productType/variants/:productDesign',
-    component: VariantsComponent},
+    component: VariantsComponent, resolve: { item: VariantsResolver }},
   { path: 'cart', component: CartComponent },
   { path: 'checkout', component: CheckOutComponent, canActivate: [AuthGuard] },
+  { path: 'myaccount', component: MyAccountComponent, canActivate: [AuthGuard] },
   { path: 'wishlist', component: WishListComponent },
   { path: 'cancellation', component: CancellationComponent },
   { path: 'delivery', component: DeliveryComponent },

@@ -25,10 +25,11 @@ export class ColorSizeStockComponent implements OnInit, OnChanges {
   public ngOnInit() {
     this.isDataLoaded = true;
     this.topItem = this.initItem.topItem;
-    console.log('init');
-    console.log(this.selectedVariant);
     if (this.topItem.productSize === '') {
-      this.checked('');
+        this.selectedVariant = {};        
+        this.selectedVariant.variants = [];
+        this.selectedVariant.variants.push(this.topItem);
+        this.checked('');        
     }
   }
 
@@ -63,11 +64,8 @@ export class ColorSizeStockComponent implements OnInit, OnChanges {
       } else {
         this.remainingQty = this.selectedVariant.variants[index].productStock;
         this.itemToCart = this.selectedVariant.variants[index];
-        console.log('in css');
-        console.log(this.itemToCart);
       }
     } else {
-      console.log('doom');
       this.remainingQty = this.selectColor;
     }
     this.quantity = 1;

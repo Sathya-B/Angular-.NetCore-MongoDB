@@ -4,6 +4,7 @@ import { CartService } from './cart.service';
 import { WishListService } from './wishlist.service';
 import { ToastMsgService } from './toastmsg.service';
 import { AppState } from '../app/app.service';
+import {Location} from '@angular/common';
 
 declare const FB: any;
 
@@ -12,7 +13,7 @@ export class LoginLogoutService {
     public fbResponse: any;
     constructor(private cartService: CartService, private wishListService: WishListService,
                 private toastmsg: ToastMsgService, private appState: AppState,
-                private router: Router) {
+                private router: Router, private location: Location) {
     }
     public Login(loginModel: any) {
         this.toastmsg.popToast('success', 'Success', 'Welcome!');
@@ -22,7 +23,8 @@ export class LoginLogoutService {
         this.appState.set('loggedIn', true);
         this.cartService.getCartItems(loginModel.userName);
         this.wishListService.getWishListItems(loginModel.userName);
-        this.router.navigate(['/']);
+        this.location.back();
+        //this.router.navigate(['/']);
     }
     public Logout() {
         this.cartService.refreshCart().then((res) => {

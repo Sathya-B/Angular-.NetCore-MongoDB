@@ -2,8 +2,10 @@
 using AuthorizedServer.Helper;
 using AuthorizedServer.Logger;
 using AuthorizedServer.Repositories;
+using AuthorizedServer.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.Examples;
 
 namespace AuthorizedServer.Controllers
 {
@@ -35,6 +37,7 @@ namespace AuthorizedServer.Controllers
         /// <response code="904">When request is bad</response> 
         /// <response code="400">If process run into a exception</response> 
         [HttpGet("auth")]
+        [SwaggerRequestExample(typeof(Parameters), typeof(ParameterDetails))]
         [ProducesResponseType(typeof(ResponseData), 999)]
         [ProducesResponseType(typeof(ResponseData), 909)]
         [ProducesResponseType(typeof(ResponseData), 901)]

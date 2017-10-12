@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
+using Swashbuckle.AspNetCore.Examples;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace AuthorizedServer
@@ -64,6 +65,7 @@ namespace AuthorizedServer
                 var basePath = PlatformServices.Default.Application.ApplicationBasePath;
                 var xmlPath = Path.Combine(basePath, "AuthorizedServer.xml");
                 c.IncludeXmlComments(xmlPath);
+                c.OperationFilter<ExamplesOperationFilter>();
             });
             #endregion
             services.AddOptions();

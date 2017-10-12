@@ -26,7 +26,7 @@ namespace Arthur_Clive.Controllers
 
         /// <summary>Get all the products </summary>
         /// <remarks>This api is used to get all the products</remarks>
-        /// <response code="200">Returns success message</response>
+        /// <response code="200">Returns products</response>
         /// <response code="404">No products found</response> 
         /// <response code="400">Process ran into an exception</response>   
         [HttpGet]
@@ -81,7 +81,7 @@ namespace Arthur_Clive.Controllers
         /// <param name="productFor">For whom is the product</param>
         /// <param name="productType">type of product</param>
         /// <param name="productDesign">Design on product</param>
-        /// <response code="200">Returns success message</response>
+        /// <response code="200">Returns products that match the filters</response>
         /// <response code="404">No products found</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpGet("{productFor}/{productType}/{productDesign}")]

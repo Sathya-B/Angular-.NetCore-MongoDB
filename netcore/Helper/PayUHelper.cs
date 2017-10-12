@@ -14,51 +14,39 @@ namespace Arthur_Clive.Helper
     {
         /// <summary>FirstName of user</summary>
         [Required]
-        [DefaultValue("First Name")]
         public string FirstName { get; set; }
         /// <summary>LastName of user</summary>
         [Required]
-        [DefaultValue("Last Name")]
         public string LastName { get; set; }
         /// <summary>ProductInfo of product from which the payment is made</summary>
         [Required]
-        [DefaultValue("Product Info")]
         public string ProductInfo { get; set; }
         /// <summary>Amount to be paid for order</summary>
         [Required]
-        [DefaultValue("100")]
         public string Amount { get; set; }
         /// <summary>Email of user</summary>
         [Required]
-        [DefaultValue("sample@gmail.com")]
         public string Email { get; set; }
         /// <summary>PhoneNumber of user</summary>
         [Required]
-        [DefaultValue("12341234")]
         public string PhoneNumber { get; set; }
         /// <summary>First line of address </summary>
         [Required]
-        [DefaultValue("No.01")]
         public string AddressLine1 { get; set; }
         /// <summary>Secound line of address</summary>
         [Required]
-        [DefaultValue("Street Name")]
         public string AddressLine2 { get; set; }
         /// <summary>City of user</summary>
         [Required]
-        [DefaultValue("City Name")]
         public string City { get; set; }
         /// <summary>State of user </summary>
         [Required]
-        [DefaultValue("State Name")]
         public string State { get; set; }
         /// <summary>Country of user </summary>
         [Required]
-        [DefaultValue("Country")]
         public string Country { get; set; }
         /// <summary>Zipcode of user location</summary>
         [Required]
-        [DefaultValue("Zip code")]
         public string ZipCode { get; set; }
     }
 

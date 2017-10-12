@@ -12,6 +12,8 @@ using AuthorizedServer.Repositories;
 using Microsoft.Extensions.Options;
 using AuthorizedServer.Logger;
 using System.Net.Http;
+using Swashbuckle.AspNetCore.Examples;
+using AuthorizedServer.Swagger;
 
 namespace AuthorizedServer.Controllers
 {
@@ -49,6 +51,7 @@ namespace AuthorizedServer.Controllers
         /// <response code="402">Verification type empty</response>   
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("register")]
+        [SwaggerRequestExample(typeof(RegisterModel), typeof(RegisterDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> Register([FromBody]RegisterModel data)
         {
@@ -216,6 +219,7 @@ namespace AuthorizedServer.Controllers
         /// <response code="404">User not found</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("login")]
+        [SwaggerRequestExample(typeof(LoginModel), typeof(LoginDetails))]
         [ProducesResponseType(typeof(JsonResult), 999)]
         [ProducesResponseType(typeof(JsonResult), 909)]
         public ActionResult Login([FromBody]LoginModel user)
@@ -300,6 +304,7 @@ namespace AuthorizedServer.Controllers
         /// <response code="404">User not found</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("forgotpassword")]
+        [SwaggerRequestExample(typeof(ForgotPasswordModel), typeof(ForgotPasswordDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> ForgotPassword([FromBody]ForgotPasswordModel data)
         {
@@ -443,6 +448,7 @@ namespace AuthorizedServer.Controllers
         /// <response code="404">User not found</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("forgotpassword/changepassword")]
+        [SwaggerRequestExample(typeof(LoginModel), typeof(ChangePassword_ForgotPassword))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult ChangePassword([FromBody]LoginModel data)
         {
@@ -507,6 +513,7 @@ namespace AuthorizedServer.Controllers
         /// <response code="404">User not found</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("changepassword")]
+        [SwaggerRequestExample(typeof(ChangePasswordModel), typeof(ChangePasswordDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult ChangePasswordWhenLoggedIn([FromBody]ChangePasswordModel data)
         {
@@ -581,6 +588,7 @@ namespace AuthorizedServer.Controllers
         /// <response code="404">User not found</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("deactivateaccount")]
+        [SwaggerRequestExample(typeof(LoginModel), typeof(DeactivateAccountDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult DeactivateAccount([FromBody]LoginModel data)
         {
@@ -645,6 +653,7 @@ namespace AuthorizedServer.Controllers
         /// <response code="403">ID mismatch</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("externallogin/google")]
+        [SwaggerRequestExample(typeof(SocialLoginModel), typeof(SocialLoginDetails))]
         [ProducesResponseType(typeof(JsonResult), 999)]
         [ProducesResponseType(typeof(JsonResult), 909)]
         public async Task<ActionResult> GoogleLogin([FromBody]SocialLoginModel data)
@@ -736,6 +745,7 @@ namespace AuthorizedServer.Controllers
         /// <response code="403">ID mismatch</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("externallogin/facebook")]
+        [SwaggerRequestExample(typeof(SocialLoginModel), typeof(SocialLoginDetails))]
         [ProducesResponseType(typeof(JsonResult), 999)]
         [ProducesResponseType(typeof(JsonResult), 909)]
         public async Task<ActionResult> FaceBookLogin([FromBody]SocialLoginModel data)
@@ -826,6 +836,7 @@ namespace AuthorizedServer.Controllers
         /// <response code="401">Token is empty </response>   
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("externallogin/facebook/check")]
+        [SwaggerRequestExample(typeof(SocialLoginModel), typeof(SocialLoginDetails))]
         [ProducesResponseType(typeof(JsonResult), 999)]
         [ProducesResponseType(typeof(JsonResult), 909)]
         public async Task<ActionResult> FaceBookLoginCheck([FromBody]SocialLoginModel data)

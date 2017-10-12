@@ -27,27 +27,21 @@ namespace Arthur_Clive.Data
         public ObjectId Id { get; set; } 
         /// <summary>Coupon code</summary>
         [Required]
-        [DefaultValue("12341234")]
         public string Code { get; set; }
         /// <summary>For whom is the coupon applicable for</summary>
         [Required]
-        [DefaultValue("All")]
         public string ApplicableFor { get; set; }
         /// <summary>Expiry time of the coupon</summary>
         [Required]
-        [DefaultValue("12341234")]
         public DateTime ExpiryTime { get; set; }
         /// <summary>Coupon usage count</summary>
         [Required]
-        [DefaultValue("0")]
         public int UsageCount { get; set; }
         /// <summary>Value of coupon in percentage or amount</summary>
         [Required]
-        [DefaultValue("10")]
         public double Value { get; set; }
         /// <summary>If the value of coupon is persentage pass the flag as true</summary>
         [Required]
-        [DefaultValue("true")]
         public bool? Percentage { get; set; }
     }
 }

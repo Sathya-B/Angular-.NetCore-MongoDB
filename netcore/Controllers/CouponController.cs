@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Arthur_Clive.Data;
 using Arthur_Clive.Logger;
+using Arthur_Clive.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using Swashbuckle.AspNetCore.Examples;
 using MH = Arthur_Clive.Helper.MongoHelper;
 
 namespace Arthur_Clive.Controllers
@@ -25,6 +27,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="401">Coupon already added</response>  
         /// <response code="400">Process ran into an exception</response>  
         [HttpPost]
+        [SwaggerRequestExample(typeof(Coupon), typeof(CouponData))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> InsertCoupon([FromBody]Coupon data)
         {
@@ -157,6 +160,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="404">Coupon not found</response>  
         /// <response code="400">Process ran into an exception</response> 
         [HttpPut("{code}")]
+        [SwaggerRequestExample(typeof(Coupon), typeof(CouponUpdateData))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult UpdateCoupon([FromBody]Coupon data, string code)
         {

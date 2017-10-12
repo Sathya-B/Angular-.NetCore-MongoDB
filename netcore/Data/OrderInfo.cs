@@ -13,14 +13,16 @@ namespace Arthur_Clive.Data
         public ObjectId Id { get; set; }
         /// <summary>Id given to the placed order</summary>
         [Required]
-        [DefaultValue("1")]
         public int OrderId { get; set; }
         /// <summary>Email or PhoneNumber of the user</summary>
         public string UserName { get; set; }
         /// <summary>Payment method prefered by the user</summary>
         [Required]
-        [DefaultValue("Cash On Delivery")]
         public string PaymentMethod { get; set; }
+        /// <summary>Total amount to be paid for order</summary>
+        public double TotalAmount { get; set; }
+        /// <summary>Discounted amount</summary>
+        public double CouponDiscount { get; set; }
         /// <summary>Payment method and status of the payment</summary>
         public PaymentMethod PaymentDetails { get; set; }
         /// <summary>Address details of user</summary>
@@ -61,36 +63,15 @@ namespace Arthur_Clive.Data
         /// <summary>Status of the payment</summary>
         public List<StatusCode> Status { get; set; }
     }
-
-    /// <summary>Contails the request details for the product</summary>
-    public class OrderRequest
-    {
-        /// <summary>ObjectId give by MongoDB</summary>
-        public ObjectId Id { get; set; }
-        /// <summary>Id given to the order</summary>
-        [Required]
-        [DefaultValue("1")]
-        public int OrderId { get; set; }
-        /// <summary>UserName of the user who make the order</summary>
-        [Required]
-        [DefaultValue("sample@gmail.com")]
-        public string UserName { get; set; }
-        /// <summary>SKU of the ordered product</summary>
-        [Required]
-        [DefaultValue("Men-Tshirt-Om-Black-S")]
-        public string ProductSKU { get; set; }
-    }
-
+    
     /// <summary>Contails update details for the order</summary>
     public class StatusUpdate
     {
-        /// <summary>Status to be updated</summary>
-        [Required]
-        [DefaultValue("Enter your status to be updated")]
-        public string Status { get; set; }
         /// <summary>Id of the order for which the status is to be updated</summary>
         [Required]
-        [DefaultValue("1")]
         public int OrderId { get; set; }
+        /// <summary>Status to be updated</summary>
+        [Required]
+        public string Status { get; set; }
     }
 }

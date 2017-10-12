@@ -9,6 +9,8 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MH = Arthur_Clive.Helper.MongoHelper;
 using GH = Arthur_Clive.Helper.GlobalHelper;
+using Swashbuckle.AspNetCore.Examples;
+using Arthur_Clive.Swagger;
 
 namespace Arthur_Clive.Controllers
 {
@@ -38,6 +40,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="405">Default address not found</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("placeorder/{username}")]
+        [SwaggerRequestExample(typeof(OrderInfo), typeof(OrderDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> PlaceOrder([FromBody]OrderInfo data, string username)
         {
@@ -63,6 +66,12 @@ namespace Arthur_Clive.Controllers
                                 data.OrderId = orders.Count + 1;
                             }
                             data.UserName = username;
+                            double totalPrice = 0;
+                            foreach(var product in cartDatas)
+                            {
+                                totalPrice = totalPrice + product.ProductPrice;
+                            }
+                            data.TotalAmount = totalPrice;
                             PaymentMethod paymentMethod = new PaymentMethod();
                             paymentMethod.Method = data.PaymentMethod;
                             List<StatusCode> paymentStatus = new List<StatusCode>();
@@ -276,6 +285,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="401">Order cancle request failed</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("cancel/{username}/{productSKU}")]
+        [SwaggerRequestExample(typeof(OrderInfo), typeof(OrderRequestDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> CancelOrder([FromBody]OrderInfo data, string username, string productSKU)
         {
@@ -412,6 +422,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="405">Resuest is not valid</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("{request}/{username}/{productSKU}")]
+        [SwaggerRequestExample(typeof(OrderInfo), typeof(OrderDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> ReturnProduct([FromBody]OrderInfo data, string request, string username, string productSKU)
         {
@@ -590,6 +601,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="401">Status is empty</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("updatestatus/{username}/{productSKU}")]
+        [SwaggerRequestExample(typeof(StatusUpdate), typeof(StatusUpdateDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> UpdateOrder([FromBody]StatusUpdate data, string username, string productSKU)
         {

@@ -9,6 +9,8 @@ using Arthur_Clive.Logger;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Http;
+using Swashbuckle.AspNetCore.Examples;
+using Arthur_Clive.Swagger;
 
 namespace Arthur_Clive.Controllers
 {
@@ -23,6 +25,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Returns the form needed to make the paymnet through PayUMoney gateway</response>
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost]
+        [SwaggerRequestExample(typeof(PaymentModel), typeof(PaymentDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult MakePayment([FromBody]PaymentModel model)
         {

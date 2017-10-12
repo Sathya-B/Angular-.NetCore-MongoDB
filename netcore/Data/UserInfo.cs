@@ -27,7 +27,7 @@ namespace Arthur_Clive.Data
     }
 
     /// <summary>Contains list of info about user</summary>
-    public class UserInfoList
+    public class AddressList
     {
         /// <summary>Address details of user</summary>
         [Required]
@@ -100,59 +100,45 @@ namespace Arthur_Clive.Data
         public ObjectId Id { get; set; }
         /// <summary>UserName of the user</summary>
         [Required]
-        [DefaultValue("sample@gamil.com")]
         public string UserName { get; set; }
         /// <summary>SKU of the product</summary>
         [Required]
-        [DefaultValue("Men-Tshirt-Om-Black-S")]
         public string ProductSKU { get; set; }
         /// <summary>Url of the image given to describe the product</summary>
         [Required]
-        [DefaultValue("https://s3.ap-south-1.amazonaws.com/arthurclive-products/Men-Tshirt-Om-Black-S.jpg")]
         public string MinioObject_URL { get; set; }
         /// <summary>For whom is the product</summary>
         [Required]
-        [DefaultValue("Men")]
         public string ProductFor { get; set; }
         /// <summary>Type of the product</summary>
         [Required]
-        [DefaultValue("Tshirt")]
         public string ProductType { get; set; }
         /// <summary>Design on the product </summary>
         [Required]
-        [DefaultValue("Om")]
         public string ProductDesign { get; set; }
         /// <summary>Brand of the product</summary>
         [Required]
-        [DefaultValue("Arthur Clive")]
         public string ProductBrand { get; set; }
         /// <summary>Price for the product</summary>
         [Required]
-        [DefaultValue("895")]
         public double ProductPrice { get; set; }
         /// <summary>Discount percentage fot the product</summary>
         [Required]
-        [DefaultValue("0")]
         public double ProductDiscount { get; set; }
         /// <summary>Discount price for the product</summary>
         [Required]
-        [DefaultValue("895")]
         public double ProductDiscountPrice { get; set; }
         /// <summary>Quantity of the product ordered</summary>
         [Required]
-        [DefaultValue("1")]
         public long ProductQuantity { get; set; }
         /// <summary>Size of the product</summary>
         [Required]
-        [DefaultValue("S")]
         public string ProductSize { get; set; }
         /// <summary>Colour of the product</summary>
         [Required]
-        [DefaultValue("Black")]
         public string ProductColour { get; set; }
         /// <summary>Description about the product</summary>
         [Required]
-        [DefaultValue("This is an absolute fashion icon on its own. The “Om” print makes it a versatile wear. Pair it up with your denims for a casual day out, or layer up with your favourite jacket for a festive ensemble. The high quality fabric makes it a comfortable wear all day.")]
         public string ProductDescription { get; set; }
     }
 
@@ -163,55 +149,42 @@ namespace Arthur_Clive.Data
         public ObjectId Id { get; set; }
         /// <summary>UserName of the user</summary>
         [Required]
-        [DefaultValue("sample@gamil.com")]
         public string UserName { get; set; }
         /// <summary>SKU of the product</summary>
         [Required]
-        [DefaultValue("Men-Tshirt-Om-Black-S")]
         public string ProductSKU { get; set; }
         /// <summary>Url of the image given to describe the product</summary>
         [Required]
-        [DefaultValue("https://s3.ap-south-1.amazonaws.com/arthurclive-products/Men-Tshirt-Om-Black-S.jpg")]
         public string MinioObject_URL { get; set; }
         /// <summary>For whom is the product</summary>
         [Required]
-        [DefaultValue("Men")]
         public string ProductFor { get; set; }
         /// <summary>Type of the product</summary>
         [Required]
-        [DefaultValue("Tshirt")]
         public string ProductType { get; set; }
         /// <summary>Design on the product </summary>
         [Required]
-        [DefaultValue("Om")]
         public string ProductDesign { get; set; }
         /// <summary>Brand of the product</summary>
         [Required]
-        [DefaultValue("Arthur Clive")]
         public string ProductBrand { get; set; }
         /// <summary>Price for the product</summary>
         [Required]
-        [DefaultValue("895")]
         public double ProductPrice { get; set; }
         /// <summary>Discount percentage fot the product</summary>
         [Required]
-        [DefaultValue("0")]
         public double ProductDiscount { get; set; }
         /// <summary>Discount price for the product</summary>
         [Required]
-        [DefaultValue("895")]
         public double ProductDiscountPrice { get; set; }
         /// <summary>Size of the product</summary>
         [Required]
-        [DefaultValue("S")]
         public string ProductSize { get; set; }
         /// <summary>Colour of the product</summary>
         [Required]
-        [DefaultValue("Black")]
         public string ProductColour { get; set; }
         /// <summary>Description about the product</summary>
         [Required]
-        [DefaultValue("This is an absolute fashion icon on its own. The “Om” print makes it a versatile wear. Pair it up with your denims for a casual day out, or layer up with your favourite jacket for a festive ensemble. The high quality fabric makes it a comfortable wear all day.")]
         public string ProductDescription { get; set; }
     }
 }

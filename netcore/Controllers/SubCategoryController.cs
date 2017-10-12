@@ -23,7 +23,7 @@ namespace Arthur_Clive.Controllers
         /// <param name="productFor">Whom is the product for</param>
         /// <param name="productType">Type of product</param>
         /// <remarks>This api is used to get product that falls under the filters productFor and productType</remarks>
-        /// <response code="200">Returns products</response>
+        /// <response code="200">Returns products that match the filter</response>
         /// <response code="404">No products found</response> 
         /// <response code="400">Process ran into an exception</response>  
         [HttpGet("{productFor}/{productType}")]

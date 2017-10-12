@@ -9,6 +9,8 @@ using AH = Arthur_Clive.Helper.AmazonHelper;
 using WH = Arthur_Clive.Helper.MinioHelper;
 using MH = Arthur_Clive.Helper.MongoHelper;
 using System.Linq;
+using Swashbuckle.AspNetCore.Examples;
+using Arthur_Clive.Swagger;
 
 namespace Arthur_Clive.Controllers
 {
@@ -29,8 +31,9 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Address List of user is refreshed</response>
         /// <response code="400">Process ran into an exception</response>    
         [HttpPost("userinfo/{username}")]
+        [SwaggerRequestExample(typeof(AddressList), typeof(AddressDetail))]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> RefreshUserInfo([FromBody]UserInfoList data, string username)
+        public async Task<ActionResult> RefreshUserInfo([FromBody]AddressList data, string username)
         {
             try
             {
@@ -103,6 +106,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Cart of user is refreshed succeddfully</response>
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("cart/{username}")]
+        [SwaggerRequestExample(typeof(CartList), typeof(CartDetail))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> RefreshCart([FromBody]CartList data, string username)
         {
@@ -184,6 +188,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Wishlist of user is refreshed successfully</response>
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("wishlist/{username}")]
+        [SwaggerRequestExample(typeof(WishlistList), typeof(WishlistDetail))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> RefreshWishList([FromBody]WishlistList data, string username)
         {

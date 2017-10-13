@@ -4,7 +4,7 @@ import { ToastMsgService } from '../../../services/toastmsg.service';
 
 @Component({
   selector: 'address',
-  styleUrls: ['./address.component.scss'],
+  styleUrls: ['./address.component.css'],
   templateUrl: './address.component.html'
 })
 export class AddressComponent {

@@ -40,3 +40,16 @@ E:\Ragu\Projects\Angular-.NetCore-MongoDB\netcore\AuthorizedServer\obj\Debug\net
 E:\Ragu\Projects\Angular-.NetCore-MongoDB\netcore\AuthorizedServer\obj\Debug\netcoreapp2.0\AuthorizedServer.AssemblyInfo.cs
 E:\Ragu\Projects\Angular-.NetCore-MongoDB\netcore\AuthorizedServer\obj\Debug\netcoreapp2.0\AuthorizedServer.dll
 E:\Ragu\Projects\Angular-.NetCore-MongoDB\netcore\AuthorizedServer\obj\Debug\netcoreapp2.0\AuthorizedServer.pdb
+D:\Arthur_Clive\netcore\AuthorizedServer\bin\Debug\netcoreapp2.0\AuthorizedServer.deps.json
+D:\Arthur_Clive\netcore\AuthorizedServer\bin\Debug\netcoreapp2.0\AuthorizedServer.runtimeconfig.json
+D:\Arthur_Clive\netcore\AuthorizedServer\bin\Debug\netcoreapp2.0\AuthorizedServer.runtimeconfig.dev.json
+D:\Arthur_Clive\netcore\AuthorizedServer\bin\Debug\netcoreapp2.0\AuthorizedServer.dll
+D:\Arthur_Clive\netcore\AuthorizedServer\bin\Debug\netcoreapp2.0\AuthorizedServer.pdb
+D:\Arthur_Clive\netcore\AuthorizedServer\obj\Debug\netcoreapp2.0\AuthorizedServer.csproj.CoreCompileInputs.cache
+D:\Arthur_Clive\netcore\AuthorizedServer\obj\Debug\netcoreapp2.0\AuthorizedServer.AssemblyInfoInputs.cache
+D:\Arthur_Clive\netcore\AuthorizedServer\obj\Debug\netcoreapp2.0\AuthorizedServer.AssemblyInfo.cs
+D:\Arthur_Clive\netcore\AuthorizedServer\obj\Debug\netcoreapp2.0\AuthorizedServer.dll
+D:\Arthur_Clive\netcore\AuthorizedServer\obj\Debug\netcoreapp2.0\AuthorizedServer.pdb
+D:\Arthur_Clive\netcore\AuthorizedServer\bin\Debug\netcoreapp2.0\AuthorizedServer.xml
+D:\Arthur_Clive\netcore\AuthorizedServer\obj\Debug\netcoreapp2.0\AuthorizedServer.csprojResolveAssemblyReference.cache
+D:\Arthur_Clive\netcore\AuthorizedServer\obj\Debug\netcoreapp2.0\UserSecretsAssemblyInfo.cs

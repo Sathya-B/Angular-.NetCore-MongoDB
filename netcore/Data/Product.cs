@@ -1,70 +1,95 @@
-﻿using MongoDB.Bson;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 
 namespace Arthur_Clive.Data
 {
-    public class Product
+    /// <summary>Contains details of category</summary>
+    public class Category
     {
+        /// <summary>ObjectId give by MongoDB</summary>
         public ObjectId Id { get; set; }
-
-        [BsonElement("Product_SKU")]
-        public string Product_SKU { get; set; }
-
-        [BsonElement("MinioObjectUrl")]
-        public string MinioObject_Url { get; set; }
-
-        [BsonElement("Product_For")]
-        public string Product_For { get; set; }
-
-        [BsonElement("Product_Type")]
-        public string Product_Type { get; set; }
-
-        [BsonElement("Product_Design")]
-        public string Product_Design { get; set; }
-
-        [BsonElement("Product_Brand")]
-        public string Product_Brand { get; set; }
-
-        [BsonElement("Product_Price")]
-        public double Product_Price { get; set; }
-
-        [BsonElement("Product_Discount")]
-        public double Product_Discount { get; set; }
-
-        [BsonElement("Discount_Price")]
-        public double Product_Discount_Price { get; set; }
-
-        [BsonElement("Product_Stock")]
-        public long Product_Stock { get; set; }
-
-        [BsonElement("Product_Size")]
-        public string Product_Size { get; set; }
-
-        [BsonElement("Detail_Material")]
-        public string Product_Material { get; set; }
-
-        [BsonElement("Product_Rating")]
-        public double Product_Rating { get; set; }
-
-        [BsonElement("Product_Reviews")]
-        public Review[] Product_Reviews { get; set; }
-
-        [BsonElement("Product_Colour")]
-        public string Product_Colour { get; set; }
-
-        [BsonElement("Refund_Applicable")]
-        public bool Refund_Applicable { get; set; }
-
-        [BsonElement("Replacement_Applicable")]
-        public bool Replacement_Applicable { get; set; }
-
-        [BsonElement("Product_Description")]
-        public string Product_Description { get; set; }
+        /// <summary>For whom is the category</summary>
+        [Required]
+        public string ProductFor { get; set ; }
+        /// <summary>Type of the category</summary>
+        [Required]
+        public string ProductType { get; set; }
+        /// <summary>Url for the image added to describe the category</summary>
+        public string MinioObject_URL { get; set; }
+        /// <summary>Description for the added categoty</summary>
+        [Required]
+        public string Description { get; set; }
     }
 
+    /// <summary>Contains details of product</summary>
+    public class Product
+    {
+        /// <summary>ObjectId give by MongoDB</summary>
+        public ObjectId Id { get; set; }
+        /// <summary>SKU for the product</summary>
+        [Required]
+        public string ProductSKU { get; set; }
+        /// <summary>Url of the image added to describe the product</summary>
+        public string MinioObject_URL { get; set; }
+        /// <summary>For whom is the product</summary>
+        [Required]
+        public string ProductFor { get; set; }
+        /// <summary>Type of the product</summary>
+        [Required]
+        public string ProductType { get; set; }
+        /// <summary>Design on the product</summary>
+        [Required]
+        public string ProductDesign { get; set; }
+        /// <summary>Brand of the product</summary>
+        [Required]
+        public string ProductBrand { get; set; }
+        /// <summary>Price of the product</summary>
+        [Required]
+        public double ProductPrice { get; set; }
+        /// <summary>Percentage of discount offered for the product</summary>
+        [Required]
+        public double ProductDiscount { get; set; }
+        /// <summary>Discount price for the product</summary>
+        public double ProductDiscountPrice { get; set; }
+        /// <summary>Stock details of the product</summary>
+        [Required]
+        public long ProductStock { get; set; }
+        /// <summary>Size of the product</summary>
+        [Required]
+        public string ProductSize { get; set; }
+        /// <summary>Material of the product</summary>
+        [Required]
+        public string ProductMaterial { get; set; }
+        /// <summary>Rating given to the product by the users</summary>
+        public double ProductRating { get; set; }
+        /// <summary>Reviews given to the product by the users</summary>
+        public Review[] ProductReviews { get; set; }
+        /// <summary>Colour of the product</summary>
+        [Required]
+        public string ProductColour { get; set; }
+        /// <summary>Refund applicable details for the product</summary>
+        [Required]
+        public bool? RefundApplicable { get; set; }
+        /// <summary>Replacement applicable details for the product</summary>
+        [Required]
+        public bool? ReplacementApplicable { get; set; }
+        /// <summary>Description for the product</summary>
+        [Required]
+        public string ProductDescription { get; set; }
+    }
+
+    /// <summary>Details of review added by user</summary>
     public class Review
     {
+        /// <summary>Name of the user who adds the review</summary>
+        [Required]
         public string Name { get; set; }
+        /// <summary>Review given by the user</summary>
+        [Required]
         public string Comment { get; set; }
     }
 }

@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v2.0": {
-      "AWSSDK.Core/3.3.17": {
+      "AWSSDK.Core/3.3.18": {
         "type": "package",
         "dependencies": {
           "Microsoft.CSharp": "4.0.1",
@@ -18,16 +18,28 @@
           "lib/netstandard1.3/AWSSDK.Core.dll": {}
         }
       },
-      "AWSSDK.S3/3.3.10.4": {
+      "AWSSDK.S3/3.3.11.1": {
         "type": "package",
         "dependencies": {
-          "AWSSDK.Core": "[3.3.17, 3.4.0)"
+          "AWSSDK.Core": "[3.3.18, 3.4.0)"
         },
         "compile": {
           "lib/netstandard1.3/AWSSDK.S3.dll": {}
         },
         "runtime": {
           "lib/netstandard1.3/AWSSDK.S3.dll": {}
+        }
+      },
+      "AWSSDK.SimpleEmail/3.3.3.1": {
+        "type": "package",
+        "dependencies": {
+          "AWSSDK.Core": "[3.3.18, 3.4.0)"
+        },
+        "compile": {
+          "lib/netstandard1.3/AWSSDK.SimpleEmail.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/AWSSDK.SimpleEmail.dll": {}
         }
       },
       "Libuv/1.10.0": {
@@ -2762,7 +2774,7 @@
           }
         }
       },
-      "Minio.NetCore/1.0.1": {
+      "Minio.NetCore/1.0.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.Build.Utilities.Core": "15.1.548",
@@ -3280,6 +3292,96 @@
         },
         "runtime": {
           "lib/netstandard1.5/StackExchange.Redis.StrongName.dll": {}
+        }
+      },
+      "Stripe.net/10.4.0": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Newtonsoft.Json": "9.0.1",
+          "System.Security.Cryptography.Algorithms": "4.3.0"
+        },
+        "compile": {
+          "lib/netstandard1.2/Stripe.net.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.2/Stripe.net.dll": {}
+        }
+      },
+      "Swashbuckle.AspNetCore/1.0.0": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Swashbuckle.AspNetCore.Swagger": "1.0.0",
+          "Swashbuckle.AspNetCore.SwaggerGen": "1.0.0",
+          "Swashbuckle.AspNetCore.SwaggerUI": "1.0.0"
+        },
+        "compile": {
+          "lib/netstandard1.6/Swashbuckle.AspNetCore.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.6/Swashbuckle.AspNetCore.dll": {}
+        }
+      },
+      "Swashbuckle.AspNetCore.Examples/2.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Swashbuckle.AspNetCore.SwaggerGen": "1.0.0"
+        },
+        "compile": {
+          "lib/netstandard1.6/Swashbuckle.AspNetCore.Examples.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.6/Swashbuckle.AspNetCore.Examples.dll": {}
+        }
+      },
+      "Swashbuckle.AspNetCore.Swagger/1.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Mvc.Core": "1.0.0",
+          "Microsoft.AspNetCore.Mvc.Formatters.Json": "1.0.0",
+          "NETStandard.Library": "1.6.1"
+        },
+        "compile": {
+          "lib/netstandard1.6/Swashbuckle.AspNetCore.Swagger.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.6/Swashbuckle.AspNetCore.Swagger.dll": {}
+        }
+      },
+      "Swashbuckle.AspNetCore.SwaggerGen/1.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Mvc.ApiExplorer": "1.0.0",
+          "Microsoft.AspNetCore.Mvc.Core": "1.0.0",
+          "Microsoft.AspNetCore.Mvc.DataAnnotations": "1.0.0",
+          "NETStandard.Library": "1.6.1",
+          "Swashbuckle.AspNetCore.Swagger": "1.0.0",
+          "System.Xml.XPath": "4.0.1"
+        },
+        "compile": {
+          "lib/netstandard1.6/Swashbuckle.AspNetCore.SwaggerGen.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.6/Swashbuckle.AspNetCore.SwaggerGen.dll": {}
+        }
+      },
+      "Swashbuckle.AspNetCore.SwaggerUI/1.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Routing": "1.0.0",
+          "Microsoft.AspNetCore.StaticFiles": "1.0.0",
+          "Microsoft.Extensions.FileProviders.Embedded": "1.0.0",
+          "NETStandard.Library": "1.6.1",
+          "Newtonsoft.Json": "9.0.1",
+          "System.Xml.XPath": "4.0.0"
+        },
+        "compile": {
+          "lib/netstandard1.6/Swashbuckle.AspNetCore.SwaggerUI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.6/Swashbuckle.AspNetCore.SwaggerUI.dll": {}
         }
       },
       "System.AppContext/4.3.0": {
@@ -5112,7 +5214,7 @@
           "System.Xml.ReaderWriter": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.3/_._": {}
+          "ref/netstandard1.3/System.Xml.XPath.dll": {}
         },
         "runtime": {
           "lib/netstandard1.3/System.Xml.XPath.dll": {}
@@ -5156,12 +5258,12 @@
     }
   },
   "libraries": {
-    "AWSSDK.Core/3.3.17": {
-      "sha512": "NTE47l/BVjbelMxYKCAMaPM+OsnDY3t5nTFXYHEJeV+EFvSHsFNLCt2pbu4YBKWRhgvYmGCJzykdngkfwgjeog==",
+    "AWSSDK.Core/3.3.18": {
+      "sha512": "15VZyyB+94JPOBz50hRFx7axCZ1iLHyAJqkGMa3khEayMjEMx4LXEScWMazE1WsbWF1EtHtXi4KL7oOYzVd44w==",
       "type": "package",
-      "path": "awssdk.core/3.3.17",
+      "path": "awssdk.core/3.3.18",
       "files": [
-        "awssdk.core.3.3.17.nupkg.sha512",
+        "awssdk.core.3.3.18.nupkg.sha512",
         "awssdk.core.nuspec",
         "lib/MonoAndroid10/AWSSDK.Core.XML",
         "lib/MonoAndroid10/AWSSDK.Core.dll",
@@ -5199,13 +5301,13 @@
         "tools/account-management.ps1"
       ]
     },
-    "AWSSDK.S3/3.3.10.4": {
-      "sha512": "ISU+332T9lBfgKeP03ZZSQ69+immhHYklSMhSy7zp5oxEKZI0RGkVuuTRrnzhu8Y2vIBv3tUSVollQnLQHs84g==",
+    "AWSSDK.S3/3.3.11.1": {
+      "sha512": "ndu1JUP6KaXhfEa0mJTXF2A6Btau0n/Cw9bJxA7e4hXZIv+TmLP2hy687lFaq7dd5PA6buoJKNegEbEYFYDPzQ==",
       "type": "package",
-      "path": "awssdk.s3/3.3.10.4",
+      "path": "awssdk.s3/3.3.11.1",
       "files": [
         "analyzers/dotnet/cs/AWSSDK.S3.CodeAnalysis.dll",
-        "awssdk.s3.3.3.10.4.nupkg.sha512",
+        "awssdk.s3.3.3.11.1.nupkg.sha512",
         "awssdk.s3.nuspec",
         "lib/MonoAndroid10/AWSSDK.S3.XML",
         "lib/MonoAndroid10/AWSSDK.S3.dll",
@@ -5226,6 +5328,37 @@
         "lib/portable-net45+win8+wpa81+wp8/AWSSDK.S3.XML",
         "lib/portable-net45+win8+wpa81+wp8/AWSSDK.S3.dll",
         "lib/portable-net45+win8+wpa81+wp8/AWSSDK.S3.pdb",
+        "tools/install.ps1",
+        "tools/uninstall.ps1"
+      ]
+    },
+    "AWSSDK.SimpleEmail/3.3.3.1": {
+      "sha512": "NfQCeZA0AMsANSPm/a7ws/TspqTpvEy4TuSsv5dTK6hwNChWyn3xcUdFTgfZL6iYg9OTSvljyYbtkarj8C8NVQ==",
+      "type": "package",
+      "path": "awssdk.simpleemail/3.3.3.1",
+      "files": [
+        "analyzers/dotnet/cs/AWSSDK.SimpleEmail.CodeAnalysis.dll",
+        "awssdk.simpleemail.3.3.3.1.nupkg.sha512",
+        "awssdk.simpleemail.nuspec",
+        "lib/MonoAndroid10/AWSSDK.SimpleEmail.XML",
+        "lib/MonoAndroid10/AWSSDK.SimpleEmail.dll",
+        "lib/MonoTouch10/AWSSDK.SimpleEmail.XML",
+        "lib/MonoTouch10/AWSSDK.SimpleEmail.dll",
+        "lib/MonoTouch10/AWSSDK.SimpleEmail.pdb",
+        "lib/Xamarin.iOS10/AWSSDK.SimpleEmail.XML",
+        "lib/Xamarin.iOS10/AWSSDK.SimpleEmail.dll",
+        "lib/net35/AWSSDK.SimpleEmail.dll",
+        "lib/net35/AWSSDK.SimpleEmail.pdb",
+        "lib/net35/AWSSDK.SimpleEmail.xml",
+        "lib/net45/AWSSDK.SimpleEmail.dll",
+        "lib/net45/AWSSDK.SimpleEmail.pdb",
+        "lib/net45/AWSSDK.SimpleEmail.xml",
+        "lib/netstandard1.3/AWSSDK.SimpleEmail.dll",
+        "lib/netstandard1.3/AWSSDK.SimpleEmail.pdb",
+        "lib/netstandard1.3/AWSSDK.SimpleEmail.xml",
+        "lib/portable-net45+win8+wpa81+wp8/AWSSDK.SimpleEmail.XML",
+        "lib/portable-net45+win8+wpa81+wp8/AWSSDK.SimpleEmail.dll",
+        "lib/portable-net45+win8+wpa81+wp8/AWSSDK.SimpleEmail.pdb",
         "tools/install.ps1",
         "tools/uninstall.ps1"
       ]
@@ -7898,15 +8031,106 @@
         "version.txt"
       ]
     },
-    "Minio.NetCore/1.0.1": {
-      "sha512": "62Mlgq4M+OyGpLHWvnzsl9ajsmxkDCEjdiglcdEBk/41PoqEo81krRUcX5Op3A6A4StR5j0eVcV4S8l5CPi40w==",
+    "Minio.NetCore/1.0.2": {
+      "sha512": "2nM0W92OVDARvqIRCjjOVLA4YaAQdof/mDZBsBOFcdIjoKnynAG/AwfGhAzheiLvTvSbj2J36cmWDO3bJLPeLg==",
       "type": "package",
-      "path": "minio.netcore/1.0.1",
+      "path": "minio.netcore/1.0.2",
       "files": [
         "lib/netstandard1.6/Minio.deps.json",
         "lib/netstandard1.6/Minio.dll",
         "lib/netstandard1.6/Minio.pdb",
-        "minio.netcore.1.0.1.nupkg.sha512",
+        "lib/netstandard1.6/publish/Microsoft.Build.Framework.dll",
+        "lib/netstandard1.6/publish/Microsoft.Build.Utilities.Core.dll",
+        "lib/netstandard1.6/publish/Microsoft.CSharp.dll",
+        "lib/netstandard1.6/publish/Minio.deps.json",
+        "lib/netstandard1.6/publish/Minio.dll",
+        "lib/netstandard1.6/publish/Minio.pdb",
+        "lib/netstandard1.6/publish/Newtonsoft.Json.dll",
+        "lib/netstandard1.6/publish/RestSharp.NetCore.dll",
+        "lib/netstandard1.6/publish/System.AppContext.dll",
+        "lib/netstandard1.6/publish/System.Buffers.dll",
+        "lib/netstandard1.6/publish/System.Collections.Concurrent.dll",
+        "lib/netstandard1.6/publish/System.Collections.NonGeneric.dll",
+        "lib/netstandard1.6/publish/System.Collections.Specialized.dll",
+        "lib/netstandard1.6/publish/System.ComponentModel.Primitives.dll",
+        "lib/netstandard1.6/publish/System.ComponentModel.TypeConverter.dll",
+        "lib/netstandard1.6/publish/System.ComponentModel.dll",
+        "lib/netstandard1.6/publish/System.Diagnostics.Contracts.dll",
+        "lib/netstandard1.6/publish/System.Diagnostics.DiagnosticSource.dll",
+        "lib/netstandard1.6/publish/System.Dynamic.Runtime.dll",
+        "lib/netstandard1.6/publish/System.IO.Compression.ZipFile.dll",
+        "lib/netstandard1.6/publish/System.IO.FileSystem.Primitives.dll",
+        "lib/netstandard1.6/publish/System.Linq.Expressions.dll",
+        "lib/netstandard1.6/publish/System.Linq.dll",
+        "lib/netstandard1.6/publish/System.Net.WebHeaderCollection.dll",
+        "lib/netstandard1.6/publish/System.ObjectModel.dll",
+        "lib/netstandard1.6/publish/System.Private.DataContractSerialization.dll",
+        "lib/netstandard1.6/publish/System.Reactive.Core.dll",
+        "lib/netstandard1.6/publish/System.Reactive.Interfaces.dll",
+        "lib/netstandard1.6/publish/System.Reactive.Linq.dll",
+        "lib/netstandard1.6/publish/System.Reflection.Emit.ILGeneration.dll",
+        "lib/netstandard1.6/publish/System.Reflection.Emit.Lightweight.dll",
+        "lib/netstandard1.6/publish/System.Reflection.Emit.dll",
+        "lib/netstandard1.6/publish/System.Reflection.TypeExtensions.dll",
+        "lib/netstandard1.6/publish/System.Resources.Reader.dll",
+        "lib/netstandard1.6/publish/System.Runtime.InteropServices.RuntimeInformation.dll",
+        "lib/netstandard1.6/publish/System.Runtime.InteropServices.WindowsRuntime.dll",
+        "lib/netstandard1.6/publish/System.Runtime.Numerics.dll",
+        "lib/netstandard1.6/publish/System.Runtime.Serialization.Formatters.dll",
+        "lib/netstandard1.6/publish/System.Runtime.Serialization.Primitives.dll",
+        "lib/netstandard1.6/publish/System.Runtime.Serialization.Xml.dll",
+        "lib/netstandard1.6/publish/System.Security.Cryptography.OpenSsl.dll",
+        "lib/netstandard1.6/publish/System.Security.Cryptography.Primitives.dll",
+        "lib/netstandard1.6/publish/System.Text.RegularExpressions.dll",
+        "lib/netstandard1.6/publish/System.Threading.Tasks.Extensions.dll",
+        "lib/netstandard1.6/publish/System.Threading.Thread.dll",
+        "lib/netstandard1.6/publish/System.Threading.ThreadPool.dll",
+        "lib/netstandard1.6/publish/System.Threading.dll",
+        "lib/netstandard1.6/publish/System.Xml.ReaderWriter.dll",
+        "lib/netstandard1.6/publish/System.Xml.XDocument.dll",
+        "lib/netstandard1.6/publish/System.Xml.XmlDocument.dll",
+        "lib/netstandard1.6/publish/System.Xml.XmlSerializer.dll",
+        "lib/netstandard1.6/publish/runtimes/debian.8-x64/native/System.Security.Cryptography.Native.OpenSsl.so",
+        "lib/netstandard1.6/publish/runtimes/fedora.23-x64/native/System.Security.Cryptography.Native.OpenSsl.so",
+        "lib/netstandard1.6/publish/runtimes/fedora.24-x64/native/System.Security.Cryptography.Native.OpenSsl.so",
+        "lib/netstandard1.6/publish/runtimes/linux/lib/netstandard1.4/System.Diagnostics.Process.dll",
+        "lib/netstandard1.6/publish/runtimes/opensuse.13.2-x64/native/System.Security.Cryptography.Native.OpenSsl.so",
+        "lib/netstandard1.6/publish/runtimes/opensuse.42.1-x64/native/System.Security.Cryptography.Native.OpenSsl.so",
+        "lib/netstandard1.6/publish/runtimes/osx.10.10-x64/native/System.Security.Cryptography.Native.Apple.dylib",
+        "lib/netstandard1.6/publish/runtimes/osx.10.10-x64/native/System.Security.Cryptography.Native.OpenSsl.dylib",
+        "lib/netstandard1.6/publish/runtimes/osx/lib/netstandard1.4/System.Diagnostics.Process.dll",
+        "lib/netstandard1.6/publish/runtimes/osx/lib/netstandard1.6/System.Security.Cryptography.Algorithms.dll",
+        "lib/netstandard1.6/publish/runtimes/rhel.7-x64/native/System.Security.Cryptography.Native.OpenSsl.so",
+        "lib/netstandard1.6/publish/runtimes/ubuntu.14.04-x64/native/System.Security.Cryptography.Native.OpenSsl.so",
+        "lib/netstandard1.6/publish/runtimes/ubuntu.16.04-x64/native/System.Security.Cryptography.Native.OpenSsl.so",
+        "lib/netstandard1.6/publish/runtimes/ubuntu.16.10-x64/native/System.Security.Cryptography.Native.OpenSsl.so",
+        "lib/netstandard1.6/publish/runtimes/unix/lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
+        "lib/netstandard1.6/publish/runtimes/unix/lib/netstandard1.3/Microsoft.Win32.Registry.dll",
+        "lib/netstandard1.6/publish/runtimes/unix/lib/netstandard1.3/System.Diagnostics.TraceSource.dll",
+        "lib/netstandard1.6/publish/runtimes/unix/lib/netstandard1.3/System.Globalization.Extensions.dll",
+        "lib/netstandard1.6/publish/runtimes/unix/lib/netstandard1.3/System.IO.Compression.dll",
+        "lib/netstandard1.6/publish/runtimes/unix/lib/netstandard1.3/System.Net.Requests.dll",
+        "lib/netstandard1.6/publish/runtimes/unix/lib/netstandard1.3/System.Security.Cryptography.Csp.dll",
+        "lib/netstandard1.6/publish/runtimes/unix/lib/netstandard1.3/System.Security.Cryptography.Encoding.dll",
+        "lib/netstandard1.6/publish/runtimes/unix/lib/netstandard1.6/System.Net.Http.dll",
+        "lib/netstandard1.6/publish/runtimes/unix/lib/netstandard1.6/System.Security.Cryptography.Algorithms.dll",
+        "lib/netstandard1.6/publish/runtimes/unix/lib/netstandard1.6/System.Security.Cryptography.Cng.dll",
+        "lib/netstandard1.6/publish/runtimes/unix/lib/netstandard1.6/System.Security.Cryptography.OpenSsl.dll",
+        "lib/netstandard1.6/publish/runtimes/unix/lib/netstandard1.6/System.Security.Cryptography.X509Certificates.dll",
+        "lib/netstandard1.6/publish/runtimes/win/lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
+        "lib/netstandard1.6/publish/runtimes/win/lib/netstandard1.3/Microsoft.Win32.Registry.dll",
+        "lib/netstandard1.6/publish/runtimes/win/lib/netstandard1.3/System.Diagnostics.TraceSource.dll",
+        "lib/netstandard1.6/publish/runtimes/win/lib/netstandard1.3/System.Globalization.Extensions.dll",
+        "lib/netstandard1.6/publish/runtimes/win/lib/netstandard1.3/System.IO.Compression.dll",
+        "lib/netstandard1.6/publish/runtimes/win/lib/netstandard1.3/System.Net.Http.dll",
+        "lib/netstandard1.6/publish/runtimes/win/lib/netstandard1.3/System.Net.Requests.dll",
+        "lib/netstandard1.6/publish/runtimes/win/lib/netstandard1.3/System.Security.Cryptography.Csp.dll",
+        "lib/netstandard1.6/publish/runtimes/win/lib/netstandard1.3/System.Security.Cryptography.Encoding.dll",
+        "lib/netstandard1.6/publish/runtimes/win/lib/netstandard1.4/System.Diagnostics.Process.dll",
+        "lib/netstandard1.6/publish/runtimes/win/lib/netstandard1.6/System.Security.Cryptography.Algorithms.dll",
+        "lib/netstandard1.6/publish/runtimes/win/lib/netstandard1.6/System.Security.Cryptography.Cng.dll",
+        "lib/netstandard1.6/publish/runtimes/win/lib/netstandard1.6/System.Security.Cryptography.X509Certificates.dll",
+        "minio.netcore.1.0.2.nupkg.sha512",
         "minio.netcore.nuspec"
       ]
     },
@@ -8558,6 +8782,78 @@
         "lib/netstandard1.5/StackExchange.Redis.StrongName.xml",
         "stackexchange.redis.strongname.1.2.4.nupkg.sha512",
         "stackexchange.redis.strongname.nuspec"
+      ]
+    },
+    "Stripe.net/10.4.0": {
+      "sha512": "V0SrilaUUw6KoHwmbuv+mxbnBTEMcl8K0H0ccT6WA3ry/ckDNStBd1Amzn5w/CQ3sb+HrJp05GdQIDiB02XECA==",
+      "type": "package",
+      "path": "stripe.net/10.4.0",
+      "files": [
+        "lib/net45/Stripe.net.dll",
+        "lib/netstandard1.2/Stripe.net.dll",
+        "stripe.net.10.4.0.nupkg.sha512",
+        "stripe.net.nuspec"
+      ]
+    },
+    "Swashbuckle.AspNetCore/1.0.0": {
+      "sha512": "pYppc+iPifsAYUWi+UoblnjFkUtfP9RZfj5JQaUmEgiWRz5RsCcIuKHvNCGG5AojVKfgjWC4naUPJx4fCjqvDg==",
+      "type": "package",
+      "path": "swashbuckle.aspnetcore/1.0.0",
+      "files": [
+        "lib/net451/Swashbuckle.AspNetCore.dll",
+        "lib/netstandard1.6/Swashbuckle.AspNetCore.dll",
+        "swashbuckle.aspnetcore.1.0.0.nupkg.sha512",
+        "swashbuckle.aspnetcore.nuspec"
+      ]
+    },
+    "Swashbuckle.AspNetCore.Examples/2.3.0": {
+      "sha512": "hiZNEBR26OcMnC3GVQbjjt4QWVQ8Z/3GdTbdA//f3DF4KWx2zHvtIB8kGaju7hu4CHBEz/7ic45QuU4YcykmNA==",
+      "type": "package",
+      "path": "swashbuckle.aspnetcore.examples/2.3.0",
+      "files": [
+        "lib/net461/Swashbuckle.AspNetCore.Examples.dll",
+        "lib/netstandard1.6/Swashbuckle.AspNetCore.Examples.dll",
+        "swashbuckle.aspnetcore.examples.2.3.0.nupkg.sha512",
+        "swashbuckle.aspnetcore.examples.nuspec"
+      ]
+    },
+    "Swashbuckle.AspNetCore.Swagger/1.0.0": {
+      "sha512": "tzZ6tXjopV6jvcHzOX7PjyYBWqof5mhJUXqxb/kPF17Z5LXxr+uglnTLlYOjWCm5BfvdxWYtU95uJgc14L1Eqw==",
+      "type": "package",
+      "path": "swashbuckle.aspnetcore.swagger/1.0.0",
+      "files": [
+        "lib/net451/Swashbuckle.AspNetCore.Swagger.dll",
+        "lib/net451/Swashbuckle.AspNetCore.Swagger.xml",
+        "lib/netstandard1.6/Swashbuckle.AspNetCore.Swagger.dll",
+        "lib/netstandard1.6/Swashbuckle.AspNetCore.Swagger.xml",
+        "swashbuckle.aspnetcore.swagger.1.0.0.nupkg.sha512",
+        "swashbuckle.aspnetcore.swagger.nuspec"
+      ]
+    },
+    "Swashbuckle.AspNetCore.SwaggerGen/1.0.0": {
+      "sha512": "1kuKS+4x1m85gpTOqICp5BRZB3Ir6VsegPN9hanH6xRp+tGDQNfFhVNPZ59Wrl8gM8YqIhB85xmFAkK68CqVdA==",
+      "type": "package",
+      "path": "swashbuckle.aspnetcore.swaggergen/1.0.0",
+      "files": [
+        "lib/net451/Swashbuckle.AspNetCore.SwaggerGen.dll",
+        "lib/net451/Swashbuckle.AspNetCore.SwaggerGen.xml",
+        "lib/netstandard1.6/Swashbuckle.AspNetCore.SwaggerGen.dll",
+        "lib/netstandard1.6/Swashbuckle.AspNetCore.SwaggerGen.xml",
+        "swashbuckle.aspnetcore.swaggergen.1.0.0.nupkg.sha512",
+        "swashbuckle.aspnetcore.swaggergen.nuspec"
+      ]
+    },
+    "Swashbuckle.AspNetCore.SwaggerUI/1.0.0": {
+      "sha512": "syirndQQePJXF8Dgzgjqt0AoxWVguPQy/p4siHNACBSGicxvk6AAd1ULIFE83ANJOCl2GmXuAvNAZBMXGbxK9A==",
+      "type": "package",
+      "path": "swashbuckle.aspnetcore.swaggerui/1.0.0",
+      "files": [
+        "lib/net451/Swashbuckle.AspNetCore.SwaggerUI.dll",
+        "lib/net451/Swashbuckle.AspNetCore.SwaggerUI.xml",
+        "lib/netstandard1.6/Swashbuckle.AspNetCore.SwaggerUI.dll",
+        "lib/netstandard1.6/Swashbuckle.AspNetCore.SwaggerUI.xml",
+        "swashbuckle.aspnetcore.swaggerui.1.0.0.nupkg.sha512",
+        "swashbuckle.aspnetcore.swaggerui.nuspec"
       ]
     },
     "System.AppContext/4.3.0": {
@@ -13554,10 +13850,18 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
-      "AWSSDK.S3 >= 3.3.10.4",
+      "AWSSDK.S3 >= 3.3.11.1",
+      "AWSSDK.SimpleEmail >= 3.3.3.1",
       "Microsoft.AspNetCore.All >= 2.0.0",
+      "Microsoft.AspNetCore.Mvc.Core >= 2.0.0",
       "Microsoft.NETCore.App >= 2.0.0",
-      "Minio.NetCore >= 1.0.1",
+      "Minio.NetCore >= 1.0.2",
+      "Stripe.net >= 10.4.0",
+      "Swashbuckle.AspNetCore >= 1.0.0",
+      "Swashbuckle.AspNetCore.Examples >= 2.3.0",
+      "Swashbuckle.AspNetCore.Swagger >= 1.0.0",
+      "Swashbuckle.AspNetCore.SwaggerGen >= 1.0.0",
+      "Swashbuckle.AspNetCore.SwaggerUi >= 1.0.0",
       "mongocsharpdriver >= 2.4.4"
     ]
   },
@@ -13571,11 +13875,11 @@
       "hideWarningsAndErrors": true
     },
     "restore": {
-      "projectUniqueName": "E:\\Ragu\\Projects\\Angular-.NetCore-MongoDB\\netcore\\Arthur_Clive.csproj",
+      "projectUniqueName": "D:\\Arthur_Clive\\netcore\\Arthur_Clive.csproj",
       "projectName": "Arthur_Clive",
-      "projectPath": "E:\\Ragu\\Projects\\Angular-.NetCore-MongoDB\\netcore\\Arthur_Clive.csproj",
+      "projectPath": "D:\\Arthur_Clive\\netcore\\Arthur_Clive.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "E:\\Ragu\\Projects\\Angular-.NetCore-MongoDB\\netcore\\obj\\",
+      "outputPath": "D:\\Arthur_Clive\\netcore\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -13610,22 +13914,54 @@
             "target": "Package",
             "version": "2.4.4"
           },
+          "Swashbuckle.AspNetCore.SwaggerUi": {
+            "target": "Package",
+            "version": "1.0.0"
+          },
+          "AWSSDK.SimpleEmail": {
+            "target": "Package",
+            "version": "3.3.3.1"
+          },
+          "Swashbuckle.AspNetCore.Swagger": {
+            "target": "Package",
+            "version": "1.0.0"
+          },
+          "Microsoft.AspNetCore.Mvc.Core": {
+            "target": "Package",
+            "version": "2.0.0"
+          },
+          "Swashbuckle.AspNetCore.Examples": {
+            "target": "Package",
+            "version": "2.3.0"
+          },
           "Microsoft.NETCore.App": {
             "target": "Package",
             "version": "2.0.0",
             "autoReferenced": true
           },
+          "Swashbuckle.AspNetCore.SwaggerGen": {
+            "target": "Package",
+            "version": "1.0.0"
+          },
+          "Swashbuckle.AspNetCore": {
+            "target": "Package",
+            "version": "1.0.0"
+          },
           "Microsoft.AspNetCore.All": {
             "target": "Package",
             "version": "2.0.0"
           },
+          "Stripe.net": {
+            "target": "Package",
+            "version": "10.4.0"
+          },
           "Minio.NetCore": {
             "target": "Package",
-            "version": "1.0.1"
+            "version": "1.0.2"
           },
           "AWSSDK.S3": {
             "target": "Package",
-            "version": "3.3.10.4"
+            "version": "3.3.11.1"
           }
         },
         "imports": [

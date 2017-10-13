@@ -1,203 +1,89 @@
-﻿using AuthorizedServer.Repositories;
+﻿using System;
+using AuthorizedServer.Helper;
+using AuthorizedServer.Logger;
+using AuthorizedServer.Repositories;
+using AuthorizedServer.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
-using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
+using Swashbuckle.AspNetCore.Examples;
 
 namespace AuthorizedServer.Controllers
 {
+    /// <summary>Controller to get JWT token</summary>
     [Route("api/token")]
     public class TokenController : Controller
     {
-        //some config in the appsettings.json
+        /// <summary></summary>
+        public AuthHelper authHelper = new AuthHelper();
+        /// <summary></summary>
         private IOptions<Audience> _settings;
-        //repository to handler the sqlite database
+        /// <summary></summary>
         private IRTokenRepository _repo;
 
+        /// <summary></summary>
+        /// <param name="settings"></param>
+        /// <param name="repo"></param>
         public TokenController(IOptions<Audience> settings, IRTokenRepository repo)
         {
             this._settings = settings;
             this._repo = repo;
         }
 
+        /// <summary>Get JWT token</summary>
+        /// <param name="parameters"></param>
+        /// <response code="999">Returns JWT token</response> 
+        /// <response code="909">Fails to return JWT</response> 
+        /// <response code="901">When parameters are null</response> 
+        /// <response code="904">When request is bad</response> 
+        /// <response code="400">If process run into a exception</response> 
         [HttpGet("auth")]
-        public IActionResult Auth([FromQuery]Parameters parameters)
+        [SwaggerRequestExample(typeof(Parameters), typeof(ParameterDetails))]
+        [ProducesResponseType(typeof(ResponseData), 999)]
+        [ProducesResponseType(typeof(ResponseData), 909)]
+        [ProducesResponseType(typeof(ResponseData), 901)]
+        [ProducesResponseType(typeof(ResponseData), 904)]
+        public ActionResult Auth([FromQuery]Parameters parameters)
         {
-            if (parameters == null)
+            try
             {
-                return Json(new ResponseData
+                if (parameters == null)
                 {
-                    Code = "901",
-                    Message = "null of parameters",
+                    return Json(new ResponseData
+                    {
+                        Code = "901",
+                        Message = "null of parameters",
+                        Data = null
+                    });
+                }
+
+                if (parameters.grant_type == "password")
+                {
+                    return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
+                }
+                else if (parameters.grant_type == "refresh_token")
+                {
+                    return Ok(Json(authHelper.DoRefreshToken(parameters, _repo, _settings)));
+                }
+                else
+                {
+                    return Json(new ResponseData
+                    {
+                        Code = "904",
+                        Message = "bad request",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("TokenController", "Auth", "Auth", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
                     Data = null
                 });
             }
-
-            if (parameters.grant_type == "password")
-            {
-                return Json(DoPassword(parameters));
-            }
-            else if (parameters.grant_type == "refresh_token")
-            {
-                return Json(DoRefreshToken(parameters));
-            }
-            else
-            {
-                return Json(new ResponseData
-                {
-                    Code = "904",
-                    Message = "bad request",
-                    Data = null
-                });
-            }
-        }
-
-        //scenario 1 ： get the access-token by username and password
-        private ResponseData DoPassword(Parameters parameters)
-        {
-            //validate the client_id/client_secret/username/password                                          
-            var isValidated = UserInfo.GetAllUsers().Any(x => x.ClientId == parameters.client_id
-                                    && x.ClientSecret == parameters.client_secret
-                                    && x.UserName == parameters.username
-                                    && x.Password == parameters.password);
-
-            if (!isValidated)
-            {
-                return new ResponseData
-                {
-                    Code = "902",
-                    Message = "invalid user infomation",
-                    Data = null
-                };
-            }
-
-            var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
-
-            var rToken = new RToken
-            {
-                ClientId = parameters.client_id,
-                RefreshToken = refresh_token,
-                Id = Guid.NewGuid().ToString(),
-                IsStop = 0
-            };
-
-            //store the refresh_token 
-            if (_repo.AddToken(rToken).Result)
-            {
-                return new ResponseData
-                {
-                    Code = "999",
-                    Message = "OK",
-                    Data = GetJwt(parameters.client_id, refresh_token)
-                };
-            }
-            else
-            {
-                return new ResponseData
-                {
-                    Code = "909",
-                    Message = "can not add token to database",
-                    Data = null
-                };
-            }
-        }
-
-        //scenario 2 ： get the access_token by refresh_token
-        private ResponseData DoRefreshToken(Parameters parameters)
-        {
-            var token = _repo.GetToken(parameters.refresh_token, parameters.client_id).Result;
-
-            if (token == null)
-            {
-                return new ResponseData
-                {
-                    Code = "905",
-                    Message = "can not refresh token",
-                    Data = null
-                };
-            }
-
-            if (token.IsStop == 1)
-            {
-                return new ResponseData
-                {
-                    Code = "906",
-                    Message = "refresh token has expired",
-                    Data = null
-                };
-            }
-
-            var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
-
-            token.IsStop = 1;
-            //expire the old refresh_token and add a new refresh_token
-            var updateFlag = _repo.ExpireToken(token).Result;
-
-            var addFlag = _repo.AddToken(new RToken
-            {
-                ClientId = parameters.client_id,
-                RefreshToken = refresh_token,
-                Id = Guid.NewGuid().ToString(),
-                IsStop = 0
-            });
-
-            if (updateFlag && addFlag.Result)
-            {
-                return new ResponseData
-                {
-                    Code = "999",
-                    Message = "OK",
-                    Data = GetJwt(parameters.client_id, refresh_token)
-                };
-            }
-            else
-            {
-                return new ResponseData
-                {
-                    Code = "910",
-                    Message = "can not expire token or a new token",
-                    Data = null
-                };
-            }
-        }
-        
-        private string GetJwt(string client_id, string refresh_token)
-        {
-            var now = DateTime.UtcNow;
-
-            var claims = new Claim[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, client_id),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat, now.ToUniversalTime().ToString(), ClaimValueTypes.Integer64)
-            };
-
-            var symmetricKeyAsBase64 = _settings.Value.Secret;
-            var keyByteArray = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
-            var signingKey = new SymmetricSecurityKey(keyByteArray);
-
-            var jwt = new JwtSecurityToken(
-                issuer: _settings.Value.Iss,
-                audience: _settings.Value.Aud,
-                claims: claims,
-                notBefore: now,
-                expires: now.Add(TimeSpan.FromMinutes(2)),
-                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256));
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            var response = new
-            {
-                access_token = encodedJwt,
-                expires_in = (int)TimeSpan.FromMinutes(2).TotalSeconds,
-                refresh_token = refresh_token,
-            };
-
-            return JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented });
         }
     }
 }

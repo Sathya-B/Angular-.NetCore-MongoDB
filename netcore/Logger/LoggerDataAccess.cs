@@ -1,12 +1,19 @@
 ﻿using MongoDB.Driver;
-using WH = Arthur_Clive.Helper.WebApiHelper;
+using MH = Arthur_Clive.Helper.MongoHelper;
 
 namespace Arthur_Clive.Logger
 {
+    /// <summary>Data access for server side logger</summary>
     public class LoggerDataAccess
     {
-        public static IMongoDatabase _db = WH._client.GetDatabase("ArthurCliveLogDB");
+        /// <summary>Mongo Database</summary>
+        public static IMongoDatabase _db = MH._client.GetDatabase("ArthurCliveLogDB");
 
+        /// <summary>Create log for server side error</summary>
+        /// <param name="controllerName"></param>
+        /// <param name="methodName"></param>
+        /// <param name="method"></param>
+        /// <param name="errorDescription"></param>
         public static void CreateLog(string controllerName, string methodName, string method, string errorDescription)
         {
             ApplicationLogger logger =

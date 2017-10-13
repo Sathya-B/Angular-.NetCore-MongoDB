@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, OnInit, Output, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { AppState } from '../app.service';
 import { RouterModule, Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
@@ -44,7 +44,8 @@ export class VariantsComponent implements OnInit {
 
   constructor(private cartService: CartService, private route: ActivatedRoute,
               private toastMsg: ToastMsgService, private wishListService: WishListService,
-              private router: Router, private apiService: ApiService) {
+              private router: Router, private apiService: ApiService,
+              private cd: ChangeDetectorRef) {
     this.for = route.snapshot.paramMap.get('productFor');
     this.type = route.snapshot.paramMap.get('productType');
     this.design = route.snapshot.paramMap.get('productDesign');
@@ -53,7 +54,7 @@ export class VariantsComponent implements OnInit {
   public ngOnInit() {
     this.variants = this.route.snapshot.data['item'];
     this.initItem = this.variants;
-    this.relatedItems = findLocalItems(this.for);
+    this.relatedItems = findLocalItems(this.for + '-' + this.type + '-' + this.design + '-related');
   }
 
   public checked(event: any, svariant?: any) {
@@ -74,11 +75,16 @@ export class VariantsComponent implements OnInit {
     }
   }
 
-  public variantItemClicked(variantItem: any) {
+  public variantItemClicked(variantItem: any) {   
+    let newKey = this.for + '-' + this.type + '-' + variantItem.productDesign;
+    let oldKey = this.variants.topItem.productFor + '-' + this.variants.topItem.productType + '-' + this.variants.productDesign;
+    refreshLocalItems(oldKey, this.variants, variantItem.productDesign, newKey, variantItem);
+    this.relatedItems = findLocalItems(newKey + '-related');
     this.variants = variantItem;
     this.selectedVariant = null;
     this.selectedColor = null;
     this.css.selectedSize = null;
+    this.cd.detectChanges();
   }
 
   public addToCart() {
@@ -113,15 +119,28 @@ export class VariantsComponent implements OnInit {
       return false;
     }
   }
+  ngOnDestroy() {
+    let removeCache = this.variants.topItem.productFor + '-' + this.variants.topItem.productType + '-' + this.variants.productDesign;
+    localStorage.removeItem(removeCache);
+    localStorage.removeItem(removeCache + '-related');
+  }
 }
 function findLocalItems(query) {
   let results = [];
-  for (let i in localStorage) {
-    if (localStorage.hasOwnProperty(i)) {
-      if (i.match(query) || (!query && typeof i === 'string')) {
-        results.push({ key: i, val: JSON.parse(localStorage.getItem(i)) });
-      }
-    }
-  }
+  results = JSON.parse(localStorage.getItem(query));  
   return results;
+}
+function refreshLocalItems(oldKey: string, variantItem: any, removeDesign: string, newKey: string, newVariant: any){
+  let results = [];
+  results = JSON.parse(localStorage.getItem(oldKey+'-related'));
+  let newresults = results.filter((item) => {
+    return item.productDesign !== removeDesign;
+  });
+  variantItem.variants.forEach(element => {
+    newresults.push(element);
+  });
+  localStorage.removeItem(oldKey+'-related');
+  localStorage.removeItem(oldKey);
+  localStorage.setItem(newKey, JSON.stringify(newVariant));
+  localStorage.setItem(newKey + '-related', JSON.stringify(newresults));     
 }

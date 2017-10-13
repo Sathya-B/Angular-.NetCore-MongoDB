@@ -12,10 +12,11 @@ export class VariantsResolver implements Resolve<any> {
     }
     public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
         let variants: any;
-
-        variants = JSON.parse(localStorage.getItem(route.paramMap.get('productFor') + '-' +
+        let variantKey = route.paramMap.get('productFor') + '-' +
             route.paramMap.get('productType') + '-' +
-            route.paramMap.get('productDesign')));
+            route.paramMap.get('productDesign');
+
+        variants = JSON.parse(localStorage.getItem(variantKey));
         if (variants === null) {
         return this.apiService.get('Product/' + route.paramMap.get('productFor') +
                 '/' + route.paramMap.get('productType') +
@@ -26,7 +27,15 @@ export class VariantsResolver implements Resolve<any> {
                     variants.productDesign = route.paramMap.get('productDesign');
                     variants.topItem = products[0];
                     variants.variants = products;
+                    return this.getProducts(route)
+                    .then((resultData)=> {
+                    localStorage.setItem(variantKey, JSON.stringify(variants));
+                    let relatedItems = resultData.filter((productItem) => {
+                    return productItem.productDesign !== route.paramMap.get('productDesign')
+                    });
+                    localStorage.setItem(variantKey + '-related', JSON.stringify(relatedItems));
                     return variants;
+                    })
                 },
                 (error: any) => {
                     console.log(error);
@@ -36,4 +45,17 @@ export class VariantsResolver implements Resolve<any> {
             return variants;
         }
     }
+
+public getProducts(route: ActivatedRouteSnapshot) {
+    let products = [];
+    return this.apiService.get('SubCategory/' + route.paramMap.get('productFor') + '/' + route.paramMap.get('productType')).then(
+      (response: any) => {
+      let products = response.data;
+      return products             
+    })
+    .catch((err)=> {
+      console.log(err);
+      return products;
+    })
+}
 }

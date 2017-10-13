@@ -6,11 +6,17 @@ export const apiUrl = {
     tokenServer: ''
 };
 
+export const relatedLogic = {
+    productFor: true,
+    productType: true,
+    productDesign: false
+};
+
 // ***dev */
 if (ENV !== 'production') {
-apiUrl.serverUrl = 'http://192.168.0.113:5000/api/';
-apiUrl.authServer = 'http://192.168.0.113:5001/api/auth';
-apiUrl.tokenServer = 'http://192.168.0.113:5001/api/';
+apiUrl.serverUrl = 'http://192.168.0.115:5000/api/';
+apiUrl.authServer = 'http://192.168.0.115:5001/api/auth';
+apiUrl.tokenServer = 'http://192.168.0.115:5001/api/';
 }
 // ***prod */
 if (ENV === 'production') {

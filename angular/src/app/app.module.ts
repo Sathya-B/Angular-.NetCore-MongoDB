@@ -28,17 +28,21 @@ import { VerificationComponent } from './auth/verification/verification.componen
 import { ForgotPasswordComponent } from './auth/forgotpassword/forgotpassword.component';
 import { UpdatePasswordComponent } from './auth/updatepassword/updatepassword.component';
 import { ChangePasswordComponent } from './auth/changepassword/changepassword.component';
+import { OrderListComponent } from './orderlist/orderlist.component';
+import { OrderItemComponent } from './orderlist/orderitem/orderitem.component';
 import { ProductsComponent } from './products/products.component';
 import { ProductItemComponent } from './products/productitem/productitem.component';
 import { ColorSizeStockComponent } from './variants/colorsizestock/colorsizestock.component';
 import { VariantsComponent } from './variants/variants.component';
 import { VariantsResolver } from './variants/variants.resolver';
+import { OrderListResolver } from './orderlist/orderlist.resolver';
 import { RelatedComponent } from './variants/related/related.component';
 import { CartComponent } from './cart/cart.component';
 import { CartItemComponent } from './cart/cartitem/cartitem.component';
 import { OrderComponent } from './cart/order/order.component';
 import { CheckOutComponent } from './checkout/checkout.component';
 import { MyAccountComponent } from './account/myaccount.component';
+import { AddressComponent } from './account/address/address.component';
 import { AddressBookComponent } from './checkout/addressbook/addressbook.component';
 import { NewAddressComponent } from './checkout/newaddress/newaddress.component';
 import { AddressItemComponent } from './checkout/addressbook/addressitem/addressitem.component';
@@ -119,6 +123,8 @@ type StoreType = {
     ForgotPasswordComponent,
     UpdatePasswordComponent,
     ChangePasswordComponent,
+    OrderListComponent,
+    OrderItemComponent,
     ColorSizeStockComponent,
     ContactComponent,
     CancellationComponent,
@@ -131,6 +137,7 @@ type StoreType = {
     OrderComponent,
     CheckOutComponent,
     MyAccountComponent,
+    AddressComponent,
     NewAddressComponent,
     AddressItemComponent,
     AddressBookComponent,
@@ -176,6 +183,7 @@ type StoreType = {
     ToastMsgService,
     SpinnerService,
     VariantsResolver,
+    OrderListResolver,
     LoginLogoutService,
     AuthGuard,
     {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}

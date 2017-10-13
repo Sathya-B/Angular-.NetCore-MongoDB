@@ -12,6 +12,7 @@ import { ActivatedRoute } from '@angular/router';
 export class RelatedComponent implements OnInit {
 
 @Input() public productitem: any;
+@Input() public indexNumber: any;
 
 public design: string;
 public Price: string;
@@ -28,12 +29,9 @@ constructor(private router: Router, private activatedRoute: ActivatedRoute) {
 public ngOnInit() {
 this.design = this.productitem.productDesign;
 this.Price = this.productitem.topItem.productPrice;
-this.ImgUrl = this.productitem.topItem.minioObject_URL;
+this.ImgUrl = this.productitem.topItem.minioObject_URL;     
 }
-
 public DesignClicked() {
-    localStorage.setItem(this.for + '-' + this.type + '-' + this.design,
-                         JSON.stringify(this.productitem));
     this.variantItemClicked.emit(this.productitem);
 }
 }

@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, AfterViewInit, Output, EventEmitter } from '@angular/core';
 import { apiUrl } from '../../config/configuration';
 import { ApiService } from '../../../services/api.service';
 import { AddressService } from '../../../services/address.service';
@@ -7,12 +7,16 @@ import { AddressService } from '../../../services/address.service';
     selector: 'addressbook',
     templateUrl: './addressbook.component.html'
 })
-export class AddressBookComponent {
+export class AddressBookComponent implements AfterViewInit {
     @Output() public addAddress = new EventEmitter<boolean>();
     public addresses: any;
+    public offsetNewAddress: number;
     constructor(private apiService: ApiService, public addressService: AddressService) {
     }
     public addNewAddress() {
         this.addAddress.emit(true);
+    }
+    public ngAfterViewInit() {
+        this.offsetNewAddress = Number(document.getElementById('newAddress').offsetTop) + 60;
     }
 }

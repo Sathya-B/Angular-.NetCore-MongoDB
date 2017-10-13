@@ -1,7 +1,7 @@
   <!-- Start item table-->
   <div class="shoppingBagWrap">
     <div class="bagLeft">
-      <div class="itemImageWrap"><a href=""><img [src]="item.minioObject_URL" alt=""></a></div>
+      <div class="itemImageWrap"><a href=""><img [lazyLoad]="item.minioObject_URL" alt=""></a></div>
       <div class="itemDescColourWrap">
         <div class="itemDescColourWrapInner">
           <a (click)="viewItem()" style="cursor: pointer"><span class="itemOderTabHeading">{{item.productFor + ' ' + item.productType}}</span></a>

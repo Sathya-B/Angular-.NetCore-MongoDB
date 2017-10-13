@@ -3,6 +3,7 @@ import { HomeComponent } from './home';
 import { ProductsComponent } from './products/products.component';
 import { VariantsComponent } from './variants/variants.component';
 import { VariantsResolver } from './variants/variants.resolver';
+import { OrderListResolver } from './orderlist/orderlist.resolver';
 import { NoContentComponent } from './no-content';
 import { AuthGuard } from './auth/authguard/authguard';
 import { LoginRegisterComponent } from './auth/loginregister/loginregister.component';
@@ -17,6 +18,8 @@ import { GetEmailComponent } from './auth/loginregister/facebook/getemail/getema
 import { CartComponent } from './cart/cart.component';
 import { CheckOutComponent } from './checkout/checkout.component';
 import { MyAccountComponent } from './account/myaccount.component';
+import { AddressComponent } from './account/address/address.component';
+import { OrderListComponent } from './orderlist/orderlist.component';
 import { WishListComponent } from './wishlist/wishlist.component';
 import { DataResolver } from './app.resolver';
 import { AboutComponent } from './policies/about/about.component';
@@ -49,6 +52,9 @@ export const ROUTES: Routes = [
   { path: 'cart', component: CartComponent },
   { path: 'checkout', component: CheckOutComponent, canActivate: [AuthGuard] },
   { path: 'myaccount', component: MyAccountComponent, canActivate: [AuthGuard] },
+  { path: 'address', component: AddressComponent, canActivate: [AuthGuard] },
+  { path: 'orderlist', component: OrderListComponent, canActivate: [AuthGuard],
+     resolve: { orders: OrderListResolver } },
   { path: 'wishlist', component: WishListComponent },
   { path: 'cancellation', component: CancellationComponent },
   { path: 'delivery', component: DeliveryComponent },

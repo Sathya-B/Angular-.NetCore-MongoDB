@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { CartService } from '../../../services/cart.service';
 import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
@@ -11,6 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 export class ProductItemComponent implements OnInit {
 
 @Input() public productitem: any;
+@Output() public clickedItem = new EventEmitter<{}>();
 
 public design: string;
 public Price: string;
@@ -32,5 +33,6 @@ this.ImgUrl = this.productitem.topItem.minioObject_URL;
 public DesignClicked() {
     localStorage.setItem(this.for + '-' + this.type + '-' + this.design,
                          JSON.stringify(this.productitem));
+    this.clickedItem.emit(this.design);
 }
 }

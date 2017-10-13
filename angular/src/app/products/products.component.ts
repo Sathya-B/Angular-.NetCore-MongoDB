@@ -40,4 +40,12 @@ public GetProducts() {
       }
     );
 }
+public loadRelatedItems(removeDesign: any) { 
+
+   let relatedItems = this.products.filter( (item) => {
+   return item.productDesign !== removeDesign;
+   });
+   localStorage.setItem(this.for + '-' + this.type + '-' + removeDesign + '-related',
+                         JSON.stringify(relatedItems)); 
+}
 }

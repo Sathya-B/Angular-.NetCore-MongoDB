@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppState } from '../app.service';
 import { NgZone } from '@angular/core';
-import { ToastMsgService } from '../../services/toastmsg.service';
-import { CartService } from '../../services/cart.service';
-import { WishListService } from '../../services/wishlist.service';
-import { LoginLogoutService } from '../../services/loginlogout.service';
+import { ToastMsgService } from '@services/toastmsg.service';
+import { CartService } from '@services/cart.service';
+import { WishListService } from '@services/wishlist.service';
+import { LoginLogoutService } from '@services/loginlogout.service';
 
 @Component({
   selector: 'header',  // <header></header>
@@ -19,6 +19,7 @@ export class HeaderComponent implements OnInit {
   public menuOpened: boolean = false;
   public scrolled: boolean = false;
   public mobile: boolean = false;
+  public clickedInsidePopup = false;
   public loggedIn: { 'loggedIn': boolean } = { loggedIn: false};
   public wishlistCount: number = 0;
   public cartCount: number = 0;
@@ -39,7 +40,7 @@ export class HeaderComponent implements OnInit {
         this.mobile = true;
       }
       });
-  };
+  }; 
 }
 public ngOnInit() {
     if (this.appState.get('loggedIn') === true) {
@@ -51,6 +52,7 @@ public openMenu() {
     this.menuOpened = !this.menuOpened;
   }
 public LoginRegister() {
+    this.menuOpened = false;
     if (this.appState.get('loggedIn') !== true) {
       this.router.navigate(['/loginregister']);
     }
@@ -60,9 +62,32 @@ public ChangePassword() {
   }
 public SignOutClicked() {
     this.loggedIn.loggedIn = false;
+    this.menuOpened = false;
     this.loginLogout.Logout();
   }
 public getUserName() {
   return localStorage.getItem('FirstName');
 }
+// public closePopUp(event: any) {
+//    console.log(event.target.parentElement.parentElement);
+//    event.target.parentElement.parentElement.classList.remove('popupAfterLoginOuter');
+//   // //document.getElementById('userIcon').classList.remove('popupAfterLoginOuter');
+// }
+
+
+public onMouseHover(){ 
+let el = document.querySelectorAll('.popupAfterLogin > a');
+for( let i = 0 ; i < el.length; i++){
+  el[i].addEventListener('click', this.classToggle);
 }
+document.querySelector('.userLoggedIn').addEventListener('mouseover',this.removeClass);
+}
+public classToggle(){
+document.querySelector('.userLoggedIn').classList.toggle('deactive');
+}
+public removeClass(){
+  console.log('mouseover');
+document.querySelector('.userLoggedIn').classList.remove('deactive');
+}
+}
+

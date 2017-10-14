@@ -16,16 +16,6 @@
     transition: all 0.3s ease;
     transition-delay:  0s;  
 }       
-/*#two {
-    background: none repeat scroll 0 0 #EEEEEE;
-    border: 1px solid #DADADA;
-    color: #333333;
-    overflow:hidden;
-    left: 0;
-    line-height: 20px;
-    position: absolute;
-    top: 50px;
-    height: 80px;
-    width: 100px;
-    z-index: 32;
-}*/
+.commonIconBtnHeader.userLoggedIn.deactive .popupAfterLoginOuter{
+display:none
+}

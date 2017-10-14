@@ -22,6 +22,8 @@ const InlineManifestWebpackPlugin = require('inline-manifest-webpack-plugin');
 const LoaderOptionsPlugin = require('webpack/lib/LoaderOptionsPlugin');
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 const ngcWebpack = require('ngc-webpack');
+const { TsConfigPathsPlugin } = require('awesome-typescript-loader');
+
 //const PreloadWebpackPlugin = require('preload-webpack-plugin');
 
 /**
@@ -86,6 +88,9 @@ module.exports = function (options) {
        * An array of directory names to be resolved to the current directory
        */
       modules: [helpers.root('src'), helpers.root('node_modules')],
+
+      plugins: [
+        new TsConfigPathsPlugin(/* { tsconfig, compiler } */)   ]
 
     },
 

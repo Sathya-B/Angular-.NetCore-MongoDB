@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { ApiService } from '../../../services/api.service';
-import { LoginLogoutService } from '../../../services/loginlogout.service';
-import { ToastMsgService } from '../../../services/toastmsg.service';
-import { apiUrl } from '../../config/configuration';
+import { ApiService } from '@services/api.service';
+import { LoginLogoutService } from '@services/loginlogout.service';
+import { ToastMsgService } from '@services/toastmsg.service';
+import { apiUrl } from '@app/config/configuration';
 
 @Component({
   selector: 'app-loginregister',

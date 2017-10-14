@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppState } from '../app.service';
 import { Title } from './title';
-import { CartService } from '../../services/cart.service';
-import { ApiService } from '../../services/api.service';
+import { CartService } from '@services/cart.service';
+import { ApiService } from '@services/api.service';
 import { CategoryComponent } from './category';
 
 @Component({

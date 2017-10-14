@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { WishListService } from '../../../services/wishlist.service';
-import { CartService } from '../../../services/cart.service';
+import { WishListService } from '@services/wishlist.service';
+import { CartService } from '@services/cart.service';
 import { Router } from '@angular/router';
 
 @Component({

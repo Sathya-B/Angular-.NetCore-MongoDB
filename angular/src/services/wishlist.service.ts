@@ -2,7 +2,7 @@ import { Inject, Injectable, Optional } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { ApiService } from './api.service';
 import { AppState } from '../app/app.service';
-import * as WishListModel from '../models/wishlist.model';
+import * as WishListModel from '@models/wishlist.model';
 import 'rxjs/add/operator/map';
 
 @Injectable()

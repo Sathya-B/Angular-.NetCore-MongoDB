@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiService } from '../../../../services/api.service';
-import { ToastMsgService } from '../../../../services/toastmsg.service';
-import { LoginLogoutService } from '../../../../services/loginlogout.service';
-import { AppState } from '../../../app.service';
-import { apiUrl } from '../../../config/configuration';
+import { ApiService } from '@services/api.service';
+import { ToastMsgService } from '@services/toastmsg.service';
+import { LoginLogoutService } from '@services/loginlogout.service';
+import { AppState } from '@app/app.service';
+import { apiUrl } from '@app/config/configuration';
 
 declare const FB: any;
 

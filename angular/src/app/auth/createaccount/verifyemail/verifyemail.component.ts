@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { apiUrl } from '../../../config/configuration';
-import { ApiService } from '../../../../services/api.service';
-import { AppState } from '../../../app.service';
-import { ToastMsgService } from '../../../../services/toastmsg.service';
+import { apiUrl } from '@app/config/configuration';
+import { ApiService } from '@services/api.service';
+import { AppState } from '@app/app.service';
+import { ToastMsgService } from '@services/toastmsg.service';
 
 @Component({
   selector: 'verifyemail',

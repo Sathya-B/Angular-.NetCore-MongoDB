@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
-import { ApiService } from '../../../services/api.service';
+import { ApiService } from '@services/api.service';
 import { ActivatedRoute, Params, Router, ParamMap } from '@angular/router';
-import { ToastMsgService } from '../../../services/toastmsg.service';
-import { apiUrl } from '../../config/configuration';
+import { ToastMsgService } from '@services/toastmsg.service';
+import { apiUrl } from '@app/config/configuration';
 
 @Component({
   selector: 'createaccount',

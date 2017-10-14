@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, OnChanges } from '@angular/core';
-import { ToastMsgService } from '../../../services/toastmsg.service';
+import { ToastMsgService } from '@services/toastmsg.service';
 
 @Component({
   selector: 'colorsizestock',

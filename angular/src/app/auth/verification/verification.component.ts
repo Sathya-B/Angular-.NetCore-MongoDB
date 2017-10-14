@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { ApiService } from '../../../services/api.service';
-import { LoginLogoutService } from '../../../services/loginlogout.service';
+import { ApiService } from '@services/api.service';
+import { LoginLogoutService } from '@services/loginlogout.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AppState } from '../../app.service';
-import { ToastMsgService } from '../../../services/toastmsg.service';
-import { apiUrl } from '../../config/configuration';
+import { AppState } from '@app/app.service';
+import { ToastMsgService } from '@services/toastmsg.service';
+import { apiUrl } from '@app/config/configuration';
 
 @Component({
   selector: 'verification',

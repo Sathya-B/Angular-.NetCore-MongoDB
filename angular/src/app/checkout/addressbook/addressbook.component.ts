@@ -1,7 +1,7 @@
 import { Component, AfterViewInit, Output, EventEmitter } from '@angular/core';
-import { apiUrl } from '../../config/configuration';
-import { ApiService } from '../../../services/api.service';
-import { AddressService } from '../../../services/address.service';
+import { apiUrl } from '@app/config/configuration';
+import { ApiService } from '@services/api.service';
+import { AddressService } from '@services/address.service';
 
 @Component({
     selector: 'addressbook',

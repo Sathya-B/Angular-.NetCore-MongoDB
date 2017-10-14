@@ -17,7 +17,11 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@angular/*": ["node_modules/@angular/*"]
+      "@angular/*": ["node_modules/@angular/*"],
+      "@app/*": ["src/app/*"],
+      "@services/*": ["src/services/*"],     
+      "@shared/*": ["src/shared/*"],
+      "@models/*": ["src/models/*"]
     },
     "typeRoots": [
       "node_modules/@types"

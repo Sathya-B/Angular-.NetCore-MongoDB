@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { AddressService } from '../../../services/address.service';
-import { ToastMsgService } from '../../../services/toastmsg.service';
+import { AddressService } from '@services/address.service';
+import { ToastMsgService } from '@services/toastmsg.service';
 
 @Component({
   selector: 'newaddress',

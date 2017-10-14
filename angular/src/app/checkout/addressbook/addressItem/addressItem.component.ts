@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { AddressService } from '../../../../services/address.service';
-import { ToastMsgService } from '../../../../services/toastmsg.service';
+import { AddressService } from '@services/address.service';
+import { ToastMsgService } from '@services/toastmsg.service';
 
 @Component({
   selector: 'addressitem',

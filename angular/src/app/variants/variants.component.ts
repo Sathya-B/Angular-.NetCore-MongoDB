@@ -3,15 +3,15 @@ import { AppState } from '../app.service';
 import { RouterModule, Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { ParamMap } from '@angular/router';
-import { CartService } from '../../services/cart.service';
-import { WishListService } from '../../services/wishlist.service';
-import { ApiService } from '../../services/api.service';
+import { CartService } from '@services/cart.service';
+import { WishListService } from '@services/wishlist.service';
+import { ApiService } from '@services/api.service';
 import { EventEmitter } from '@angular/core';
 import { RelatedComponent } from './related/related.component';
 import { ColorSizeStockComponent } from './colorsizestock/colorsizestock.component';
-import { ToastMsgService } from '../../services/toastmsg.service';
-import * as CartModel from '../../models/cart.model';
-import * as WishListModel from '../../models/wishlist.model';
+import { ToastMsgService } from '@services/toastmsg.service';
+import * as CartModel from '@models/cart.model';
+import * as WishListModel from '@models/wishlist.model';
 
 @Component({
   selector: 'variants',

@@ -3,10 +3,10 @@ import { HttpClient, HttpHeaders,
          HttpParams, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Rx';
-import { apiUrl } from '../app/config/configuration';
-import { TokenService } from '../services/token.service';
+import { apiUrl } from '@app/config/configuration';
+import { TokenService } from '@services/token.service';
 import { SpinnerService } from 'angular-spinners';
-import * as Util from '../shared/utils/utils';
+import * as Util from '@shared/utils/utils';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/toPromise';
 

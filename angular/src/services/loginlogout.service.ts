@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { CartService } from './cart.service';
 import { WishListService } from './wishlist.service';
 import { ToastMsgService } from './toastmsg.service';
-import { AppState } from '../app/app.service';
+import { AppState } from '@app/app.service';
 import {Location} from '@angular/common';
 
 declare const FB: any;

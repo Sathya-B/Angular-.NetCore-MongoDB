@@ -6,11 +6,11 @@ import {
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
-import { AppState } from '../app/app.service';
-import { apiUrl } from '../app/config/configuration';
+import { AppState } from '@app/app.service';
+import { apiUrl } from '@app/config/configuration';
 import { SpinnerService } from 'angular-spinners';
-import * as Util from '../shared/utils/utils';
-import * as Config from '../app/config/configuration';
+import * as Util from '@shared/utils/utils';
+import * as Config from '@app/config/configuration';
 import 'rxjs/Rx';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/toPromise';

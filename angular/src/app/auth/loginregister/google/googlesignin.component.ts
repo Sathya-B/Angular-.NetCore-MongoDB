@@ -1,8 +1,8 @@
 import { Component, ElementRef, AfterViewInit } from '@angular/core';
-import { ApiService } from '../../../../services/api.service';
-import { ToastMsgService } from '../../../../services/toastmsg.service';
-import { LoginLogoutService } from '../../../../services/loginlogout.service';
-import { apiUrl } from '../../../config/configuration';
+import { ApiService } from '@services/api.service';
+import { ToastMsgService } from '@services/toastmsg.service';
+import { LoginLogoutService } from '@services/loginlogout.service';
+import { apiUrl } from '@app/config/configuration';
 
 declare const gapi: any;
 

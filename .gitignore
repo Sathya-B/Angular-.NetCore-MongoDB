@@ -30,6 +30,9 @@ RawBlameHistory
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
+#visual studio files
+.vs/
+
 
 # Build results
 [Dd]ebug/

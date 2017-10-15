@@ -13,13 +13,13 @@ export const relatedLogic = {
 };
 
 // ***dev */
-if (ENV !== 'production') {
+if (ENV === 'production') {
 apiUrl.serverUrl = 'http://192.168.0.115:5000/api/';
 apiUrl.authServer = 'http://192.168.0.115:5001/api/auth';
 apiUrl.tokenServer = 'http://192.168.0.115:5001/api/';
 }
 // ***prod */
-if (ENV === 'production') {
+if (ENV !== 'production') {
 apiUrl.serverUrl = 'https://artwear.in:5003/api/';
 apiUrl.authServer = 'https://artwear.in:5002/api/auth';
 apiUrl.tokenServer = 'https://artwear.in:5002/api/';

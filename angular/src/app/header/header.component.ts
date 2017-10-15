@@ -68,12 +68,6 @@ public SignOutClicked() {
 public getUserName() {
   return localStorage.getItem('FirstName');
 }
-// public closePopUp(event: any) {
-//    console.log(event.target.parentElement.parentElement);
-//    event.target.parentElement.parentElement.classList.remove('popupAfterLoginOuter');
-//   // //document.getElementById('userIcon').classList.remove('popupAfterLoginOuter');
-// }
-
 
 public onMouseHover(){ 
 let el = document.querySelectorAll('.popupAfterLogin > a');
@@ -86,7 +80,6 @@ public classToggle(){
 document.querySelector('.userLoggedIn').classList.toggle('deactive');
 }
 public removeClass(){
-  console.log('mouseover');
 document.querySelector('.userLoggedIn').classList.remove('deactive');
 }
 }

@@ -1,0 +1,32 @@
+<div>
+    <form (ngSubmit)="onSubmit(f)" #f="ngForm">
+    <div class="form-group">
+      <label for="productFor">Product For</label>
+      <input type="text" name="productFor" if="productFor" class="form-control"
+       [(ngModel)]="category.categoryItem.productFor" required>
+      <label *ngIf="f.controls.productFor?.errors && f.controls.productFor.touched"
+       class="form-control-label" for="inputError">Field required.</label>
+    </div>
+    <div class="form-group">
+      <label for="productType">Product Type</label>
+      <input type="text" name="productType" class="form-control"
+       [(ngModel)]="category.categoryItem.productType" required>
+      <label *ngIf="f.controls.productType?.errors && f.controls.productType.touched"
+       class="form-control-label" for="inputError">Field required.</label>
+    </div>
+      <label for="description">Description</label>
+      <input type="text" name="description" class="form-control"
+       [(ngModel)]="category.categoryItem.description" required>
+      <label *ngIf="f.controls.description?.errors && f.controls.description.touched"
+       class="form-control-label" for="inputError">Field required.</label>
+    <div class="form-group">
+      <label for="minioObject_URL">Image Url</label>
+      <input type="text" name="minioObject_URL" class="form-control"
+       [(ngModel)]="category.categoryItem.minioObject_URL" required>
+      <label *ngIf="f.controls.minioObject_URL?.errors && f.controls.minioObject_URL.touched"
+       class="form-control-label" for="inputError">Field required.</label>
+    </div>
+  </form>
+    <button _ngcontent-c9="" class="btn btn-primary" type="button">Save</button>
+    <button _ngcontent-c9="" class="btn btn-danger" type="button" (click)="cancelClicked()">Cancel</button>
+</div>

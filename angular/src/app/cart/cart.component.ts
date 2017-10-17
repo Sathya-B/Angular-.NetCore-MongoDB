@@ -9,13 +9,14 @@ import { Router } from '@angular/router';
 })
 export class CartComponent implements OnInit, OnDestroy {
 
-public cartItems: any;
+public cartItems: any = {};
 
 constructor(public cartService: CartService, private route: Router) {
 }
 
-public ngOnInit() {
- this.cartItems = this.cartService.cartItems.listOfProducts;
+public ngOnInit() { 
+ this.cartItems = this.cartService.cartItems;
+ console.log(this.cartItems);
 }
 public ngOnDestroy() {
     this.cartService.refreshCart();

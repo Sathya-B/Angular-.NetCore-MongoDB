@@ -88,6 +88,9 @@ export class VariantsComponent implements OnInit {
   }
 
   public addToCart() {
+    console.log('clicked');
+    console.log(this.css.remainingQty);
+   if ((Number(this.css.remainingQty) >= 1)) {
     let cartItem: CartModel.CartItem;
     cartItem = this.css.itemToCart;
     cartItem.productQuantity = this.css.quantity;
@@ -95,6 +98,9 @@ export class VariantsComponent implements OnInit {
     this.router.navigate(['/addedtocart']);
     if (localStorage.getItem('UserName') !== undefined) {
       this.cartService.refreshCart();
+    }
+    } else {
+      this.toastMsg.popToast('info', 'Info', 'Please Select a Colour and Size.');
     }
   }
 
@@ -110,13 +116,6 @@ export class VariantsComponent implements OnInit {
       this.router.navigate(['/addedtowishlist']);
     } else {
       this.toastMsg.popToast('info', 'Info', 'Please Select a Colour and Size.');
-    }
-  }
-  public isBagDisabled() {
-    if (!(Number(this.css.remainingQty) >= 1)) {
-      return true;
-    } else {
-      return false;
     }
   }
   ngOnDestroy() {

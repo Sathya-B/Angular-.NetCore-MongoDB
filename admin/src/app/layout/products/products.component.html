@@ -1,0 +1,43 @@
+<div [@routerTransition]>
+    <app-page-header [heading]="'Products'" [icon]="'fa-table'"></app-page-header>
+    <div class="row">
+        <div class="col col-xl-10">
+            <div class="card mb-3">
+                <div class="card-header">
+                    Add New Product
+                </div>
+                <div class="card-block table-responsive">
+                <button _ngcontent-c9="" class="btn btn-success" type="button" (click)="addClicked()">Add</button>
+                <div *ngIf="showAdd">
+                <app-product-insert-update (cancelButtonClicked)="cancelClicked($event)"></app-product-insert-update>
+                </div>
+                </div>
+                <div class="card-header">
+                    Available Products
+                </div>
+                <div class="card-block table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="customtd">
+                                <table>
+                                <th>#</th>
+                                <th class="tdwidth">Product For</th>
+                                <th class="tdwidth">Product Type</th>
+                                <th class="tdwidth">Design</th>
+                                <th class="tdwidth">Size</th>
+                                <th class="tdwidth">Update</th>
+                                <th class="tdwidth">Delete</th>
+                                </table>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let product of products; let i=index" [app-productitem]="{'productItem': product, 'itemIndex': i}">
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>

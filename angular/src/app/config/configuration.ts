@@ -7,19 +7,19 @@ export const apiUrl = {
 };
 
 export const relatedLogic = {
-    productFor: true,
+    productFor: true, 
     productType: true,
     productDesign: false
 };
 
 // ***dev */
-if (ENV === 'production') {
-apiUrl.serverUrl = 'http://192.168.0.115:5000/api/';
-apiUrl.authServer = 'http://192.168.0.115:5001/api/auth';
-apiUrl.tokenServer = 'http://192.168.0.115:5001/api/';
+if (ENV !== 'production') {
+apiUrl.serverUrl = 'http://192.168.0.113:5000/api/';
+apiUrl.authServer = 'http://192.168.0.113:5001/api/auth';
+apiUrl.tokenServer = 'http://192.168.0.113:5001/api/';
 }
 // ***prod */
-if (ENV !== 'production') {
+if (ENV === 'production') {
 apiUrl.serverUrl = 'https://artwear.in:5003/api/';
 apiUrl.authServer = 'https://artwear.in:5002/api/auth';
 apiUrl.tokenServer = 'https://artwear.in:5002/api/';

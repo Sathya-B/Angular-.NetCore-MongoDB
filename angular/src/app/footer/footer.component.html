@@ -8,7 +8,7 @@
 						<p>Sign up for our newsletter and receive Latest product and offers. No spam promise.</p>
 						<div class="newsLetterWrap">
 							<form (ngSubmit)="onSubscribe(f)" #f="ngForm">
-								<input type="email" name="Email" placeholder="Email Address" ngModel pattern="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?">
+								<input type="email" name="Email" placeholder="Email Address" ngModel email>
 								<div class="error" *ngIf="f.controls.Email?.errors && f.controls.Email?.touched"><span class="error">Please enter a valid Email</span></div>
 								<input type="submit" [disabled]="!f.valid" class="createAccount" value="Subscribe">
 							</form>

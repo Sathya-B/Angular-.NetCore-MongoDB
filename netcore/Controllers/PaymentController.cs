@@ -33,6 +33,7 @@ namespace Arthur_Clive.Controllers
             {
                 string SuccessUrl = "http://localhost:5001/api/payment/success";
                 string FailureUrl = "http://localhost:5001/api/payment/failed";
+                string CancleUrl = "http://localhost:5001/api/payment/cancle";
                 string txnId = PU.GetTxnId();
                 string hashString = PU.GetHashString(txnId,model);
                 string hash = PU.Generatehash512(hashString).ToLower();
@@ -40,7 +41,7 @@ namespace Arthur_Clive.Controllers
                 Hashtable data = new Hashtable();
                 data.Add("hash", hash);
                 data.Add("txnid", txnId);
-                data.Add("key", "gtKFFx");
+                data.Add("key", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("key").First().Value);
                 string AmountForm = Convert.ToDecimal(model.Amount).ToString("g29");
                 data.Add("amount", AmountForm);
                 data.Add("firstname", model.FirstName);
@@ -50,7 +51,7 @@ namespace Arthur_Clive.Controllers
                 data.Add("surl", SuccessUrl);
                 data.Add("furl", FailureUrl);
                 data.Add("lastname", model.LastName);
-                data.Add("curl", "");
+                data.Add("curl", CancleUrl);
                 data.Add("address1", model.AddressLine1);
                 data.Add("address2", model.AddressLine2);
                 data.Add("city", model.City);
@@ -64,7 +65,7 @@ namespace Arthur_Clive.Controllers
                 data.Add("udf5", "");
                 data.Add("pg", "");
                 data.Add("service_provider", "PayUMoney");
-                StringBuilder strForm = PU.PreparePOSTForm(action, data);
+                string strForm = PU.PreparePOSTForm(action, data);
                 var form = PU.PreparePOSTForm(action, data);
                 dynamic UserInfo = new System.Dynamic.ExpandoObject();
                 UserInfo.form = form;
@@ -142,6 +143,24 @@ namespace Arthur_Clive.Controllers
                     Data = null
                 });
             }
+        }
+
+        [HttpGet("cancle")]
+        public string CancleOrder()
+        {
+            return "Cancled";
+        }
+
+        [HttpGet("success")]
+        public string Success()
+        {
+            return "Success";
+        }
+
+        [HttpGet("failed")]
+        public string Failedss()
+        {
+            return "Failed";
         }
     }
 }

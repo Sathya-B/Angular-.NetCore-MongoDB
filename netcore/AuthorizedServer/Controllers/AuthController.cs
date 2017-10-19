@@ -74,6 +74,7 @@ namespace AuthorizedServer.Controllers
                     if (data.UserLocation != null)
                     {
                         data.UserName = userName;
+                        data.UserRole = "User";
                         RegisterModel registerModel = new RegisterModel { UserName = userName, Password = data.Password };
                         data.Password = passwordHasher.HashPassword(registerModel, data.Password);
                         data.OTPExp = DateTime.UtcNow.AddMinutes(2);
@@ -246,7 +247,7 @@ namespace AuthorizedServer.Controllers
                         else
                         {
                             var filter = Builders<BsonDocument>.Filter.Eq("UserName", user.UserName);
-                            string response = GlobalHelper.RecordLoginAttempts(filter);
+                            string response = MongoHelper.RecordLoginAttempts(filter);
                             if (response != "Failed")
                                 return BadRequest(new ResponseData
                                 {
@@ -539,7 +540,7 @@ namespace AuthorizedServer.Controllers
                     }
                     else
                     {
-                        string response = GlobalHelper.RecordLoginAttempts(filter);
+                        string response = MongoHelper.RecordLoginAttempts(filter);
                         if (response != "Failed")
                             return BadRequest(new ResponseData
                             {
@@ -690,6 +691,7 @@ namespace AuthorizedServer.Controllers
                             {
                                 RegisterModel registerModel = new RegisterModel();
                                 registerModel.UserName = result.email;
+                                registerModel.UserRole = "User";
                                 registerModel.SocialId = result.sub;
                                 registerModel.FullName = result.name;
                                 registerModel.Status = "Verified";
@@ -782,6 +784,7 @@ namespace AuthorizedServer.Controllers
                             {
                                 RegisterModel registerModel = new RegisterModel();
                                 registerModel.UserName = result.id;
+                                registerModel.UserRole = "User";
                                 registerModel.SocialId = result.id;
                                 registerModel.FullName = result.name;
                                 registerModel.Status = "Verified";

@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v2.0": {
-      "AWSSDK.Core/3.3.17.9": {
+      "AWSSDK.Core/3.3.18": {
         "type": "package",
         "dependencies": {
           "Microsoft.CSharp": "4.0.1",
@@ -18,10 +18,10 @@
           "lib/netstandard1.3/AWSSDK.Core.dll": {}
         }
       },
-      "AWSSDK.SimpleEmail/3.3.3": {
+      "AWSSDK.SimpleEmail/3.3.4": {
         "type": "package",
         "dependencies": {
-          "AWSSDK.Core": "[3.3.17, 3.4.0)"
+          "AWSSDK.Core": "[3.3.18, 3.4.0)"
         },
         "compile": {
           "lib/netstandard1.3/AWSSDK.SimpleEmail.dll": {}
@@ -30,10 +30,10 @@
           "lib/netstandard1.3/AWSSDK.SimpleEmail.dll": {}
         }
       },
-      "AWSSDK.SimpleNotificationService/3.3.0.21": {
+      "AWSSDK.SimpleNotificationService/3.3.0.22": {
         "type": "package",
         "dependencies": {
-          "AWSSDK.Core": "[3.3.17.3, 3.4.0)"
+          "AWSSDK.Core": "[3.3.18, 3.4.0)"
         },
         "compile": {
           "lib/netstandard1.3/AWSSDK.SimpleNotificationService.dll": {}
@@ -42,7 +42,7 @@
           "lib/netstandard1.3/AWSSDK.SimpleNotificationService.dll": {}
         }
       },
-      "Castle.Core/4.2.0": {
+      "Castle.Core/4.2.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
@@ -871,6 +871,20 @@
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll": {}
+        }
+      },
+      "Microsoft.AspNetCore.Identity.MongoDB/1.0.2": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Identity": "1.0.0",
+          "MongoDB.Driver": "2.3.0",
+          "NETStandard.Library": "1.6.0"
+        },
+        "compile": {
+          "lib/netstandard1.5/Microsoft.AspNetCore.Identity.MongoDB.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.5/Microsoft.AspNetCore.Identity.MongoDB.dll": {}
         }
       },
       "Microsoft.AspNetCore.JsonPatch/2.0.0": {
@@ -2780,10 +2794,10 @@
           "lib/netstandard1.5/MongoDB.Driver.Core.dll": {}
         }
       },
-      "Moq/4.7.137": {
+      "Moq/4.7.142": {
         "type": "package",
         "dependencies": {
-          "Castle.Core": "4.2.0",
+          "Castle.Core": "4.2.1",
           "NETStandard.Library": "1.6.1",
           "System.Linq.Queryable": "4.3.0",
           "System.Reflection.TypeExtensions": "4.3.0"
@@ -3246,7 +3260,7 @@
           "lib/netstandard1.6/Swashbuckle.AspNetCore.dll": {}
         }
       },
-      "Swashbuckle.AspNetCore.Examples/2.3.0": {
+      "Swashbuckle.AspNetCore.Examples/2.3.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
@@ -5093,12 +5107,12 @@
     }
   },
   "libraries": {
-    "AWSSDK.Core/3.3.17.9": {
-      "sha512": "7ztkmMvumu1aMR6ETKqZwznLQR4SC/axTj3q4QauyWv5E36Hio6r1UzmDjOOexMUl3Cg4IqQgGfe8oBidSiJuw==",
+    "AWSSDK.Core/3.3.18": {
+      "sha512": "15VZyyB+94JPOBz50hRFx7axCZ1iLHyAJqkGMa3khEayMjEMx4LXEScWMazE1WsbWF1EtHtXi4KL7oOYzVd44w==",
       "type": "package",
-      "path": "awssdk.core/3.3.17.9",
+      "path": "awssdk.core/3.3.18",
       "files": [
-        "awssdk.core.3.3.17.9.nupkg.sha512",
+        "awssdk.core.3.3.18.nupkg.sha512",
         "awssdk.core.nuspec",
         "lib/MonoAndroid10/AWSSDK.Core.XML",
         "lib/MonoAndroid10/AWSSDK.Core.dll",
@@ -5136,13 +5150,13 @@
         "tools/account-management.ps1"
       ]
     },
-    "AWSSDK.SimpleEmail/3.3.3": {
-      "sha512": "bIL9dF8gbaImhP3sbtYVQnu2drozJqt7wDVAGu9V8k6sqQM7q25MUpyNzgH0NaGO+j7gHFWmFq1VI/vB+iXLqw==",
+    "AWSSDK.SimpleEmail/3.3.4": {
+      "sha512": "GQtUDl5uUk0V1//7PT1Jd3zqpu6ThsNRKAeRmQG+69SCFUk8tV0EFvGU7kJSUP2oYdBQf5Ai5NSe0d3Mg2ITVA==",
       "type": "package",
-      "path": "awssdk.simpleemail/3.3.3",
+      "path": "awssdk.simpleemail/3.3.4",
       "files": [
         "analyzers/dotnet/cs/AWSSDK.SimpleEmail.CodeAnalysis.dll",
-        "awssdk.simpleemail.3.3.3.nupkg.sha512",
+        "awssdk.simpleemail.3.3.4.nupkg.sha512",
         "awssdk.simpleemail.nuspec",
         "lib/MonoAndroid10/AWSSDK.SimpleEmail.XML",
         "lib/MonoAndroid10/AWSSDK.SimpleEmail.dll",
@@ -5167,13 +5181,13 @@
         "tools/uninstall.ps1"
       ]
     },
-    "AWSSDK.SimpleNotificationService/3.3.0.21": {
-      "sha512": "MYfUhmq3/wEd3dQjhtCowJcE8VbkGWa4z1wyCw5RdPc3ER6SMXbCG9r+Cg4XEWjQek9WW0r4GrtdmFN4L1p3cg==",
+    "AWSSDK.SimpleNotificationService/3.3.0.22": {
+      "sha512": "hbQTmNQPSMQ00s4XXu8//KgNVdDFP6OdQIRzfegpnWBEx0ilWzJjlHTMXSxWS+uYgab8guX0OpIkEuz57jdt/g==",
       "type": "package",
-      "path": "awssdk.simplenotificationservice/3.3.0.21",
+      "path": "awssdk.simplenotificationservice/3.3.0.22",
       "files": [
         "analyzers/dotnet/cs/AWSSDK.SimpleNotificationService.CodeAnalysis.dll",
-        "awssdk.simplenotificationservice.3.3.0.21.nupkg.sha512",
+        "awssdk.simplenotificationservice.3.3.0.22.nupkg.sha512",
         "awssdk.simplenotificationservice.nuspec",
         "lib/MonoAndroid10/AWSSDK.SimpleNotificationService.XML",
         "lib/MonoAndroid10/AWSSDK.SimpleNotificationService.dll",
@@ -5198,20 +5212,24 @@
         "tools/uninstall.ps1"
       ]
     },
-    "Castle.Core/4.2.0": {
-      "sha512": "1TtKHYYVfox7aUZ0akCqkULmAjpG8X5ZRzTzTiONY34xtvvaPuUSSdVL1VaF/1/ljRhOkpy+uKOGn6XoFGvorw==",
+    "Castle.Core/4.2.1": {
+      "sha512": "XSNA0Gc1Zu33L+8+/3Tqt+aFu8QWS8UenVHZ7RenIP5wJfhoLrA4PnNscpxReeo5aBq8PDoGnV8rNaOzIOUo/w==",
       "type": "package",
-      "path": "castle.core/4.2.0",
+      "path": "castle.core/4.2.1",
       "files": [
         "ASL - Apache Software Foundation License.txt",
         "CHANGELOG.md",
         "LICENSE",
-        "castle.core.4.2.0.nupkg.sha512",
+        "castle.core.4.2.1.nupkg.sha512",
         "castle.core.nuspec",
         "lib/net35/Castle.Core.dll",
+        "lib/net35/Castle.Core.xml",
         "lib/net40/Castle.Core.dll",
+        "lib/net40/Castle.Core.xml",
         "lib/net45/Castle.Core.dll",
+        "lib/net45/Castle.Core.xml",
         "lib/netstandard1.3/Castle.Core.dll",
+        "lib/netstandard1.3/Castle.Core.xml",
         "readme.txt"
       ]
     },
@@ -5743,6 +5761,17 @@
         "lib/netstandard2.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.xml",
         "microsoft.aspnetcore.identity.entityframeworkcore.2.0.0.nupkg.sha512",
         "microsoft.aspnetcore.identity.entityframeworkcore.nuspec"
+      ]
+    },
+    "Microsoft.AspNetCore.Identity.MongoDB/1.0.2": {
+      "sha512": "qUaOLfo+lKR+wOnSHCVPUjtWMZ5idaLwDGnN4h+m6lugYZBSMSy8UkpldIbkgBXoDGa9YW3sNwO3apnLVjTWeA==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.identity.mongodb/1.0.2",
+      "files": [
+        "lib/net451/Microsoft.AspNetCore.Identity.MongoDB.dll",
+        "lib/netstandard1.5/Microsoft.AspNetCore.Identity.MongoDB.dll",
+        "microsoft.aspnetcore.identity.mongodb.1.0.2.nupkg.sha512",
+        "microsoft.aspnetcore.identity.mongodb.nuspec"
       ]
     },
     "Microsoft.AspNetCore.JsonPatch/2.0.0": {
@@ -7899,10 +7928,10 @@
         "mongodb.driver.core.nuspec"
       ]
     },
-    "Moq/4.7.137": {
-      "sha512": "CtVIMofBEyHAMPixhup7nSXZO/UG1DCqEI2E816XgQzJ4dkJvi/JaPEvTndLNKBzcfDMfA8yhAwzpRXRn/GBiA==",
+    "Moq/4.7.142": {
+      "sha512": "LeQTESlgZJMYWpyLX/jQLkIx2Uf9CLTu9WfO2o/W0gl+qduhTRDqviVGPlP36RHfCwhNMDf42WSNhIFWbyj8aQ==",
       "type": "package",
-      "path": "moq/4.7.137",
+      "path": "moq/4.7.142",
       "files": [
         "lib/net45/Moq.dll",
         "lib/net45/Moq.pdb",
@@ -7910,7 +7939,7 @@
         "lib/netstandard1.3/Moq.dll",
         "lib/netstandard1.3/Moq.pdb",
         "lib/netstandard1.3/Moq.xml",
-        "moq.4.7.137.nupkg.sha512",
+        "moq.4.7.142.nupkg.sha512",
         "moq.nuspec"
       ]
     },
@@ -8506,14 +8535,14 @@
         "swashbuckle.aspnetcore.nuspec"
       ]
     },
-    "Swashbuckle.AspNetCore.Examples/2.3.0": {
-      "sha512": "hiZNEBR26OcMnC3GVQbjjt4QWVQ8Z/3GdTbdA//f3DF4KWx2zHvtIB8kGaju7hu4CHBEz/7ic45QuU4YcykmNA==",
+    "Swashbuckle.AspNetCore.Examples/2.3.1": {
+      "sha512": "qTrnTRM/n7rYa0TuoRc62LsFnLe/pBnThkk9QtxA0Zi2jrh6cYi8iOKdzZowX/ZeW3Md/VFvfI7TsgYKeZauiA==",
       "type": "package",
-      "path": "swashbuckle.aspnetcore.examples/2.3.0",
+      "path": "swashbuckle.aspnetcore.examples/2.3.1",
       "files": [
-        "lib/net461/Swashbuckle.AspNetCore.Examples.dll",
+        "lib/net451/Swashbuckle.AspNetCore.Examples.dll",
         "lib/netstandard1.6/Swashbuckle.AspNetCore.Examples.dll",
-        "swashbuckle.aspnetcore.examples.2.3.0.nupkg.sha512",
+        "swashbuckle.aspnetcore.examples.2.3.1.nupkg.sha512",
         "swashbuckle.aspnetcore.examples.nuspec"
       ]
     },
@@ -13362,16 +13391,17 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
-      "AWSSDK.Core >= 3.3.17.9",
-      "AWSSDK.SimpleEmail >= 3.3.3",
-      "AWSSDK.SimpleNotificationService >= 3.3.0.21",
+      "AWSSDK.Core >= 3.3.18",
+      "AWSSDK.SimpleEmail >= 3.3.4",
+      "AWSSDK.SimpleNotificationService >= 3.3.0.22",
       "Microsoft.AspNetCore.All >= 2.0.0",
       "Microsoft.AspNetCore.Authentication.Google >= 2.0.0",
+      "Microsoft.AspNetCore.Identity.MongoDB >= 1.0.2",
       "Microsoft.NETCore.App >= 2.0.0",
       "MongoDB.Driver >= 2.4.4",
-      "Moq >= 4.7.137",
+      "Moq >= 4.7.142",
       "Swashbuckle.AspNetCore >= 1.0.0",
-      "Swashbuckle.AspNetCore.Examples >= 2.3.0"
+      "Swashbuckle.AspNetCore.Examples >= 2.3.1"
     ]
   },
   "packageFolders": {
@@ -13403,7 +13433,8 @@
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {},
-        "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json": {}
+        "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json": {},
+        "https://www.myget.org/gallery/efcore-mongodb": {}
       },
       "frameworks": {
         "netcoreapp2.0": {
@@ -13421,7 +13452,7 @@
         "dependencies": {
           "AWSSDK.Core": {
             "target": "Package",
-            "version": "3.3.17.9"
+            "version": "3.3.18"
           },
           "MongoDB.Driver": {
             "target": "Package",
@@ -13429,15 +13460,15 @@
           },
           "AWSSDK.SimpleEmail": {
             "target": "Package",
-            "version": "3.3.3"
+            "version": "3.3.4"
           },
           "Swashbuckle.AspNetCore.Examples": {
             "target": "Package",
-            "version": "2.3.0"
+            "version": "2.3.1"
           },
           "Moq": {
             "target": "Package",
-            "version": "4.7.137"
+            "version": "4.7.142"
           },
           "Microsoft.NETCore.App": {
             "target": "Package",
@@ -13456,9 +13487,13 @@
             "target": "Package",
             "version": "2.0.0"
           },
+          "Microsoft.AspNetCore.Identity.MongoDB": {
+            "target": "Package",
+            "version": "1.0.2"
+          },
           "AWSSDK.SimpleNotificationService": {
             "target": "Package",
-            "version": "3.3.0.21"
+            "version": "3.3.0.22"
           }
         },
         "imports": [

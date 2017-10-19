@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.0",
-    "signature": "ea8bff17117c10dddf76f4a32ec1621f160ac143"
+    "signature": "86a5a1d8176cca97c39e9b0ed61ea477042a7ee3"
   },
   "compilationOptions": {
     "defines": [
@@ -24,14 +24,15 @@
       "Arthur_Clive/1.0.0": {
         "dependencies": {
           "AWSSDK.S3": "3.3.11.1",
-          "AWSSDK.SimpleEmail": "3.3.3.1",
+          "AWSSDK.SimpleEmail": "3.3.4",
           "Microsoft.AspNetCore.All": "2.0.0",
           "Microsoft.AspNetCore.Mvc.Core": "2.0.0",
           "Microsoft.NETCore.App": "2.0.0",
           "Minio.NetCore": "1.0.2",
-          "Stripe.net": "10.4.0",
+          "NuGet.CommandLine": "4.3.0",
+          "Stripe.net": "11.4.0",
           "Swashbuckle.AspNetCore": "1.0.0",
-          "Swashbuckle.AspNetCore.Examples": "2.3.0",
+          "Swashbuckle.AspNetCore.Examples": "2.3.1",
           "Swashbuckle.AspNetCore.Swagger": "1.0.0",
           "Swashbuckle.AspNetCore.SwaggerGen": "1.0.0",
           "Swashbuckle.AspNetCore.SwaggerUI": "1.0.0",
@@ -70,7 +71,7 @@
           "lib/netstandard1.3/AWSSDK.S3.dll": {}
         }
       },
-      "AWSSDK.SimpleEmail/3.3.3.1": {
+      "AWSSDK.SimpleEmail/3.3.4": {
         "dependencies": {
           "AWSSDK.Core": "3.3.18"
         },
@@ -2531,6 +2532,7 @@
           "lib/netstandard1.3/Newtonsoft.Json.Bson.dll": {}
         }
       },
+      "NuGet.CommandLine/4.3.0": {},
       "Remotion.Linq/2.1.1": {
         "dependencies": {
           "System.Collections": "4.3.0",
@@ -2841,7 +2843,7 @@
           "lib/netstandard1.5/StackExchange.Redis.StrongName.dll": {}
         }
       },
-      "Stripe.net/10.4.0": {
+      "Stripe.net/11.4.0": {
         "dependencies": {
           "NETStandard.Library": "2.0.0",
           "Newtonsoft.Json": "10.0.2",
@@ -2868,7 +2870,7 @@
           "lib/netstandard1.6/Swashbuckle.AspNetCore.dll": {}
         }
       },
-      "Swashbuckle.AspNetCore.Examples/2.3.0": {
+      "Swashbuckle.AspNetCore.Examples/2.3.1": {
         "dependencies": {
           "NETStandard.Library": "2.0.0",
           "Swashbuckle.AspNetCore.SwaggerGen": "1.0.0"
@@ -4447,12 +4449,12 @@
       "path": "awssdk.s3/3.3.11.1",
       "hashPath": "awssdk.s3.3.3.11.1.nupkg.sha512"
     },
-    "AWSSDK.SimpleEmail/3.3.3.1": {
+    "AWSSDK.SimpleEmail/3.3.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-NfQCeZA0AMsANSPm/a7ws/TspqTpvEy4TuSsv5dTK6hwNChWyn3xcUdFTgfZL6iYg9OTSvljyYbtkarj8C8NVQ==",
-      "path": "awssdk.simpleemail/3.3.3.1",
-      "hashPath": "awssdk.simpleemail.3.3.3.1.nupkg.sha512"
+      "sha512": "sha512-GQtUDl5uUk0V1//7PT1Jd3zqpu6ThsNRKAeRmQG+69SCFUk8tV0EFvGU7kJSUP2oYdBQf5Ai5NSe0d3Mg2ITVA==",
+      "path": "awssdk.simpleemail/3.3.4",
+      "hashPath": "awssdk.simpleemail.3.3.4.nupkg.sha512"
     },
     "Libuv/1.10.0": {
       "type": "package",
@@ -5651,6 +5653,13 @@
       "path": "newtonsoft.json.bson/1.0.1",
       "hashPath": "newtonsoft.json.bson.1.0.1.nupkg.sha512"
     },
+    "NuGet.CommandLine/4.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Wo+kltIu41aw8+Kl31acZSlFsVMwB75hSdzPq/zK0z3CCVLILz2oIPgZw5PLUQ0+A7uTHF0YQ9AiF0XNPI1rMg==",
+      "path": "nuget.commandline/4.3.0",
+      "hashPath": "nuget.commandline.4.3.0.nupkg.sha512"
+    },
     "Remotion.Linq/2.1.1": {
       "type": "package",
       "serviceable": true,
@@ -5861,12 +5870,12 @@
       "path": "stackexchange.redis.strongname/1.2.4",
       "hashPath": "stackexchange.redis.strongname.1.2.4.nupkg.sha512"
     },
-    "Stripe.net/10.4.0": {
+    "Stripe.net/11.4.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-V0SrilaUUw6KoHwmbuv+mxbnBTEMcl8K0H0ccT6WA3ry/ckDNStBd1Amzn5w/CQ3sb+HrJp05GdQIDiB02XECA==",
-      "path": "stripe.net/10.4.0",
-      "hashPath": "stripe.net.10.4.0.nupkg.sha512"
+      "sha512": "sha512-mf09vxV+nfJn9Xhq9Y1hyzt2I5TwjAkH5sk7JiA/PNq1KqhIuhAxC5ItajYtFSCEHPGeJQRJvcw0tiJKc54g1A==",
+      "path": "stripe.net/11.4.0",
+      "hashPath": "stripe.net.11.4.0.nupkg.sha512"
     },
     "Swashbuckle.AspNetCore/1.0.0": {
       "type": "package",
@@ -5875,12 +5884,12 @@
       "path": "swashbuckle.aspnetcore/1.0.0",
       "hashPath": "swashbuckle.aspnetcore.1.0.0.nupkg.sha512"
     },
-    "Swashbuckle.AspNetCore.Examples/2.3.0": {
+    "Swashbuckle.AspNetCore.Examples/2.3.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-hiZNEBR26OcMnC3GVQbjjt4QWVQ8Z/3GdTbdA//f3DF4KWx2zHvtIB8kGaju7hu4CHBEz/7ic45QuU4YcykmNA==",
-      "path": "swashbuckle.aspnetcore.examples/2.3.0",
-      "hashPath": "swashbuckle.aspnetcore.examples.2.3.0.nupkg.sha512"
+      "sha512": "sha512-qTrnTRM/n7rYa0TuoRc62LsFnLe/pBnThkk9QtxA0Zi2jrh6cYi8iOKdzZowX/ZeW3Md/VFvfI7TsgYKeZauiA==",
+      "path": "swashbuckle.aspnetcore.examples/2.3.1",
+      "hashPath": "swashbuckle.aspnetcore.examples.2.3.1.nupkg.sha512"
     },
     "Swashbuckle.AspNetCore.Swagger/1.0.0": {
       "type": "package",

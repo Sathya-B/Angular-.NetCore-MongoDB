@@ -187,5 +187,32 @@ namespace Arthur_Clive.Controllers
                 });
             }
         }
+
+        ///// <summary>Assign roles to users</summary>
+        ///// <param name="username">Details of role</param>
+        ///// <param name="rolename">Details of role</param>
+        //[HttpPost("roles/{username}/{rolename}")]
+        //public async Task<ActionResult> InsertRoles(string username,string rolename)
+        //{
+        //    try
+        //    {
+        //        return Ok(new ResponseData
+        //        {
+        //            Code = "200",
+        //            Message = "Subscribed Succesfully",
+        //            Data = null
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LoggerDataAccess.CreateLog("AdminContoller", "InsertRoles", "InsertRoles", ex.Message);
+        //        return BadRequest(new ResponseData
+        //        {
+        //            Code = "400",
+        //            Message = "Failed",
+        //            Data = ex.Message
+        //        });
+        //    }
+        //}
     }
 }

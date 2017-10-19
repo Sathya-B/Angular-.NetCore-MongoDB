@@ -11,6 +11,7 @@ using MH = Arthur_Clive.Helper.MongoHelper;
 using GH = Arthur_Clive.Helper.GlobalHelper;
 using Swashbuckle.AspNetCore.Examples;
 using Arthur_Clive.Swagger;
+using Arthur_Clive.Helper;
 
 namespace Arthur_Clive.Controllers
 {
@@ -46,121 +47,103 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                if (data.PaymentMethod != null)
+                IAsyncCursor<Address> userCursor = await _db.GetCollection<Address>("UserInfo").FindAsync(Builders<Address>.Filter.Eq("UserName", username));
+                var users = userCursor.ToList();
+                if (users.Count > 0)
                 {
-                    IAsyncCursor<Address> userCursor = await _db.GetCollection<Address>("UserInfo").FindAsync(Builders<Address>.Filter.Eq("UserName", username));
-                    var users = userCursor.ToList();
-                    if (users.Count > 0)
+                    IAsyncCursor<Cart> cartCursor = await _db.GetCollection<Cart>("Cart").FindAsync(Builders<Cart>.Filter.Eq("UserName", username));
+                    var cartDatas = cartCursor.ToList();
+                    if (cartDatas.Count > 0)
                     {
-                        IAsyncCursor<Cart> cartCursor = await _db.GetCollection<Cart>("Cart").FindAsync(Builders<Cart>.Filter.Eq("UserName", username));
-                        var cartDatas = cartCursor.ToList();
-                        if (cartDatas.Count > 0)
+                        var orders = await MH.GetOrders(username, order_db);
+                        if (orders == null)
                         {
-                            var orders = await GH.GetOrders(username, order_db);
-                            if (orders == null)
-                            {
-                                data.OrderId = 1;
-                            }
-                            else
-                            {
-                                data.OrderId = orders.Count + 1;
-                            }
-                            data.UserName = username;
-                            double totalPrice = 0;
-                            foreach(var product in cartDatas)
-                            {
-                                totalPrice = totalPrice + product.ProductPrice;
-                            }
-                            data.TotalAmount = totalPrice;
-                            PaymentMethod paymentMethod = new PaymentMethod();
-                            paymentMethod.Method = data.PaymentMethod;
-                            List<StatusCode> paymentStatus = new List<StatusCode>();
-                            if (data.PaymentMethod == "Cash On Delivery")
-                            {
-                                paymentStatus.Add(new StatusCode { StatusId = 1, Date = DateTime.UtcNow, Description = "Payment Pending" });
-                            }
-                            else
-                            {
-                                paymentStatus.Add(new StatusCode { StatusId = 1, Date = DateTime.UtcNow, Description = "Payment Service Initiated" });
-                            }
-                            paymentMethod.Status = paymentStatus;
-                            data.PaymentDetails = paymentMethod;
-                            List<Address> addressList = new List<Address>();
-                            foreach (var address in users)
-                            {
-                                if (address.DefaultAddress == true)
-                                {
-                                    addressList.Add(address);
-                                }
-                            }
-                            data.Address = addressList;
-                            if (data.Address.Count == 0)
-                            {
-                                return BadRequest(new ResponseData
-                                {
-                                    Code = "405",
-                                    Message = "No default address found",
-                                    Data = null
-                                });
-                            }
-                            List<ProductDetails> productList = new List<ProductDetails>();
-                            foreach (var cart in cartDatas)
-                            {
-                                foreach (var product in GH.GetProducts(cart.ProductSKU, product_db).Result)
-                                {
-                                    if (product.ProductStock < cart.ProductQuantity)
-                                    {
-                                        return BadRequest(new ResponseData
-                                        {
-                                            Code = "403",
-                                            Message = "Order quantity is higher than the product stock.",
-                                            Data = null
-                                        });
-                                    }
-                                    ProductDetails productDetails = new ProductDetails();
-                                    productDetails.ProductSKU = cart.ProductSKU;
-                                    productDetails.Status = "Order Placed";
-                                    List<StatusCode> productStatus = new List<StatusCode>();
-                                    productStatus.Add(new StatusCode { StatusId = 1, Date = DateTime.UtcNow, Description = "OrderPlaced" });
-                                    productDetails.StatusCode = productStatus;
-                                    productDetails.ProductInCart = cart;
-                                    productList.Add(productDetails);
-                                }
-                            }
-                            data.ProductDetails = productList;
-                            await order_db.GetCollection<OrderInfo>("OrderInfo").InsertOneAsync(data);
-                            foreach (var cart in cartDatas)
-                            {
-                                foreach (var product in GH.GetProducts(cart.ProductSKU, product_db).Result)
-                                {
-                                    var update = Builders<BsonDocument>.Update.Set("ProductStock", product.ProductStock - cart.ProductQuantity);
-                                    var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", cart.ProductSKU), "ProductDB", "Product", update).Result;
-                                }
-                                var response = MH.DeleteSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", cart.ProductSKU), "UserInfo", "Cart");
-                            }
-                            return Ok(new ResponseData
-                            {
-                                Code = "200",
-                                Message = "Order Placed",
-                                Data = null
-                            });
+                            data.OrderId = 1;
                         }
                         else
                         {
+                            data.OrderId = orders.Count + 1;
+                        }
+                        data.UserName = username;
+                        data.PaymentMethod = "Nil";
+                        PaymentMethod paymentMethod = new PaymentMethod();
+                        paymentMethod.Method = "Nil";
+                        List<StatusCode> paymentStatus = new List<StatusCode>();
+                        paymentStatus.Add(new StatusCode { Date = DateTime.UtcNow, StatusId = 1, Description = "Payment Initiated" });
+                        paymentMethod.Status = paymentStatus;
+                        data.PaymentDetails = paymentMethod;
+                        List<Address> addressList = new List<Address>();
+                        foreach (var address in users)
+                        {
+                            if (address.DefaultAddress == true)
+                            {
+                                addressList.Add(address);
+                            }
+                        }
+                        data.Address = addressList;
+                        if (data.Address.Count == 0)
+                        {
                             return BadRequest(new ResponseData
                             {
-                                Code = "402",
-                                Message = "Cart not found",
+                                Code = "405",
+                                Message = "No default address found",
                                 Data = null
                             });
                         }
+                        List<ProductDetails> productList = new List<ProductDetails>();
+                        foreach (var cart in cartDatas)
+                        {
+                            foreach (var product in MH.GetProducts(cart.ProductSKU, product_db).Result)
+                            {
+                                if (product.ProductStock < cart.ProductQuantity)
+                                {
+                                    return BadRequest(new ResponseData
+                                    {
+                                        Code = "403",
+                                        Message = "Order quantity is higher than the product stock.",
+                                        Data = null
+                                    });
+                                }
+                                ProductDetails productDetails = new ProductDetails();
+                                productDetails.ProductSKU = cart.ProductSKU;
+                                productDetails.Status = "Order Placed";
+                                List<StatusCode> productStatus = new List<StatusCode>();
+                                productStatus.Add(new StatusCode { StatusId = 1, Date = DateTime.UtcNow, Description = "OrderPlaced" });
+                                productDetails.StatusCode = productStatus;
+                                productDetails.ProductInCart = cart;
+                                productList.Add(productDetails);
+                            }
+                        }
+                        data.ProductDetails = productList;
+                        await order_db.GetCollection<OrderInfo>("OrderInfo").InsertOneAsync(data);
+                        string productInfo = "";
+                        foreach (var cart in cartDatas)
+                        {
+                            productInfo = cart.ProductSKU + "|";
+                            foreach (var product in MH.GetProducts(cart.ProductSKU, product_db).Result)
+                            {
+                                var update = Builders<BsonDocument>.Update.Set("ProductStock", product.ProductStock - cart.ProductQuantity);
+                                var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", cart.ProductSKU), "ProductDB", "Product", update).Result;
+                            }
+                            var response = MH.DeleteSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", cart.ProductSKU), "UserInfo", "Cart");
+                        }
+                        RegisterModel userInfo = BsonSerializer.Deserialize<RegisterModel>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication").Result);
+                        Address addressInfo = BsonSerializer.Deserialize<Address>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "UserInfo", "UserInfo").Result);
+                        PaymentModel paymentModel = new PaymentModel { FirstName = userInfo.FullName, LastName = "", ProductInfo = productInfo, Amount = data.TotalAmount.ToString(), Email = userInfo.Email, PhoneNumber = userInfo.PhoneNumber, AddressLine1 = addressInfo.AddressLines, AddressLine2 = addressInfo.Landmark, City = addressInfo.City, State = addressInfo.State, Country = userInfo.UserLocation, ZipCode = addressInfo.PinCode };
+                        var hashtableData = PayUHelper.GetHashtableData(paymentModel);
+                        return Ok(new ResponseData
+                        {
+                            Code = "200",
+                            Message = "Order Placed",
+                            Data = hashtableData
+                        });
                     }
                     else
                     {
                         return BadRequest(new ResponseData
                         {
-                            Code = "401",
-                            Message = "UserInfo not found",
+                            Code = "402",
+                            Message = "Cart not found",
                             Data = null
                         });
                     }
@@ -169,8 +152,8 @@ namespace Arthur_Clive.Controllers
                 {
                     return BadRequest(new ResponseData
                     {
-                        Code = "404",
-                        Message = "Provide a payment method",
+                        Code = "401",
+                        Message = "UserInfo not found",
                         Data = null
                     });
                 }
@@ -199,7 +182,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var orders = GH.GetOrders(username, order_db);
+                var orders = MH.GetOrders(username, order_db);
                 if (orders != null)
                 {
                     return Ok(new ResponseData
@@ -291,7 +274,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var orders = GH.GetOrders(username, order_db).Result;
+                var orders = MH.GetOrders(username, order_db).Result;
                 if (orders == null)
                 {
                     return BadRequest(new ResponseData
@@ -430,7 +413,7 @@ namespace Arthur_Clive.Controllers
             {
                 if (request == "refund" || request == "replace")
                 {
-                    var orders = GH.GetOrders(username, order_db).Result;
+                    var orders = MH.GetOrders(username, order_db).Result;
                     if (orders == null)
                     {
                         return BadRequest(new ResponseData

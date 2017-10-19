@@ -1,6 +1,5 @@
 ﻿using System;
 using Arthur_Clive.Data;
-using Arthur_Clive.Helper;
 using Arthur_Clive.Logger;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
@@ -8,6 +7,7 @@ using AH = Arthur_Clive.Helper.AmazonHelper;
 using WH = Arthur_Clive.Helper.MinioHelper;
 using MH = Arthur_Clive.Helper.MongoHelper;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Arthur_Clive.Controllers
 {

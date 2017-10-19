@@ -1,8 +1,15 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Arthur_Clive.Data;
+using Arthur_Clive.Logger;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using AH = Arthur_Clive.Helper.AmazonHelper;
+using WH = Arthur_Clive.Helper.MinioHelper;
+using MH = Arthur_Clive.Helper.MongoHelper;
 
 namespace Arthur_Clive.Helper
 {
@@ -11,10 +18,10 @@ namespace Arthur_Clive.Helper
     {
         /// <summary></summary>
         public static IMongoDatabase _mongodb;
-
         /// <summary>Client for MongoDB</summary>
         public static MongoClient _client = GetClient();
-
+        /// <summary></summary>
+        public static FilterDefinition<BsonDocument> filter;
         /// <summary>Get client for MongoDB</summary>
         public static MongoClient GetClient()
         {
@@ -38,7 +45,39 @@ namespace Arthur_Clive.Helper
             IAsyncCursor<BsonDocument> cursor = await collection.FindAsync(filter);
             return cursor.FirstOrDefault();
         }
-        
+
+        /// <summary>Get list of objects from MongoDB</summary>
+        /// <param name="filterField1"></param>
+        /// <param name="filterField2"></param>
+        /// <param name="filterField3"></param>
+        /// <param name="filterData1"></param>
+        /// <param name="filterData2"></param>
+        /// <param name="filterData3"></param>
+        /// <param name="dbName"></param>
+        /// <param name="collectionName"></param>
+        public static async Task<List<BsonDocument>> GetListOfObjects(string filterField1, dynamic filterData1, string filterField2, dynamic filterData2, string filterField3, dynamic filterData3, string dbName, string collectionName)
+        {
+            var collection = _client.GetDatabase(dbName).GetCollection<BsonDocument>(collectionName);
+            if (filterField1 == null & filterField2 == null & filterField3 == null)
+            {
+                filter = FilterDefinition<BsonDocument>.Empty;
+            }
+            else if (filterField1 != null & filterField2 == null & filterField3 == null)
+            {
+                filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1);
+            }
+            else if (filterField1 != null & filterField2 != null & filterField3 == null)
+            {
+                filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2);
+            }
+            else if (filterField1 != null & filterField2 != null & filterField3 != null)
+            {
+                filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2) & Builders<BsonDocument>.Filter.Eq(filterField3, filterData3);
+            }
+            IAsyncCursor<BsonDocument> cursor = await collection.FindAsync(filter);
+            return cursor.ToList();
+        }
+
         /// <summary>Update single object in MongoDB </summary>
         /// <param name="filter"></param>
         /// <param name="dbName"></param>
@@ -84,5 +123,90 @@ namespace Arthur_Clive.Helper
             }
             return GetSingleObject(filter, dbName, collectionName).Result;
         }
+        
+        /// <summary>Get order list from MongoDB</summary>
+        /// <param name="username"></param>
+        /// <param name="order_db"></param>
+        public async static Task<List<OrderInfo>> GetOrders(string username, IMongoDatabase order_db)
+        {
+            try
+            {
+                IAsyncCursor<OrderInfo> cursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("UserName", username));
+                var orders = cursor.ToList();
+                return orders;
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("GlobalHelper", "GetOrders", "GetOrders", ex.Message);
+                return null;
+            }
+        }
+
+        /// <summary>Get product list  from MongoDB</summary>
+        /// <param name="productSKU"></param>
+        /// <param name="product_db"></param>
+        public async static Task<List<Product>> GetProducts(string productSKU, IMongoDatabase product_db)
+        {
+            try
+            {
+                IAsyncCursor<Product> productCursor = await product_db.GetCollection<Product>("Product").FindAsync(Builders<Product>.Filter.Eq("ProductSKU", productSKU));
+                var products = productCursor.ToList();
+                return products;
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("GlobalHelper", "GetProducts", "GetProducts", ex.Message);
+                return null;
+            }
+        }
+
+        /// <summary></summary>
+        /// <param name="objectId"></param>
+        /// <param name="productSKU"></param>
+        /// <param name="updateData"></param>
+        /// <param name="updateField"></param>
+        /// <param name="objectName"></param>
+        public async static void UpdateProductDetails(dynamic objectId, string productSKU, dynamic updateData, string updateField, string objectName)
+        {
+            try
+            {
+                var update = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Product", Builders<BsonDocument>.Update.Set(updateField, updateData));
+                string MinioObject_URL;
+                //MinioObject_URL = WH.GetMinioObject("arthurclive-products", objectName).Result;
+                //MinioObject_URL = AH.GetAmazonS3Object("arthurclive-products", objectName);
+                MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
+                var update1 = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductSKU", objectName));
+                var update2 = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Product", Builders<BsonDocument>.Update.Set("MinioObject_URL", MinioObject_URL));
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("GlobalHelper", "UpdateProductDetails", "UpdateProductDetails", ex.Message);
+            }
+        }
+
+        /// <summary></summary>
+        /// <param name="objectId"></param>
+        /// <param name="productFor"></param>
+        /// <param name="productType"></param>
+        /// <param name="updateData"></param>
+        /// <param name="updateField"></param>
+        /// <param name="objectName"></param>
+        public async static void UpdateCategoryDetails(dynamic objectId, string productFor, string productType, dynamic updateData, string updateField, string objectName)
+        {
+            try
+            {
+                var update = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Category", Builders<BsonDocument>.Update.Set(updateField, updateData));
+                string MinioObject_URL;
+                //MinioObject_URL = WH.GetMinioObject("products", objectName).Result;
+                //MinioObject_URL = AH.GetAmazonS3Object("product-category", objectName);
+                MinioObject_URL = AH.GetS3Object("product-category", objectName);
+                var update1 = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Category", Builders<BsonDocument>.Update.Set("MinioObject_URL", MinioObject_URL));
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("GlobalHelper", "UpdateCategoryDetails", "UpdateCategoryDetails", ex.Message);
+            }
+        }
+
     }
 }

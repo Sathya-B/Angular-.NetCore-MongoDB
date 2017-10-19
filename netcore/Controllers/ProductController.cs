@@ -13,6 +13,7 @@ using GH = Arthur_Clive.Helper.GlobalHelper;
 using Swashbuckle.AspNetCore.Examples;
 using Arthur_Clive.Swagger;
 using MongoDB.Bson.Serialization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Arthur_Clive.Controllers
 {
@@ -136,7 +137,7 @@ namespace Arthur_Clive.Controllers
         /// <remarks>This api is used to insert a new product</remarks>
         /// <param name="product">Details of product to be inserted</param>
         /// <response code="200">Product inserted successfully</response>
-        /// <response code="400">Process ran into an exception</response>   
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPost]
         [SwaggerRequestExample(typeof(Product), typeof(InsertProduct))]
         [ProducesResponseType(typeof(ResponseData), 200)]
@@ -240,19 +241,19 @@ namespace Arthur_Clive.Controllers
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
                         var objectName = data.ProductFor + "-" + productSKU.Split('-')[1] + "-" + productSKU.Split('-')[2] + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4];
-                        GH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, productSKU,data.ProductFor, "ProductFor",objectName);
+                        MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, productSKU,data.ProductFor, "ProductFor",objectName);
                     }
                     if (data.ProductType != null)
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
                         var objectName = productSKU.Split('-')[0] + "-" + data.ProductType + "-" + productSKU.Split('-')[2] + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4];
-                        GH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, productSKU, data.ProductType, "ProductType",objectName);
+                        MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, productSKU, data.ProductType, "ProductType",objectName);
                     }
                     if (data.ProductDesign != null)
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
                         var objectName = productSKU.Split('-')[0] + "-" + productSKU.Split('-')[1] + "-" + data.ProductDesign + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4];
-                        GH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, productSKU, data.ProductDesign, "ProductDesign",objectName);
+                        MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, productSKU, data.ProductDesign, "ProductDesign",objectName);
                     }
                     if (data.ProductBrand != null)
                     {
@@ -299,7 +300,7 @@ namespace Arthur_Clive.Controllers
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
                         var objectName = productSKU.Split('-')[0] + "-" + productSKU.Split('-')[1] + "-" + productSKU.Split('-')[2] + "-" + productSKU.Split('-')[3] + "-" + data.ProductSize;
-                        GH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, productSKU, data.ProductSize, "ProductSize",objectName);
+                        MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, productSKU, data.ProductSize, "ProductSize",objectName);
                     }
                     if (data.ProductMaterial != null)
                     {
@@ -317,7 +318,7 @@ namespace Arthur_Clive.Controllers
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
                         var objectName = productSKU.Split('-')[0] + "-" + productSKU.Split('-')[1] + "-" + productSKU.Split('-')[2] + "-" + data.ProductColour + "-" + productSKU.Split('-')[4];
-                        GH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, productSKU, data.ProductColour, "ProductColour",objectName);
+                        MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, productSKU, data.ProductColour, "ProductColour",objectName);
                     }
                     if (data.RefundApplicable != null)
                     {

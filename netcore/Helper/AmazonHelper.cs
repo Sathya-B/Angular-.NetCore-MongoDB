@@ -11,15 +11,12 @@ namespace Arthur_Clive.Helper
     {
         /// <summary>Amazon s3 client</summary>
         public static IAmazonS3 s3Client;
-
-        /// <summary>Get Url prefix for amazon s3 ObjectUrl</summary>
-        public static string s3PrefixUrl = "https://s3.ap-south-1.amazonaws.com/";
-        
+                
         /// <summary>Get Amazon S3 client</summary>
         public static IAmazonS3 GetAmazonS3Client()
         {
-            string accessKey = GlobalHelper.ReadXML().Elements("amazons3").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("accesskey").First().Value;
-            string secretKey = GlobalHelper.ReadXML().Elements("amazons3").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("secretkey").First().Value;
+            string accessKey = GlobalHelper.ReadXML().Elements("amasons3").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("accesskey").FirstOrDefault().Value;
+            string secretKey = GlobalHelper.ReadXML().Elements("amasons3").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("secretkey").FirstOrDefault().Value;
             s3Client = new AmazonS3Client(accessKey, secretKey, Amazon.RegionEndpoint.APSouth1);
             return s3Client;
         }
@@ -54,6 +51,7 @@ namespace Arthur_Clive.Helper
         /// <param name="objectName"></param>
         public static string GetS3Object(string bucketName, string objectName)
         {
+            string s3PrefixUrl = "https://s3.ap-south-1.amazonaws.com/";
             string presignedUrl = s3PrefixUrl + bucketName + "/" + objectName;
             return presignedUrl;
         }

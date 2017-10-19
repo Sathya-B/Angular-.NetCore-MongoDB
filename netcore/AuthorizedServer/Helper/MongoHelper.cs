@@ -1,8 +1,14 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using AuthorizedServer.Logger;
+using AuthorizedServer.Models;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using MH = AuthorizedServer.Helper.MongoHelper;
 
 namespace AuthorizedServer.Helper
 {
@@ -11,10 +17,10 @@ namespace AuthorizedServer.Helper
     {
         /// <summary></summary>
         public static IMongoDatabase _mongodb;
-
         /// <summary></summary>
-        public static MongoClient _client = GetClient();      
-
+        public static MongoClient _client = GetClient();
+        /// <summary></summary>
+        public static FilterDefinition<BsonDocument> filter;
         /// <summary>Get Mongo Client</summary>
         public static MongoClient GetClient()
         {
@@ -37,6 +43,39 @@ namespace AuthorizedServer.Helper
             var collection = _mongodb.GetCollection<BsonDocument>(collectionName);
             IAsyncCursor<BsonDocument> cursor = await collection.FindAsync(filter);
             return cursor.FirstOrDefault();
+        }
+
+        /// <summary>Get list of objects from MongoDB</summary>
+        /// <param name="filterField1"></param>
+        /// <param name="filterField2"></param>
+        /// <param name="filterField3"></param>
+        /// <param name="filterData1"></param>
+        /// <param name="filterData2"></param>
+        /// <param name="filterData3"></param>
+        /// <param name="dbName"></param>
+        /// <param name="collectionName"></param>
+        public static async Task<List<BsonDocument>> GetListOfObjects(string filterField1, dynamic filterData1, string filterField2, dynamic filterData2, string filterField3, dynamic filterData3, string dbName, string collectionName)
+        {
+            _mongodb = MH._client.GetDatabase(dbName);
+            var collection = _mongodb.GetCollection<BsonDocument>(collectionName);
+            if(filterField1 == null & filterField2 == null & filterField3 == null)
+            {
+                filter = FilterDefinition<BsonDocument>.Empty;
+            }
+            else if(filterField1 != null & filterField2 == null & filterField3 == null)
+            {
+                filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1);
+            }
+            else if (filterField1 != null & filterField2 != null & filterField3 == null)
+            {
+                filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2);
+            }
+            else if (filterField1 != null & filterField2 != null & filterField3 != null)
+            {
+                filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2) & Builders<BsonDocument>.Filter.Eq(filterField3, filterData3);
+            }
+            IAsyncCursor<BsonDocument> cursor = await collection.FindAsync(filter);
+            return cursor.ToList();
         }
 
         /// <summary>
@@ -77,6 +116,33 @@ namespace AuthorizedServer.Helper
                 filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2);
             }
             return GetSingleObject(filter, dbName, collectionName).Result;
+        }
+
+        /// <summary>To record invalid login attempts</summary>
+        /// <param name="filter"></param>
+        public static string RecordLoginAttempts(FilterDefinition<BsonDocument> filter)
+        {
+            try
+            {
+                var verifyUser = BsonSerializer.Deserialize<RegisterModel>(MH.GetSingleObject(filter, "Authentication", "Authentication").Result);
+                if (verifyUser.WrongAttemptCount < 10)
+                {
+                    var update = Builders<BsonDocument>.Update.Set("WrongAttemptCount", verifyUser.WrongAttemptCount + 1);
+                    var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
+                    return "Login Attempt Recorded";
+                }
+                else
+                {
+                    var update = Builders<BsonDocument>.Update.Set("Status", "Revoked");
+                    var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
+                    return "Account Blocked";
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AuthController", "RecordLoginAttempts", "RecordLoginAttempts", ex.Message);
+                return "Failed";
+            }
         }
     }
 }

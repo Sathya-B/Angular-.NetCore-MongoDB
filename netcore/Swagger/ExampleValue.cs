@@ -314,7 +314,6 @@ namespace Arthur_Clive.Swagger
         {
             return new OrderInfo
             {
-                PaymentMethod = "Cash On Delivery",
                 CouponDiscount = 0
             };
         }
@@ -329,7 +328,6 @@ namespace Arthur_Clive.Swagger
             return new OrderInfo
             {
                 OrderId = 1,
-                PaymentMethod = "Cash On Delivery"
             };
         }
     }

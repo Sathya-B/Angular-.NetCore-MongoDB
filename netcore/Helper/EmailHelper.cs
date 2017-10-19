@@ -16,7 +16,8 @@ namespace Arthur_Clive.Helper
         /// <param name="key"></param>
         public static string GetCredentials(string key)
         {
-            var result = GlobalHelper.ReadXML().Elements("amazonses").Where(x => x.Element("current").Value.Equals("test")).Descendants(key);
+            var xx = GlobalHelper.ReadXML();
+            var result = GlobalHelper.ReadXML().Elements("amazonses").Where(x => x.Element("current").Value.Equals("Yes")).Descendants(key);
             return result.First().Value;
         }
 

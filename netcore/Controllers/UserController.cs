@@ -11,6 +11,8 @@ using MH = Arthur_Clive.Helper.MongoHelper;
 using System.Linq;
 using Swashbuckle.AspNetCore.Examples;
 using Arthur_Clive.Swagger;
+using Microsoft.AspNetCore.Authorization;
+using MongoDB.Bson.Serialization;
 
 namespace Arthur_Clive.Controllers
 {
@@ -23,6 +25,40 @@ namespace Arthur_Clive.Controllers
         public IMongoDatabase _db = MH._client.GetDatabase("UserInfo");
         /// <summary></summary>
         public UpdateDefinition<BsonDocument> updateDefinition;
+
+        /// <summary>Get default address of user</summary>
+        /// <param name="username">UserName of user</param>
+        /// <remarks>This api is user to get default address of an user</remarks>
+        /// <response code="200">Returns the default address of the user</response>
+        /// <response code="400">Process ran into an exception</response>  
+        [HttpGet("userinfo/{username}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public async Task<ActionResult> GetDefaultAddressOfUser(string username)
+        {
+            try
+            {
+                var userCollection = _db.GetCollection<Address>("UserInfo");
+                var filter = Builders<Address>.Filter.Eq("UserName", username) & Builders<Address>.Filter.Eq("DefaultAddress", true);
+                IAsyncCursor<Address> cursor = await userCollection.FindAsync(filter);
+                var userInfo = cursor.ToList();
+                return Ok(new ResponseData
+                {
+                    Code = "200",
+                    Message = "Success",
+                    Data = userInfo
+                });
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("UserController", "GetDefaultAddressOfUser", "GetDefaultAddressOfUser", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                }); ;
+            }
+        }
 
         /// <summary>Refresh address details of user</summary>
         /// <remarks>This api is uses to refresh userinfo of a user</remarks>
@@ -65,37 +101,44 @@ namespace Arthur_Clive.Controllers
             }
         }
         
-        /// <summary>Get default address of user</summary>
+        /// <summary>Get products in cart of user</summary>
         /// <param name="username">UserName of user</param>
-        /// <remarks>This api is user to get default address of an user</remarks>
-        /// <response code="200">Returns the default address of the user</response>
-        /// <response code="400">Process ran into an exception</response>  
-        [HttpGet("userinfo/{username}")]
+        /// <remarks>This api is user to get products in cart of an user</remarks>
+        /// <response code="200">Returns the products in cart</response>
+        /// <response code="400">Process ran into an exception</response> 
+        [HttpGet("cart/{username}")]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> GetDefaultAddressOfUser(string username)
+        public async Task<ActionResult> GetProductsInCart(string username)
         {
             try
             {
-                var userCollection = _db.GetCollection<Address>("UserInfo");
-                var filter = Builders<Address>.Filter.Eq("UserName", username) & Builders<Address>.Filter.Eq("DefaultAddress", true);
-                IAsyncCursor<Address> cursor = await userCollection.FindAsync(filter);
-                var userInfo = cursor.ToList();
+                var collection = _db.GetCollection<Cart>("Cart");
+                var filter = Builders<Cart>.Filter.Eq("UserName", username);
+                IAsyncCursor<Cart> cursor = await collection.FindAsync(filter);
+                var products = cursor.ToList();
+                foreach (var data in products)
+                {
+                    string objectName = data.ProductSKU + ".jpg";
+                    //data.ObjectUrl = WH.GetMinioObject("products", objectName).Result;
+                    //data.ObjectUrl = AH.GetAmazonS3Object("arthurclive-products", objectName);
+                    data.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
+                }
                 return Ok(new ResponseData
                 {
                     Code = "200",
                     Message = "Success",
-                    Data = userInfo
+                    Data = products
                 });
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("UserController", "GetDefaultAddressOfUser", "GetDefaultAddressOfUser", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "GetProductsInCart", "GetProductsInCart", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
                     Message = "Failed",
                     Data = ex.Message
-                }); ;
+                });
             }
         }
 
@@ -139,21 +182,21 @@ namespace Arthur_Clive.Controllers
                 });
             }
         }
-
-        /// <summary>Get products in cart of user</summary>
+        
+        /// <summary>Get products in wishlist of user</summary>
         /// <param name="username">UserName of user</param>
-        /// <remarks>This api is user to get products in cart of an user</remarks>
-        /// <response code="200">Returns the products in cart</response>
+        /// <remarks>This api is user to get products in wishlist of an user</remarks>
+        /// <response code="200">Returns the products in wishlist</response>
         /// <response code="400">Process ran into an exception</response> 
-        [HttpGet("cart/{username}")]
+        [HttpGet("wishlist/{username}")]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> GetProductsInCart(string username)
+        public async Task<ActionResult> GetProductsInWishList(string username)
         {
             try
             {
-                var collection = _db.GetCollection<Cart>("Cart");
-                var filter = Builders<Cart>.Filter.Eq("UserName", username);
-                IAsyncCursor<Cart> cursor = await collection.FindAsync(filter);
+                var collection = _db.GetCollection<WishList>("WishList");
+                var filter = Builders<WishList>.Filter.Eq("UserName", username);
+                IAsyncCursor<WishList> cursor = await collection.FindAsync(filter);
                 var products = cursor.ToList();
                 foreach (var data in products)
                 {
@@ -171,7 +214,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "GetProductsInCart", "GetProductsInCart", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "GetProductsInWishList", "GetProductsInWishList", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -213,47 +256,6 @@ namespace Arthur_Clive.Controllers
             catch (Exception ex)
             {
                 LoggerDataAccess.CreateLog("AuthController", "RefreshWishList", "RefreshWishList", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
-            }
-        }
-
-        /// <summary>Get products in wishlist of user</summary>
-        /// <param name="username">UserName of user</param>
-        /// <remarks>This api is user to get products in wishlist of an user</remarks>
-        /// <response code="200">Returns the products in wishlist</response>
-        /// <response code="400">Process ran into an exception</response> 
-        [HttpGet("wishlist/{username}")]
-        [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> GetProductsInWishList(string username)
-        {
-            try
-            {
-                var collection = _db.GetCollection<WishList>("WishList");
-                var filter = Builders<WishList>.Filter.Eq("UserName", username);
-                IAsyncCursor<WishList> cursor = await collection.FindAsync(filter);
-                var products = cursor.ToList();
-                foreach (var data in products)
-                {
-                    string objectName = data.ProductSKU + ".jpg";
-                    //data.ObjectUrl = WH.GetMinioObject("products", objectName).Result;
-                    //data.ObjectUrl = AH.GetAmazonS3Object("arthurclive-products", objectName);
-                    data.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
-                }
-                return Ok(new ResponseData
-                {
-                    Code = "200",
-                    Message = "Success",
-                    Data = products
-                });
-            }
-            catch (Exception ex)
-            {
-                LoggerDataAccess.CreateLog("AuthController", "GetProductsInWishList", "GetProductsInWishList", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

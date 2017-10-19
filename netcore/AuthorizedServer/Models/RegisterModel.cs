@@ -18,6 +18,8 @@ namespace AuthorizedServer.Models
         public string FullName { get; set; }
         /// <summary>Username of user</summary>
         public string UserName { get; set; }
+        /// <summary>Role for user</summary>
+        public string UserRole { get; set; }
         /// <summary>Dialcode for phonenumber of the user</summary>
         [Required]
         public string DialCode { get; set; }

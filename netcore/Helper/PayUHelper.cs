@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Linq;
+using Arthur_Clive.Logger;
 
 namespace Arthur_Clive.Helper
 {
@@ -73,7 +74,7 @@ namespace Arthur_Clive.Helper
         /// <summary>/// Prepare post form for paymet through PayUMoney</summary>
         /// <param name="url"></param>
         /// <param name="data"></param>
-        public static StringBuilder PreparePOSTForm(string url, Hashtable data)
+        public static string PreparePOSTForm(string url, Hashtable data)
         {
             string formID = "PostForm";
             StringBuilder strForm = new StringBuilder();
@@ -89,7 +90,7 @@ namespace Arthur_Clive.Helper
             strScript.Append("v" + formID + ".submit();");
             strScript.Append("</script>");
             strForm.Append(strScript);
-            return strForm;
+            return strForm.ToString();
         }
 
         /// <summary>Get TxnId</summary>
@@ -148,6 +149,108 @@ namespace Arthur_Clive.Helper
             }
             hashString += GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("saltkey").First().Value;
             return hashString;
+        }
+
+        /// <summary>Generate hashtable data for payment gateway process</summary>
+        /// <param name="model">Data to be included in the form</param>
+        public static Hashtable GetHashtableData(PaymentModel model)
+        {
+            try
+            {
+                string SuccessUrl = "http://localhost:5001/api/payment/success";
+                string FailureUrl = "http://localhost:5001/api/payment/failed";
+                string CancleUrl = "http://localhost:5001/api/payment/cancle";
+                string txnId = GetTxnId();
+                string hashString = GetHashString(txnId, model);
+                string hash = Generatehash512(hashString).ToLower();
+                string action = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("url").First().Value + "/_payment";
+                Hashtable data = new Hashtable();
+                data.Add("hash", hash);
+                data.Add("txnid", txnId);
+                data.Add("key", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("key").First().Value);
+                string AmountForm = Convert.ToDecimal(model.Amount).ToString("g29");
+                data.Add("amount", AmountForm);
+                data.Add("firstname", model.FirstName);
+                data.Add("email", model.Email);
+                data.Add("phone", model.PhoneNumber);
+                data.Add("productinfo", model.ProductInfo);
+                data.Add("surl", SuccessUrl);
+                data.Add("furl", FailureUrl);
+                data.Add("lastname", model.LastName);
+                data.Add("curl", CancleUrl);
+                data.Add("address1", model.AddressLine1);
+                data.Add("address2", model.AddressLine2);
+                data.Add("city", model.City);
+                data.Add("state", model.State);
+                data.Add("country", model.Country);
+                data.Add("zipcode", model.ZipCode);
+                data.Add("udf1", "");
+                data.Add("udf2", "");
+                data.Add("udf3", "");
+                data.Add("udf4", "");
+                data.Add("udf5", "");
+                data.Add("pg", "");
+                data.Add("service_provider", "PayUMoney");
+                return data;
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("PaymentController", "MakePayment", "MakePayment", ex.Message);
+                return null;
+            }
+        }
+
+        /// <summary>Generate form for payment gateway using PayUMoney</summary>
+        /// <param name="model">Data to be included in the form</param>
+        public static string GenerateForm(PaymentModel model)
+        {
+            try
+            {
+                string SuccessUrl = "http://localhost:5001/api/payment/success";
+                string FailureUrl = "http://localhost:5001/api/payment/failed";
+                string CancleUrl = "http://localhost:5001/api/payment/cancle";
+                string txnId = GetTxnId();
+                string hashString = GetHashString(txnId, model);
+                string hash = Generatehash512(hashString).ToLower();
+                string action = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("url").First().Value + "/_payment";
+                Hashtable data = new Hashtable();
+                data.Add("hash", hash);
+                data.Add("txnid", txnId);
+                data.Add("key", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("key").First().Value);
+                string AmountForm = Convert.ToDecimal(model.Amount).ToString("g29");
+                data.Add("amount", AmountForm);
+                data.Add("firstname", model.FirstName);
+                data.Add("email", model.Email);
+                data.Add("phone", model.PhoneNumber);
+                data.Add("productinfo", model.ProductInfo);
+                data.Add("surl", SuccessUrl);
+                data.Add("furl", FailureUrl);
+                data.Add("lastname", model.LastName);
+                data.Add("curl", CancleUrl);
+                data.Add("address1", model.AddressLine1);
+                data.Add("address2", model.AddressLine2);
+                data.Add("city", model.City);
+                data.Add("state", model.State);
+                data.Add("country", model.Country);
+                data.Add("zipcode", model.ZipCode);
+                data.Add("udf1", "");
+                data.Add("udf2", "");
+                data.Add("udf3", "");
+                data.Add("udf4", "");
+                data.Add("udf5", "");
+                data.Add("pg", "");
+                data.Add("service_provider", "PayUMoney");
+                string strForm = PreparePOSTForm(action, data);
+                var form = PreparePOSTForm(action, data);
+                dynamic UserInfo = new System.Dynamic.ExpandoObject();
+                UserInfo.form = form;
+                return UserInfo;
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("PaymentController", "MakePayment", "MakePayment", ex.Message);
+                return null;
+            }
         }
     }
 }

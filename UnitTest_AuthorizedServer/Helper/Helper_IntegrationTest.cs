@@ -19,7 +19,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void DoPassword()
+        public void AuthHelper_DoPassword_IntegrationTest_AuthorizedServer()
         {
             //Arrange
             var repo = new Mock<IRTokenRepository>();
@@ -40,7 +40,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void DoRefreshToken()
+        public void AuthHelper_DoRefreshToken_IntegrationTest_AuthorizedServer()
         {
             //Arrange
             var repo = new Mock<IRTokenRepository>();
@@ -61,7 +61,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void GetJWT()
+        public void AuthHelper_GetJWT_IntegrationTest_AuthorizedServer()
         {
             //Arrange
             var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
@@ -81,7 +81,7 @@ namespace UnitTest_AuthorizedServer.Helper
     public class EmailHelper_IntegrationTest
     {
         [TestMethod]
-        public void EmailHelper_GetCredentials()
+        public void EmailHelper_GetCredentials_IntegrationTest_AuthorizedServer()
         {
             //Arrange
             var key1 = "accesskey";
@@ -102,7 +102,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void EmailHelper_SendEmail()
+        public void EmailHelper_SendEmail_IntegrationTest_AuthorizedServer()
         {
             //Arrange
 
@@ -112,7 +112,7 @@ namespace UnitTest_AuthorizedServer.Helper
         }
 
         [TestMethod]
-        public void EmailHelper_CreateEmailBody()
+        public void EmailHelper_CreateEmailBody_IntegrationTest_AuthorizedServer()
         {
             //Arrange
             var linkFromXML = GlobalHelper.ReadXML().Elements("ipconfig").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("authorizedserver2");
@@ -134,7 +134,7 @@ namespace UnitTest_AuthorizedServer.Helper
     public class GlobalHelper_IntegrationTest
     {
         [TestMethod]
-        public void GlobalHelper_GetCurrentDir()
+        public void GlobalHelper_GetCurrentDir_IntegrationTest_AuthorizedServer()
         {
             //Arrange
 
@@ -146,7 +146,7 @@ namespace UnitTest_AuthorizedServer.Helper
         }
 
         [TestMethod]
-        public void GlobalHelper_ReadXML()
+        public void GlobalHelper_ReadXML_IntegrationTest_AuthorizedServer()
         {
             //Arrange
 
@@ -158,7 +158,7 @@ namespace UnitTest_AuthorizedServer.Helper
         }
         
         [TestMethod]
-        public void GlobalHelper_GetIpConfig()
+        public void GlobalHelper_GetIpConfig_IntegrationTest_AuthorizedServer()
         {
             //Arrange
 
@@ -174,7 +174,7 @@ namespace UnitTest_AuthorizedServer.Helper
     public class MongoHelper_IntegrationTest
     {
         [TestMethod]
-        public void MongoHelper_GetClient()
+        public void MongoHelper_GetClient_IntegrationTest_AuthorizedServer()
         {
             //Arrange
             var ipFromXML = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("ip").First().Value;
@@ -195,7 +195,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_GetSingleObject()
+        public void MongoHelper_GetSingleObject_IntegrationTest_AuthorizedServer()
         {
             //Arrange
 
@@ -206,7 +206,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_GetListOfObjects()
+        public void MongoHelper_GetListOfObjects_IntegrationTest_AuthorizedServer()
         {
             //Arrange
 
@@ -217,7 +217,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_UpdateSingleObject()
+        public void MongoHelper_UpdateSingleObject_IntegrationTest_AuthorizedServer()
         {
             //Arrange
 
@@ -228,7 +228,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_CheckForDatas()
+        public void MongoHelper_CheckForDatas_IntegrationTest_AuthorizedServer()
         {
             //Arrange
 
@@ -239,7 +239,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_RecordLoginAttempts()
+        public void MongoHelper_RecordLoginAttempts_IntegrationTest_AuthorizedServer()
         {
             //Arrange
 
@@ -253,7 +253,7 @@ namespace UnitTest_AuthorizedServer.Helper
     public class SMSHelper_IntegrationTest
     {
         [TestMethod]
-        public void SMSHlper_GetCredentials()
+        public void SMSHlper_GetCredentials_IntegrationTest_AuthorizedServer()
         {
             //Arrange
             var key1 = "accesskey";
@@ -270,7 +270,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void SMSHlper_SendSMS()
+        public void SMSHlper_SendSMS_IntegrationTest_AuthorizedServer()
         {
             //Arrange
 

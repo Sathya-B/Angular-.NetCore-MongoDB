@@ -41,7 +41,7 @@ namespace AuthorizedServer.Helper
                         Subject = new Content(GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsubject2").First().Value),
                         Body = new Body
                         {
-                            Html = new Content(CreateEmailBody(fullname, "<a href ='" + link + "'>Click Here To Verify</a>"))
+                            Html = new Content(CreateEmailBody(fullname, "<a href ='" + link + "' style='background-color:#2a2c2e; color:#fff; text-align:center; padding:10px 15px 7px; text-decoration:none;'>Click Here To Verify</a>"))
                         }
                     }
                 };
@@ -65,7 +65,7 @@ namespace AuthorizedServer.Helper
         {
             string emailBody;
             var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            var path = Path.Combine(dir, "EmailVerification.html");
+            var path = Path.Combine(dir, "EmailTemplate\\VerificationEmail.html");
             using (StreamReader reader = File.OpenText(path))
             {
                 emailBody = reader.ReadToEnd();

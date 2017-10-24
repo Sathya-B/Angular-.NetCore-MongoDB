@@ -37,8 +37,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="401">UserInfo not found</response> 
         /// <response code="402">Cart not found</response> 
         /// <response code="403">Order quantity is higher than the product stock</response> 
-        /// <response code="404">Payment method is empty</response> 
-        /// <response code="405">Default address not found</response> 
+        /// <response code="404">Default address not found</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("placeorder/{username}")]
         [SwaggerRequestExample(typeof(OrderInfo), typeof(OrderDetails))]
@@ -55,19 +54,12 @@ namespace Arthur_Clive.Controllers
                     var cartDatas = cartCursor.ToList();
                     if (cartDatas.Count > 0)
                     {
-                        var orders = await MH.GetOrders(username, order_db);
-                        if (orders == null)
-                        {
-                            data.OrderId = 1;
-                        }
-                        else
-                        {
-                            data.OrderId = orders.Count + 1;
-                        }
+                        var ordersCollection = order_db.GetCollection<OrderInfo>("OrderInfo");
+                        var ordersCount = ordersCollection.Find(Builders<OrderInfo>.Filter.Empty).Count();
+                        data.OrderId = ordersCount + 1;
                         data.UserName = username;
                         data.PaymentMethod = "Nil";
                         PaymentMethod paymentMethod = new PaymentMethod();
-                        paymentMethod.Method = "Nil";
                         List<StatusCode> paymentStatus = new List<StatusCode>();
                         paymentStatus.Add(new StatusCode { Date = DateTime.UtcNow, StatusId = 1, Description = "Payment Initiated" });
                         paymentMethod.Status = paymentStatus;
@@ -85,7 +77,7 @@ namespace Arthur_Clive.Controllers
                         {
                             return BadRequest(new ResponseData
                             {
-                                Code = "405",
+                                Code = "404",
                                 Message = "No default address found",
                                 Data = null
                             });
@@ -116,20 +108,16 @@ namespace Arthur_Clive.Controllers
                         }
                         data.ProductDetails = productList;
                         await order_db.GetCollection<OrderInfo>("OrderInfo").InsertOneAsync(data);
-                        string productInfo = "";
+                        List<string> productInfoList = new List<string>();
                         foreach (var cart in cartDatas)
                         {
-                            productInfo = cart.ProductSKU + "|";
-                            foreach (var product in MH.GetProducts(cart.ProductSKU, product_db).Result)
-                            {
-                                var update = Builders<BsonDocument>.Update.Set("ProductStock", product.ProductStock - cart.ProductQuantity);
-                                var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", cart.ProductSKU), "ProductDB", "Product", update).Result;
-                            }
-                            var response = MH.DeleteSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", cart.ProductSKU), "UserInfo", "Cart");
+                            productInfoList.Add(cart.ProductSKU);
                         }
+
+                        string productInfo = String.Join(":", productInfoList);
                         RegisterModel userInfo = BsonSerializer.Deserialize<RegisterModel>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication").Result);
                         Address addressInfo = BsonSerializer.Deserialize<Address>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "UserInfo", "UserInfo").Result);
-                        PaymentModel paymentModel = new PaymentModel { FirstName = userInfo.FullName, LastName = "", ProductInfo = productInfo, Amount = data.TotalAmount.ToString(), Email = userInfo.Email, PhoneNumber = userInfo.PhoneNumber, AddressLine1 = addressInfo.AddressLines, AddressLine2 = addressInfo.Landmark, City = addressInfo.City, State = addressInfo.State, Country = userInfo.UserLocation, ZipCode = addressInfo.PinCode };
+                        PaymentModel paymentModel = new PaymentModel { FirstName = userInfo.FullName, UserName = username, LastName = "", ProductInfo = productInfo, Amount = data.TotalAmount.ToString(), Email = userInfo.Email, PhoneNumber = userInfo.PhoneNumber, AddressLine1 = addressInfo.AddressLines, AddressLine2 = addressInfo.Landmark, City = addressInfo.City, State = addressInfo.State, Country = userInfo.UserLocation, ZipCode = addressInfo.PinCode, OrderId = data.OrderId };
                         var hashtableData = PayUHelper.GetHashtableData(paymentModel);
                         return Ok(new ResponseData
                         {
@@ -311,23 +299,15 @@ namespace Arthur_Clive.Controllers
                         else
                         {
                             PaymentMethod paymentMethod = new PaymentMethod();
-                            paymentMethod.Method = order.PaymentMethod;
                             List<StatusCode> paymentList = new List<StatusCode>();
-                            int i = 1;
                             foreach (var status in order.PaymentDetails.Status)
                             {
                                 paymentList.Add(status);
-                                i++;
                             }
-                            StatusCode paymentStatus = new StatusCode();
-                            paymentStatus.StatusId = i;
-                            paymentStatus.Date = DateTime.UtcNow;
-                            if (data.PaymentMethod == "Cash On Delivery") { paymentStatus.Description = "Payment Cancled"; }
-                            else { paymentStatus.Description = "Refund Initiated"; }
+                            StatusCode paymentStatus = new StatusCode { StatusId = 3, Date = DateTime.UtcNow, Description = "Payment refund initiated" };
                             paymentList.Add(paymentStatus);
                             paymentMethod.Status = paymentList;
-                            var paymentUpdate = Builders<BsonDocument>.Update.Set("PaymentDetails", paymentMethod);
-                            var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username) & Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", paymentUpdate).Result;
+                            var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentMethod)).Result;
                             List<ProductDetails> productDetailsList = new List<ProductDetails>();
                             foreach (var product in order.ProductDetails)
                             {
@@ -335,15 +315,10 @@ namespace Arthur_Clive.Controllers
                                 {
                                     ProductDetails details = new ProductDetails();
                                     details.ProductSKU = productSKU;
-                                    details.Status = "Cancled";
+                                    details.Status = "Order cancled";
                                     List<StatusCode> productStatusList = new List<StatusCode>();
-                                    int j = 1;
-                                    foreach (var status in product.StatusCode)
-                                    {
-                                        productStatusList.Add(status);
-                                        j++;
-                                    }
-                                    StatusCode productStatus = new StatusCode { StatusId = j, Date = DateTime.UtcNow, Description = "Cancled" };
+                                    foreach (var status in product.StatusCode) { productStatusList.Add(status); }
+                                    StatusCode productStatus = new StatusCode { StatusId = 3, Date = DateTime.UtcNow, Description = "Order cancled" };
                                     productStatusList.Add(productStatus);
                                     details.StatusCode = productStatusList;
                                     details.ProductInCart = product.ProductInCart;
@@ -354,8 +329,7 @@ namespace Arthur_Clive.Controllers
                                     productDetailsList.Add(product);
                                 }
                             }
-                            var productUpdate = Builders<BsonDocument>.Update.Set("ProductDetails", productDetailsList);
-                            var responce = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username) & Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", productUpdate).Result;
+                            var responce = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("ProductDetails", productDetailsList)).Result;
                         }
                     }
                     IAsyncCursor<OrderInfo> orderCursorAfterUpdate = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("UserName", username) & Builders<OrderInfo>.Filter.Eq("OrderId", data.OrderId));
@@ -366,8 +340,7 @@ namespace Arthur_Clive.Controllers
                         {
                             IAsyncCursor<Product> productCursor = await product_db.GetCollection<Product>("Product").FindAsync(Builders<Product>.Filter.Eq("ProductSKU", productSKU));
                             var productData = productCursor.FirstOrDefaultAsync().Result;
-                            var productUpdate = Builders<BsonDocument>.Update.Set("ProductStock", productData.ProductStock + product.ProductInCart.ProductQuantity);
-                            var responce = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", productSKU), "ProductDB", "Product", productUpdate).Result;
+                            var responce = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", productSKU), "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductStock", productData.ProductStock + product.ProductInCart.ProductQuantity)).Result;
                         }
                     }
                     return Ok(new ResponseData
@@ -425,7 +398,7 @@ namespace Arthur_Clive.Controllers
                     }
                     else
                     {
-                        IAsyncCursor<OrderInfo> orderCursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("UserName", username) & Builders<OrderInfo>.Filter.Eq("OrderId", data.OrderId));
+                        IAsyncCursor<OrderInfo> orderCursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("OrderId", data.OrderId));
                         var order = orderCursor.FirstOrDefaultAsync().Result;
                         if (order == null)
                         {
@@ -441,7 +414,7 @@ namespace Arthur_Clive.Controllers
                             if (productDetails.ProductSKU == productSKU)
                             {
                                 var productData = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", productSKU), "ProductDB", "Product").Result);
-                                if (productDetails.Status != "Delivered")
+                                if (productDetails.Status != "Order delivered")
                                 {
                                     return BadRequest(new ResponseData
                                     {
@@ -476,30 +449,19 @@ namespace Arthur_Clive.Controllers
                                             });
                                         }
                                     }
-                                    PaymentMethod paymentMethod = new PaymentMethod();
-                                    paymentMethod.Method = order.PaymentMethod;
-                                    List<StatusCode> paymentList = new List<StatusCode>();
-                                    int i = 1;
-                                    foreach (var status in order.PaymentDetails.Status)
-                                    {
-                                        paymentList.Add(status);
-                                        i++;
-                                    }
-                                    StatusCode paymentStatus = new StatusCode();
-                                    paymentStatus.StatusId = i;
-                                    paymentStatus.Date = DateTime.UtcNow;
                                     if (request == "refund")
                                     {
-                                        paymentStatus.Description = "Refund Initiated";
+                                        PaymentMethod paymentMethod = new PaymentMethod();
+                                        List<StatusCode> paymentList = new List<StatusCode>();
+                                        foreach (var status in order.PaymentDetails.Status)
+                                        {
+                                            paymentList.Add(status);
+                                        }
+                                        StatusCode paymentStatus = new StatusCode { StatusId = 3, Date = DateTime.UtcNow, Description = "Payment refund initiated" };
+                                        paymentList.Add(paymentStatus);
+                                        paymentMethod.Status = paymentList;
+                                        var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentMethod)).Result;
                                     }
-                                    if (request == "replace")
-                                    {
-                                        paymentStatus.Description = "Replacement Initiated";
-                                    }
-                                    paymentList.Add(paymentStatus);
-                                    paymentMethod.Status = paymentList;
-                                    var paymentUpdate = Builders<BsonDocument>.Update.Set("PaymentDetails", paymentMethod);
-                                    var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username) & Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", paymentUpdate).Result;
                                     List<ProductDetails> productDetailsList = new List<ProductDetails>();
                                     foreach (var product in order.ProductDetails)
                                     {
@@ -509,22 +471,18 @@ namespace Arthur_Clive.Controllers
                                             details.ProductSKU = productSKU;
                                             details.Status = "Refund Initiated";
                                             List<StatusCode> productStatusList = new List<StatusCode>();
-                                            int j = 1;
-                                            foreach (var status in product.StatusCode)
-                                            {
-                                                productStatusList.Add(status);
-                                                j++;
-                                            }
+                                            foreach (var status in product.StatusCode){ productStatusList.Add(status); }
                                             StatusCode productStatus = new StatusCode();
-                                            productStatus.StatusId = j;
                                             productStatus.Date = DateTime.UtcNow;
                                             if (request == "refund")
                                             {
-                                                productStatus.Description = "Refund Initiated";
+                                                productStatus.StatusId = 6;
+                                                productStatus.Description = "Order refund initiated";
                                             }
                                             if (request == "replace")
                                             {
-                                                productStatus.Description = "Replacement Initiated";
+                                                productStatus.StatusId = 4;
+                                                productStatus.Description = "Order replacement initiated";
                                             }
                                             productStatusList.Add(productStatus);
                                             details.StatusCode = productStatusList;
@@ -536,8 +494,7 @@ namespace Arthur_Clive.Controllers
                                             productDetailsList.Add(product);
                                         }
                                     }
-                                    var productUpdate = Builders<BsonDocument>.Update.Set("ProductDetails", productDetailsList);
-                                    var responce = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username) & Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", productUpdate).Result;
+                                    var responce = MH.UpdateSingleObject( Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("ProductDetails", productDetailsList)).Result;
                                 }
                             }
                         }
@@ -599,7 +556,7 @@ namespace Arthur_Clive.Controllers
                         Data = null
                     });
                 }
-                IAsyncCursor<OrderInfo> orderCursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("UserName", username) & Builders<OrderInfo>.Filter.Eq("OrderId", data.OrderId));
+                IAsyncCursor<OrderInfo> orderCursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("OrderId", data.OrderId));
                 var order = orderCursor.FirstOrDefaultAsync().Result;
                 if (order == null)
                 {
@@ -615,14 +572,13 @@ namespace Arthur_Clive.Controllers
                 List<ProductDetails> productList = new List<ProductDetails>();
                 if (data.Status == "Delivered")
                 {
-                    paymentMethod.Method = data.Status;
                     int i = 1;
                     foreach (var status in order.PaymentDetails.Status)
                     {
                         statusList.Add(status);
                         i++;
                     }
-                    if (order.PaymentDetails.Method == "Cash On Delivery")
+                    if (order.PaymentMethod == "COD")
                     {
                         statusList.Add(new StatusCode { StatusId = i, Date = DateTime.UtcNow, Description = "Payment Received" });
                     }
@@ -634,7 +590,7 @@ namespace Arthur_Clive.Controllers
                         {
                             ProductDetails details = new ProductDetails();
                             details.ProductSKU = productSKU;
-                            details.Status = order.PaymentDetails.Method;
+                            details.Status = order.PaymentMethod;
                             List<StatusCode> productStatusList = new List<StatusCode>();
                             int j = 1;
                             foreach (var status in product.StatusCode)
@@ -657,14 +613,13 @@ namespace Arthur_Clive.Controllers
                 else if (data.Status == "Refunded" || data.Status == "Replaced" || data.Status == "Refund Failed" || data.Status == "Replacement Failed"
                             || data.Status == "Refund Cancle" || data.Status == "Replacement Cancled")
                 {
-                    paymentMethod.Method = data.Status;
                     int i = 1;
                     foreach (var status in order.PaymentDetails.Status)
                     {
                         statusList.Add(status);
                         i++;
                     }
-                    if (order.PaymentDetails.Method == "Cash On Delivery")
+                    if (order.PaymentMethod == "Cash On Delivery")
                     {
                         if (data.Status == "Refunded")
                         {
@@ -679,7 +634,7 @@ namespace Arthur_Clive.Controllers
                         {
                             ProductDetails details = new ProductDetails();
                             details.ProductSKU = productSKU;
-                            details.Status = order.PaymentDetails.Method;
+                            details.Status = order.PaymentMethod;
                             List<StatusCode> productStatusList = new List<StatusCode>();
                             int j = 1;
                             foreach (var status in product.StatusCode)

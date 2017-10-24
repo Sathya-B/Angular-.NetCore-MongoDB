@@ -17,13 +17,13 @@
         }
     },
     "Arthur_Clive": {
-        "commandName": "Project",
-        "launchBrowser": true,
-        "launchUrl": "api/category",
-        "environmentVariables": {
-            "ASPNETCORE_ENVIRONMENT": "Development"
-        },
-        "applicationUrl": "http://0.0.0.0:5000/"
+      "commandName": "Project",
+      //"launchBrowser": true,
+      "launchUrl": "api/category",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://0.0.0.0:5000/"
     }
   }
 }

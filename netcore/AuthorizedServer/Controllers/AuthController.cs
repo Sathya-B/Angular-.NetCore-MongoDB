@@ -136,6 +136,56 @@ namespace AuthorizedServer.Controllers
             }
         }
 
+        /// <summary>Get User Info</summary>
+        /// <remarks>This api is get user information</remarks>
+        /// <param name="username">UserName of user whose information to be retrieved</param>
+        /// <response code="200">User information returned</response>
+        /// <response code="401">Not Authorised</response>     
+        /// <response code="404">User not found </response> 
+        /// <response code="400">Process ran into an exception</response> 
+        [HttpGet("userinfo/{username}")]
+        [ProducesResponseType(typeof(JsonResult), 200)]
+        public ActionResult UserInfo(string username)
+        {
+            try
+            {
+                var checkUser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
+                if (checkUser != null)
+                {
+
+                    var filter = Builders<BsonDocument>.Filter.Eq("UserName", username);
+                    var result = MH.GetSingleObject(filter, "Authentication", "Authentication").Result;
+                    var userModel = BsonSerializer.Deserialize<RegisterModel>(result);
+                    UserInfo userInfo = new UserInfo();
+                    userInfo.FullName = userModel.FullName;
+                    userInfo.UserName = userModel.UserName;
+                    userInfo.Email = userModel.Email;
+                    userInfo.DialCode = userModel.DialCode;
+                    userInfo.PhoneNumber = userModel.PhoneNumber;
+                    return Ok(Json(userInfo));
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "User Not Found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AuthController", "UserInfo", "UserInfo", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
+            }
+        }
+
         /// <summary>Verify user using SMS or Email</summary>
         /// <remarks>This api is used to verify registered</remarks>
         /// <param name="username">UserName of user who needs to get verified</param>

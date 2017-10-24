@@ -60,6 +60,9 @@ namespace Arthur_Clive.Data
         /// <summary>State in which the user is located</summary>
         [Required]
         public string State { get; set; }
+        /// <summary>Country of user</summary>
+        [Required]
+        public string Country { get; set; }
         /// <summary>Pincode under which the user address comes</summary>
         [Required]
         public string PinCode { get; set; }

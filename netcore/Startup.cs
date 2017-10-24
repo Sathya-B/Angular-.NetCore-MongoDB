@@ -110,7 +110,7 @@ namespace Arthur_Clive
             app.UseCors("CorsPolicy");
             #endregion
             app.UseAuthentication();
-            app.UseMvc();
+            app.UseMvc();   
         }
 
         /// <summary>Add roles to policy list based on access level</summary>

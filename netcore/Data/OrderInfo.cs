@@ -12,7 +12,7 @@ namespace Arthur_Clive.Data
         /// <summary>ObjectId give by MongoDB</summary>
         public ObjectId Id { get; set; }
         /// <summary>Id given to the placed order</summary>
-        public int OrderId { get; set; }
+        public long OrderId { get; set; }
         /// <summary>Email or PhoneNumber of the user</summary>
         public string UserName { get; set; }
         /// <summary>Total amount to be paid for order</summary>
@@ -71,8 +71,6 @@ namespace Arthur_Clive.Data
     /// <summary>Contails payment details for the product</summary>
     public class PaymentMethod
     {   
-        /// <summary>Method of the payment</summary>
-        public string Method { get; set; }
         /// <summary>Status of the payment</summary>
         public List<StatusCode> Status { get; set; }
     }

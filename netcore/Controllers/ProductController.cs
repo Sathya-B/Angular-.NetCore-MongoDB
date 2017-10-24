@@ -241,19 +241,19 @@ namespace Arthur_Clive.Controllers
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
                         var objectName = data.ProductFor + "-" + productSKU.Split('-')[1] + "-" + productSKU.Split('-')[2] + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4];
-                        MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, productSKU,data.ProductFor, "ProductFor",objectName);
+                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id,data.ProductFor, "ProductFor",objectName);
                     }
                     if (data.ProductType != null)
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
                         var objectName = productSKU.Split('-')[0] + "-" + data.ProductType + "-" + productSKU.Split('-')[2] + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4];
-                        MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, productSKU, data.ProductType, "ProductType",objectName);
+                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductType, "ProductType",objectName);
                     }
                     if (data.ProductDesign != null)
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
                         var objectName = productSKU.Split('-')[0] + "-" + productSKU.Split('-')[1] + "-" + data.ProductDesign + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4];
-                        MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, productSKU, data.ProductDesign, "ProductDesign",objectName);
+                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductDesign, "ProductDesign",objectName);
                     }
                     if (data.ProductBrand != null)
                     {
@@ -300,7 +300,7 @@ namespace Arthur_Clive.Controllers
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
                         var objectName = productSKU.Split('-')[0] + "-" + productSKU.Split('-')[1] + "-" + productSKU.Split('-')[2] + "-" + productSKU.Split('-')[3] + "-" + data.ProductSize;
-                        MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, productSKU, data.ProductSize, "ProductSize",objectName);
+                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductSize, "ProductSize",objectName);
                     }
                     if (data.ProductMaterial != null)
                     {
@@ -318,7 +318,7 @@ namespace Arthur_Clive.Controllers
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
                         var objectName = productSKU.Split('-')[0] + "-" + productSKU.Split('-')[1] + "-" + productSKU.Split('-')[2] + "-" + data.ProductColour + "-" + productSKU.Split('-')[4];
-                        MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, productSKU, data.ProductColour, "ProductColour",objectName);
+                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductColour, "ProductColour",objectName);
                     }
                     if (data.RefundApplicable != null)
                     {

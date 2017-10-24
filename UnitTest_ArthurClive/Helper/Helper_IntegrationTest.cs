@@ -19,7 +19,7 @@ namespace UnitTest_ArthurClive.Helper
     public class AmazonHelper_IntegrationTest
     {
         [TestMethod]
-        public void AmazonHelper_GetAmazonS3Client_IntegrationTest()
+        public void AmazonHelper_GetAmazonS3Client_IntegrationTest_ArthurClive()
         {
             //Arrange
             var accessKeyFromXML = GlobalHelper.ReadXML().Elements("amasons3").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("accesskey").FirstOrDefault().Value;
@@ -38,8 +38,8 @@ namespace UnitTest_ArthurClive.Helper
             Assert.AreEqual(expectedSecretKey, secretKeyFromXML);
         }
 
-        [TestMethod]
-        public void AmazonHelper_GetAmazonS3Object_IntegrationTest()
+        //[TestMethod]
+        public void AmazonHelper_GetAmazonS3Object_IntegrationTest_ArthurClive()
         {
             //Arrange
             var bucketName = "arthurclive-products";
@@ -53,7 +53,7 @@ namespace UnitTest_ArthurClive.Helper
         }
 
         [TestMethod]
-        public void AmazonHelper_GetS3Object_IntegrationTest()
+        public void AmazonHelper_GetS3Object_IntegrationTest_ArthurClive()
         {
             //Arrange
             var bucketName = "arthurclive-products";
@@ -73,7 +73,7 @@ namespace UnitTest_ArthurClive.Helper
     public class EmailHelper_IntegrationTest
     {
         [TestMethod]
-        public void EmailHelper_GetCredentials_IntegrationTest()
+        public void EmailHelper_GetCredentials_IntegrationTest_ArthurClive()
         {
             //Arrange
             var key1 = "accesskey";
@@ -93,7 +93,7 @@ namespace UnitTest_ArthurClive.Helper
         }
 
         //[TestMethod]
-        public void EmailHelper_SendEmail_IntegrationTest()
+        public void EmailHelper_SendEmail_IntegrationTest_ArthurClive()
         {
             //Arrange
             var fullNameOfReceiver = "SampleUser";
@@ -105,11 +105,11 @@ namespace UnitTest_ArthurClive.Helper
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(result,"Success");
+            Assert.AreEqual(result, "Success");
         }
 
         [TestMethod]
-        public void EmailHelper_CreateEmailBody_IntegrationTest()
+        public void EmailHelper_CreateEmailBody_IntegrationTest_ArthurClive()
         {
             //Arrange
             var fullname = "Sample user";
@@ -131,7 +131,7 @@ namespace UnitTest_ArthurClive.Helper
     public class GlobalHelper_IntegrationTest
     {
         [TestMethod]
-        public void GlobalHelper_GetCurrentDir_IntegrationTest()
+        public void GlobalHelper_GetCurrentDir_IntegrationTest_ArthurClive()
         {
             //Arrange
 
@@ -143,7 +143,7 @@ namespace UnitTest_ArthurClive.Helper
         }
 
         [TestMethod]
-        public void GlobalHelper_ReadXML_IntegrationTest()
+        public void GlobalHelper_ReadXML_IntegrationTest_ArthurClive()
         {
             //Arrange
             var expectedXElement = "<credentials>\r\n  <!-- Mongo Credentials -->\r\n  <mongo>\r\n    <current>Yes</current>\r\n    <ip>localhost</ip>\r\n    <db>admin</db>\r\n    <user>Ragu</user>\r\n    <password>123ragu</password>\r\n  </mongo>\r\n  <!-- Contents related to email service -->\r\n  <email>\r\n    <current>Yes</current>\r\n    <emailsender>sales@artwear.in</emailsender>\r\n    <websitelink>https://artwear.in/</websitelink>\r\n    <emailsubject1>Message from the Arthur Clive Admin.</emailsubject1>\r\n    <emailsubject2>Verification of your ArthurClive account.</emailsubject2>\r\n  </email>\r\n  <!-- IPconfigurations for the project -->\r\n  <ipconfig>\r\n    <current>Yes</current>\r\n    <arthurclive>http://192.168.0.113:5000/</arthurclive>\r\n    <authorizedserver>http://192.168.0.113:5001/</authorizedserver>\r\n    <authorizedserver2>http://localhost:3000/#/verifyemail/</authorizedserver2>\r\n  </ipconfig>\r\n  <ipconfig>\r\n    <current>No</current>\r\n    <arthurclive>http://192.168.0.113:52922/</arthurclive>\r\n    <authorizedserver>http://192.168.0.113:56872/</authorizedserver>\r\n  </ipconfig>\r\n  <!-- PayUMOney Credentials -->\r\n  <payu>\r\n    <current>Yes</current>\r\n    <key>gtKFFx</key>\r\n    <saltkey>eCwWELxi</saltkey>\r\n    <url>https://test.payu.in</url>\r\n  </payu>\r\n  <!-- Amazon S3 credentials -->\r\n  <amasons3>\r\n    <current>Yes</current>\r\n    <accesskey>AKIAIUAYVIL7A7I6XECA</accesskey>\r\n    <secretkey>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</secretkey>\r\n  </amasons3>\r\n  <!-- Amazon SNS credentials -->\r\n  <amazonsns>\r\n    <current>Yes</current>\r\n    <accesskey>AKIAJCDU2723BYGUAHCA</accesskey>\r\n    <secretkey>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</secretkey>\r\n  </amazonsns>\r\n  <amazonsns>\r\n    <current>No</current>\r\n    <accesskey>AKIAJ3B7P4FXGYSUXMYA</accesskey>\r\n    <secretkey>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</secretkey>\r\n  </amazonsns>\r\n  <!-- Amazon SES credentials -->\r\n  <amazonses>\r\n    <current>Yes</current>\r\n    <accesskey>AKIAIQRMI2NXYVDB7UKA</accesskey>\r\n    <secretkey>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</secretkey>\r\n  </amazonses>\r\n  <amazonses>\r\n    <current>No</current>\r\n    <accesskey>AKIAJ3UPJB4KZY3GTNSA</accesskey>\r\n    <secretkey>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</secretkey>\r\n  </amazonses>\r\n  <amazonses>\r\n    <current>test</current>\r\n    <accesskey>AKIAJZK4MPI7AEGQGUIQ</accesskey>\r\n    <secretkey>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</secretkey>\r\n  </amazonses>\r\n  <!-- Minio credentials -->\r\n  <minioclient>\r\n    <current>Yes</current>\r\n    <host>localhost:9000</host>\r\n    <accesskey>MinioServer</accesskey>\r\n    <secretkey>123654789@Ragu</secretkey>\r\n  </minioclient>\r\n</credentials>";
@@ -162,7 +162,7 @@ namespace UnitTest_ArthurClive.Helper
     public class MinioHelper_IntegrationTest
     {
         [TestMethod]
-        public void MinioHelper_GetMinioClient_IntegrationTest()
+        public void MinioHelper_GetMinioClient_IntegrationTest_ArthurClive()
         {
             //Arrange
             var hostFromXMl = GlobalHelper.ReadXML().Elements("minioclient").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("host").First().Value;
@@ -178,9 +178,9 @@ namespace UnitTest_ArthurClive.Helper
             Assert.IsNotNull(accesskeyFromXML);
             Assert.IsNotNull(secretkeyFromXML);
         }
-        
+
         //[TestMethod]
-        public void MinioHelper_GetMinioObject_IntegrationTest()
+        public void MinioHelper_GetMinioObject_IntegrationTest_ArthurClive()
         {
             //Arrange
             var bucketName = "products";
@@ -197,8 +197,15 @@ namespace UnitTest_ArthurClive.Helper
     [TestClass]
     public class MongoHelper_IntegrationTest
     {
+        public MongoHelper_IntegrationTest()
+        {
+            UnitTestHelper.InsertData_SampleCategory();
+            UnitTestHelper.InsertData_SampleOrder();
+            UnitTestHelper.InsertData_SampleProduct();
+        }
+
         [TestMethod]
-        public void MongoHelper_GetClient_IntegrationTest()
+        public void MongoHelper_GetClient_IntegrationTest_ArthurClive()
         {
             //Arrange
             var ipFromXML = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("ip").First().Value;
@@ -217,13 +224,15 @@ namespace UnitTest_ArthurClive.Helper
             Assert.IsNotNull(dbFromXML);
         }
 
-        [TestMethod]
-        public void MongoHelper_GetSingleObject_IntegrationTest()
+        //[TestMethod]
+        public void MongoHelper_GetSingleObject_IntegrationTest_ArthurClive()
         {
             //Arrange
+            IMongoDatabase db = MongoHelper._client.GetDatabase("UnitTestDB");
+            var collection = db.GetCollection<Category>("Category");
             var productFor = "Boys";
             var productType = "Tshirt";
-            var filter = Builders<BsonDocument>.Filter.Eq("ProductFor", productFor) & Builders<BsonDocument>.Filter.Eq("ProductType",productType);
+            var filter = Builders<BsonDocument>.Filter.Eq("ProductFor", productFor) & Builders<BsonDocument>.Filter.Eq("ProductType", productType);
             var dbName = "ProductDB";
             var collectionName = "Category";
             var expectedUrl = "https://s3.ap-south-1.amazonaws.com/product-category/Boys-Tshirt.jpg";
@@ -232,19 +241,18 @@ namespace UnitTest_ArthurClive.Helper
             var expectedProductType = "Tshirt";
 
             //Act
-            var result = BsonSerializer.Deserialize<Category>(MongoHelper.GetSingleObject(filter,dbName,collectionName).Result) as Category;
+            var result = BsonSerializer.Deserialize<Category>(MongoHelper.GetSingleObject(filter, dbName, collectionName).Result) as Category;
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(expectedUrl,result.MinioObject_URL);
-            Assert.AreEqual(expectedDescription,result.Description);
-            Assert.AreEqual(expectedProductFor,result.ProductFor);
-            Assert.AreEqual(expectedProductType,result.ProductType);
-
+            Assert.AreEqual(expectedUrl, result.MinioObject_URL);
+            Assert.AreEqual(expectedDescription, result.Description);
+            Assert.AreEqual(expectedProductFor, result.ProductFor);
+            Assert.AreEqual(expectedProductType, result.ProductType);
         }
 
-        [TestMethod]
-        public void MongoHelper_GetListOfObjects_IntegrationTest()
+        //[TestMethod]
+        public void MongoHelper_GetListOfObjects_IntegrationTest_ArthurClive()
         {
             //Arrange
             var dbName = "RolesDB";
@@ -254,49 +262,49 @@ namespace UnitTest_ArthurClive.Helper
 
             //Act
             var result = MongoHelper.GetListOfObjects(null, null, null, null, null, null, dbName, collectionName).Result as List<BsonDocument>;
-            foreach(var data in result)
+            foreach (var data in result)
             {
                 roleList.Add(BsonSerializer.Deserialize<Roles>(data));
             }
 
             //Assert
             Assert.IsNotNull(roleList);
-            Assert.AreEqual(expectedRoleCount,roleList.Count());
+            Assert.AreEqual(expectedRoleCount, roleList.Count());
         }
 
-        [TestMethod]
-        public void MongoHelper_UpdateSingleObject_IntegrationTest()
-        {
-            //Arrange
-            var filter = Builders<BsonDocument>.Filter.Eq("ProductFor", "Men") & Builders<BsonDocument>.Filter.Eq("ProductType","Tshirt");
-            var updateDefinition = Builders<BsonDocument>.Update.Set("ProductFor", "Women");
-
-            //Act
-            var result = MongoHelper.UpdateSingleObject(filter,"UnitTestDB","Category",updateDefinition).Result as bool?;
-
-            //Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(result,true);
-        }
-
-        [TestMethod]
-        public void MongoHelper_DeleteSingleObject_IntegrationTest()
+        //[TestMethod]
+        public void MongoHelper_UpdateSingleObject_IntegrationTest_ArthurClive()
         {
             //Arrange
             var filter = Builders<BsonDocument>.Filter.Eq("ProductFor", "Men") & Builders<BsonDocument>.Filter.Eq("ProductType", "Tshirt");
+            var updateDefinition = Builders<BsonDocument>.Update.Set("ProductFor", "Women");
+
+            //Act
+            var result = MongoHelper.UpdateSingleObject(filter, "UnitTestDB", "Category", updateDefinition).Result as bool?;
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(result, true);
+        }
+
+        //[TestMethod]
+        public void MongoHelper_DeleteSingleObject_IntegrationTest_ArthurClive()
+        {
+            //Arrange
+            var filter = Builders<BsonDocument>.Filter.Eq("ProductFor", "Women") & Builders<BsonDocument>.Filter.Eq("ProductType", "Tshirt");
             var dbName = "UnitTestDB";
             var collectionName = "Category";
 
             //Act
-            var result = MongoHelper.DeleteSingleObject(filter,dbName,collectionName) as bool?;
+            var result = MongoHelper.DeleteSingleObject(filter, dbName, collectionName) as bool?;
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(result,true);
+            Assert.AreEqual(result, true);
         }
 
-        [TestMethod]
-        public void MongoHelper_CheckForDatas_IntegrationTest()
+        //[TestMethod]
+        public void MongoHelper_CheckForDatas_IntegrationTest_ArthurClive()
         {
             //Arrange
             //UnitTestHelper.InsertData_SampleCategory();
@@ -304,62 +312,71 @@ namespace UnitTest_ArthurClive.Helper
             var collectionName = "Category";
 
             //Act
-            var result = BsonSerializer.Deserialize<Category>(MongoHelper.CheckForDatas("ProductFor","Women","ProductType","Tshirt",dbName,collectionName)) as Category;
+            var result = BsonSerializer.Deserialize<Category>(MongoHelper.CheckForDatas("ProductFor", "Men", "ProductType", "Tshirt", dbName, collectionName)) as Category;
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(result.ProductFor,"Men");
+            Assert.AreEqual(result.ProductFor, "Men");
             Assert.AreEqual(result.ProductType, "Tshirt");
         }
 
         //[TestMethod]
-        public void MongoHelper_GetOrders_IntegrationTest()
+        public void MongoHelper_GetOrders_IntegrationTest_ArthurClive()
         {
             //Arrange
-            IMongoDatabase order_db = MongoHelper._client.GetDatabase("UnitTestDB");
+            IMongoDatabase db = MongoHelper._client.GetDatabase("UnitTestDB");
             var username = "sample@gmail.com";
-            var orderCount = 2;
 
             //Act
-            var result = MongoHelper.GetOrders(username, order_db).Result as List<OrderInfo>;
+            var result = MongoHelper.GetOrders(username, db).Result as List<OrderInfo>;
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(result.Count,orderCount);
-            foreach(var order in result)
+            foreach (var order in result)
             {
-                Assert.AreEqual(username,order.UserName);
+                Assert.AreEqual(username, order.UserName);
+            }
+        }
+        
+        //[TestMethod]
+        public void MongoHelper_GetProducts_IntegrationTest_ArthurClive()
+        {
+            //Arrange
+            IMongoDatabase db = MongoHelper._client.GetDatabase("UnitTestDB");
+            var productSKU = "";
+
+            //Act
+            var result = MongoHelper.GetProducts(productSKU,db).Result as List<Product>;
+
+            //Assert
+            Assert.IsNotNull(result);
+            foreach(var product in result)
+            {
+                Assert.AreEqual(product.ProductSKU,productSKU);
             }
         }
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_GetProducts_IntegrationTest()
+        public void MongoHelper_UpdateProductDetails_IntegrationTest_ArthurClive()
         {
             //Arrange
-            IMongoDatabase product_db = MongoHelper._client.GetDatabase("ProductDB");
-            var productSKU = "All-Art-Bangalore-Black-";
+            var productData = BsonSerializer.Deserialize<Product>(MongoHelper.CheckForDatas("ProductSKU", "All-Art-Bangalore-Black-",null,null,"UnitTestDB","Product"));
+            var objectId = productData.Id;
+            var updateDesign = "Calcutta";
+            var updateSKU = "All-Art-Calcutta-Black-";
 
             //Act
-            //var result =
+            var result = MongoHelper.UpdateProductDetails(objectId,updateDesign,"ProductDesign",updateSKU).Result as bool?;
 
             //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(result,true);
         }
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_UpdateProductDetails_IntegrationTest()
-        {
-            //Arrange
-
-            //Act
-
-            //Assert
-        }
-
-        //Pending
-        //[TestMethod]
-        public void MongoHelper_UpdateCategoryDetails_IntegrationTest()
+        public void MongoHelper_UpdateCategoryDetails_IntegrationTest_ArthurClive()
         {
             //Arrange
 
@@ -373,7 +390,7 @@ namespace UnitTest_ArthurClive.Helper
     public class PayUHelper_IntegrationTest
     {
         [TestMethod]
-        public void PayUHelper_Generatehash512_IntegrationTest()
+        public void PayUHelper_Generatehash512_IntegrationTest_ArthurClive()
         {
             //Arrange
             string text = "Text to be hashed";
@@ -388,7 +405,7 @@ namespace UnitTest_ArthurClive.Helper
         }
 
         [TestMethod]
-        public void PayUHelper_PreparePOSTForm_IntegrationTest()
+        public void PayUHelper_PreparePOSTForm_IntegrationTest_ArthurClive()
         {
             //Arrange
             var url = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("url").First().Value + "/_payment";
@@ -428,7 +445,7 @@ namespace UnitTest_ArthurClive.Helper
         }
 
         [TestMethod]
-        public void PayUHelper_GetTxnId_IntegrationTest()
+        public void PayUHelper_GetTxnId_IntegrationTest_ArthurClive()
         {
             //Arrange
 
@@ -440,7 +457,7 @@ namespace UnitTest_ArthurClive.Helper
         }
 
         [TestMethod]
-        public void PayUHelper_GetHashString_IntegrationTest()
+        public void PayUHelper_GetHashString_IntegrationTest_ArthurClive()
         {
             //Arrange
             var keyFromXML = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("key").First().Value;

@@ -166,7 +166,7 @@ namespace Arthur_Clive.Helper
         /// <param name="updateData"></param>
         /// <param name="updateField"></param>
         /// <param name="objectName"></param>
-        public async static void UpdateProductDetails(dynamic objectId, string productSKU, dynamic updateData, string updateField, string objectName)
+        public async static Task<bool> UpdateProductDetails(dynamic objectId, dynamic updateData, string updateField, string objectName)
         {
             try
             {
@@ -177,10 +177,19 @@ namespace Arthur_Clive.Helper
                 MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
                 var update1 = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductSKU", objectName));
                 var update2 = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Product", Builders<BsonDocument>.Update.Set("MinioObject_URL", MinioObject_URL));
+                if(update1 == true & update2 == true)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception ex)
             {
                 LoggerDataAccess.CreateLog("GlobalHelper", "UpdateProductDetails", "UpdateProductDetails", ex.Message);
+                return false;
             }
         }
 
@@ -191,7 +200,7 @@ namespace Arthur_Clive.Helper
         /// <param name="updateData"></param>
         /// <param name="updateField"></param>
         /// <param name="objectName"></param>
-        public async static void UpdateCategoryDetails(dynamic objectId, string productFor, string productType, dynamic updateData, string updateField, string objectName)
+        public async static Task<bool> UpdateCategoryDetails(dynamic objectId, string productFor, string productType, dynamic updateData, string updateField, string objectName)
         {
             try
             {
@@ -201,10 +210,12 @@ namespace Arthur_Clive.Helper
                 //MinioObject_URL = AH.GetAmazonS3Object("product-category", objectName);
                 MinioObject_URL = AH.GetS3Object("product-category", objectName);
                 var update1 = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Category", Builders<BsonDocument>.Update.Set("MinioObject_URL", MinioObject_URL));
+                return update1;
             }
             catch (Exception ex)
             {
                 LoggerDataAccess.CreateLog("GlobalHelper", "UpdateCategoryDetails", "UpdateCategoryDetails", ex.Message);
+                return false;
             }
         }
 

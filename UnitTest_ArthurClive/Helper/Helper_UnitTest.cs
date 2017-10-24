@@ -10,6 +10,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
+using Arthur_Clive.Data;
 using Arthur_Clive.Helper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minio;
@@ -22,7 +23,7 @@ namespace UnitTest_ArthurClive.Helper
     public class AmazonHelper_UnitTest
     {
         [TestMethod]
-        public void AmazonHelper_GetAmazonS3Client_UnitTest()
+        public void AmazonHelper_GetAmazonS3Client_UnitTest_ArthurClive()
         {
             //Arrange
             var accessKeyFromXML = GlobalHelper.ReadXML().Elements("amasons3").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("accesskey").FirstOrDefault().Value;
@@ -43,7 +44,7 @@ namespace UnitTest_ArthurClive.Helper
 
         //Pending
         //[TestMethod]
-        public void AmazonHelper_GetAmazonS3Object_UnitTest()
+        public void AmazonHelper_GetAmazonS3Object_UnitTest_ArthurClive()
         {
             //Arrange
             GetPreSignedUrlRequest request = new GetPreSignedUrlRequest()
@@ -62,7 +63,7 @@ namespace UnitTest_ArthurClive.Helper
         }
 
         [TestMethod]
-        public void AmazonHelper_GetS3Object_UnitTest()
+        public void AmazonHelper_GetS3Object_UnitTest_ArthurClive()
         {
             //Arrange
             var bucketName = "bucketname";
@@ -82,7 +83,7 @@ namespace UnitTest_ArthurClive.Helper
     public class EmailHelper_UnitTest
     {
         [TestMethod]
-        public void EmailHelper_GetCredentials_UnitTest()
+        public void EmailHelper_GetCredentials_UnitTest_ArthurClive()
         {
             //Arrange
             var accesskeyFromXml = GlobalHelper.ReadXML().Elements("amazonses").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("accesskey").FirstOrDefault().Value;
@@ -101,7 +102,7 @@ namespace UnitTest_ArthurClive.Helper
         
         //Pending
         //[TestMethod]
-        public void EmailHelper_SendEmail_UnitTest()
+        public void EmailHelper_SendEmail_UnitTest_ArthurClive()
         {
             //Arrange
             string emailSender = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsender").First().Value;
@@ -140,7 +141,7 @@ namespace UnitTest_ArthurClive.Helper
         }
         
         [TestMethod]
-        public void EmailHelper_CreateEmailBody_UnitTest()
+        public void EmailHelper_CreateEmailBody_UnitTest_ArthurClive()
         {
             //Arrange
             var fullname = "Sample user";
@@ -170,7 +171,7 @@ namespace UnitTest_ArthurClive.Helper
     public class GlobalHelper_UnitTest
     {
         [TestMethod]
-        public void GlobalHelper_GetCurrentDir_UnitTest()
+        public void GlobalHelper_GetCurrentDir_UnitTest_ArthurClive()
         {
             //Arrange
             var expectedPath = "D:\\Arthur_Clive\\UnitTest_ArthurClive\\bin\\Debug\\netcoreapp2.0";
@@ -184,7 +185,7 @@ namespace UnitTest_ArthurClive.Helper
         }
         
         [TestMethod]
-        public void GlobalHelper_ReadXML_UnitTest()
+        public void GlobalHelper_ReadXML_UnitTest_ArthurClive()
         {
             //Arrange
             var dir = "D:\\Arthur_Clive\\UnitTest_ArthurClive\\bin\\Debug\\netcoreapp2.0";
@@ -205,7 +206,7 @@ namespace UnitTest_ArthurClive.Helper
     public class MinioHelper_UnitTest
     {
         [TestMethod]
-        public void MinioHelper_GetMinioClient_UnitTest()
+        public void MinioHelper_GetMinioClient_UnitTest_ArthurClive()
         {
             //Arrange
             var hostFromXMl = GlobalHelper.ReadXML().Elements("minioclient").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("host").First().Value;
@@ -228,7 +229,7 @@ namespace UnitTest_ArthurClive.Helper
 
         //Pending
         //[TestMethod]
-        public void MinioHelper_GetMinioObject_UnitTest()
+        public void MinioHelper_GetMinioObject_UnitTest_ArthurClive()
         {
             //Arrange
 
@@ -242,7 +243,7 @@ namespace UnitTest_ArthurClive.Helper
     public class MongoHelper_UnitTest
     {
         [TestMethod]
-        public void MongoHelper_GetClient()
+        public void MongoHelper_GetClient_UnitTest_ArthurClive()
         {
             //Arrange
             var ipFromXML = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("ip").First().Value;
@@ -274,7 +275,7 @@ namespace UnitTest_ArthurClive.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_GetSingleObject()
+        public void MongoHelper_GetSingleObject_UnitTest_ArthurClive()
         {
             //Arrange
 
@@ -285,7 +286,7 @@ namespace UnitTest_ArthurClive.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_GetListOfObjects()
+        public void MongoHelper_GetListOfObjects_UnitTest_ArthurClive()
         {
             //Arrange
 
@@ -296,7 +297,7 @@ namespace UnitTest_ArthurClive.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_UpdateSingleObject()
+        public void MongoHelper_UpdateSingleObject_UnitTest_ArthurClive()
         {
             //Arrange
 
@@ -307,7 +308,7 @@ namespace UnitTest_ArthurClive.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_DeleteSingleObject()
+        public void MongoHelper_DeleteSingleObject_UnitTest_ArthurClive()
         {
             //Arrange
 
@@ -318,7 +319,7 @@ namespace UnitTest_ArthurClive.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_CheckForDatas()
+        public void MongoHelper_CheckForDatas_UnitTest_ArthurClive()
         {
             //Arrange
 
@@ -329,7 +330,7 @@ namespace UnitTest_ArthurClive.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_GetOrders_UnitTest()
+        public void MongoHelper_GetOrders_UnitTest_ArthurClive()
         {
             //Arrange
 
@@ -340,7 +341,7 @@ namespace UnitTest_ArthurClive.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_GetProducts_UnitTest()
+        public void MongoHelper_GetProducts_UnitTest_ArthurClive()
         {
             //Arrange
 
@@ -351,7 +352,7 @@ namespace UnitTest_ArthurClive.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_UpdateProductDetails_UnitTest()
+        public void MongoHelper_UpdateProductDetails_UnitTest_ArthurClive()
         {
             //Arrange
 
@@ -362,7 +363,7 @@ namespace UnitTest_ArthurClive.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_UpdateCategoryDetails_UnitTest()
+        public void MongoHelper_UpdateCategoryDetails_UnitTest_ArthurClive()
         {
             //Arrange
 
@@ -376,7 +377,7 @@ namespace UnitTest_ArthurClive.Helper
     public class PayUHelper_UnitTest
     {
         [TestMethod]
-        public void PayUHelper_Generatehash512()
+        public void PayUHelper_Generatehash512_UnitTest_ArthurClive()
         {
             //Arrange
             string text = "Text to be hashed";
@@ -401,7 +402,7 @@ namespace UnitTest_ArthurClive.Helper
         }
 
         [TestMethod]
-        public void PayUHelper_PreparePOSTForm()
+        public void PayUHelper_PreparePOSTForm_UnitTest_ArthurClive()
         {
             //Arrange
             var url = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("url").First().Value + "/_payment";
@@ -457,7 +458,7 @@ namespace UnitTest_ArthurClive.Helper
         }
 
         [TestMethod]
-        public void PayUHelper_GetTxnId()
+        public void PayUHelper_GetTxnId_UnitTest_ArthurClive()
         {
             //Arrange
             Random random = new Random();
@@ -472,7 +473,7 @@ namespace UnitTest_ArthurClive.Helper
         }
         
         [TestMethod]
-        public void PayUHelper_GetHashString()
+        public void PayUHelper_GetHashString_UnitTest_ArthurClive()
         {
             //Arrange
             var keyFromXML = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("key").First().Value;

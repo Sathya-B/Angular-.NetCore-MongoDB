@@ -183,13 +183,13 @@ namespace Arthur_Clive.Controllers
                     {
                         var value = BsonSerializer.Deserialize<Category>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Category")).ProductType;
                         var objectName = data.ProductFor + "-" + value;
-                        MH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor,productType, data.ProductFor, "ProductFor", objectName);
+                        await MH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor,productType, data.ProductFor, "ProductFor", objectName);
                     }
                     if(data.ProductType != null)
                     {
                         var value = BsonSerializer.Deserialize<Category>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Category")).ProductFor;
                         var objectName = value + "-" + data.ProductType;
-                        MH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor, productType, data.ProductType, "ProductType", objectName);
+                        await MH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor, productType, data.ProductType, "ProductType", objectName);
                     }
                     if(data.Description != null)
                     {

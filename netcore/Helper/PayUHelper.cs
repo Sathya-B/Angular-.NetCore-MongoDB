@@ -6,51 +6,11 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Linq;
+using Arthur_Clive.Data;
 using Arthur_Clive.Logger;
 
 namespace Arthur_Clive.Helper
 {
-    /// <summary>Contains to make payment through PayUMoney</summary>
-    public class PaymentModel
-    {
-        /// <summary>FirstName of user</summary>
-        [Required]
-        public string FirstName { get; set; }
-        /// <summary>LastName of user</summary>
-        [Required]
-        public string LastName { get; set; }
-        /// <summary>ProductInfo of product from which the payment is made</summary>
-        [Required]
-        public string ProductInfo { get; set; }
-        /// <summary>Amount to be paid for order</summary>
-        [Required]
-        public string Amount { get; set; }
-        /// <summary>Email of user</summary>
-        [Required]
-        public string Email { get; set; }
-        /// <summary>PhoneNumber of user</summary>
-        [Required]
-        public string PhoneNumber { get; set; }
-        /// <summary>First line of address </summary>
-        [Required]
-        public string AddressLine1 { get; set; }
-        /// <summary>Secound line of address</summary>
-        [Required]
-        public string AddressLine2 { get; set; }
-        /// <summary>City of user</summary>
-        [Required]
-        public string City { get; set; }
-        /// <summary>State of user </summary>
-        [Required]
-        public string State { get; set; }
-        /// <summary>Country of user </summary>
-        [Required]
-        public string Country { get; set; }
-        /// <summary>Zipcode of user location</summary>
-        [Required]
-        public string ZipCode { get; set; }
-    }
-
     /// <summary>Helper method for PayUMoney service</summary>
     public class PayUHelper
     {
@@ -107,59 +67,48 @@ namespace Arthur_Clive.Helper
         /// <param name="model"></param>
         public static string GetHashString(string txnId,PaymentModel model)
         {
-            string hashString = "";
-            string[] hashSequence = ("key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5|udf6|udf7|udf8|udf9|udf10").Split('|');
-            foreach (string hash_var in hashSequence)
-            {
-                if (hash_var == "key")
-                {
-                    hashString = hashString + GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("key").First().Value;
-                    hashString = hashString + '|';
-                }
-                else if (hash_var == "txnid")
-                {
-                    hashString = hashString + txnId;
-                    hashString = hashString + '|';
-                }
-                else if (hash_var == "amount")
-                {
-                    hashString = hashString + Convert.ToDecimal(model.Amount).ToString("g29");
-                    hashString = hashString + '|';
-                }
-                else if (hash_var == "productinfo")
-                {
-                    hashString = hashString + model.ProductInfo;
-                    hashString = hashString + '|';
-                }
-                else if (hash_var == "firstname")
-                {
-                    hashString = hashString + model.FirstName;
-                    hashString = hashString + '|';
-                }
-                else if (hash_var == "email")
-                {
-                    hashString = hashString + model.Email;
-                    hashString = hashString + '|';
-                }
-                else
-                {
-                    hashString = hashString + "";
-                    hashString = hashString + '|';
-                }
-            }
-            hashString += GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("saltkey").First().Value;
-            return hashString;
+            string hashSequence = "key|txnid|amount|productinfo|firstname|email|udf1|udf2|||||||||salt";
+            hashSequence = hashSequence.Replace("key", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("key").First().Value);
+            hashSequence = hashSequence.Replace("txnid", txnId);
+            hashSequence = hashSequence.Replace("amount", Convert.ToDecimal(model.Amount).ToString("F2"));
+            hashSequence = hashSequence.Replace("productinfo", model.ProductInfo);
+            hashSequence = hashSequence.Replace("firstname", model.FirstName);
+            hashSequence = hashSequence.Replace("email", model.Email);
+            hashSequence = hashSequence.Replace("udf1", model.OrderId.ToString());
+            hashSequence = hashSequence.Replace("udf2", model.UserName);
+            hashSequence = hashSequence.Replace("salt", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("saltkey").First().Value);
+
+            return hashSequence;
         }
 
+        /// <summary>Get reverse hash string</summary>
+        /// <param name="txnId"></param>
+        /// <param name="model"></param>
+        public static string GetReverseHashString(string txnId, PaymentModel model)
+        {
+            string hashSequence = "salt|status|||||||||udf2|udf1|email|firstname|productinfo|amount|txnid|key";
+            hashSequence = hashSequence.Replace("key", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("key").First().Value);
+            hashSequence = hashSequence.Replace("txnid", txnId);
+            hashSequence = hashSequence.Replace("amount", Convert.ToDecimal(model.Amount).ToString("F2"));
+            hashSequence = hashSequence.Replace("productinfo", model.ProductInfo);
+            hashSequence = hashSequence.Replace("firstname", model.FirstName);
+            hashSequence = hashSequence.Replace("email",model.Email);
+            hashSequence = hashSequence.Replace("status", "success");
+            hashSequence = hashSequence.Replace("udf1", model.OrderId.ToString());
+            hashSequence = hashSequence.Replace("udf2", model.UserName);
+            hashSequence = hashSequence.Replace("salt", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("saltkey").First().Value);
+            return hashSequence;
+        }
+        
         /// <summary>Generate hashtable data for payment gateway process</summary>
         /// <param name="model">Data to be included in the form</param>
         public static Hashtable GetHashtableData(PaymentModel model)
         {
             try
             {
-                string SuccessUrl = "http://localhost:5001/api/payment/success";
-                string FailureUrl = "http://localhost:5001/api/payment/failed";
-                string CancleUrl = "http://localhost:5001/api/payment/cancle";
+                string SuccessUrl = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("successurl").First().Value;
+                string FailureUrl = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("failureurl").First().Value;
+                string CancleUrl = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("cancleurl").First().Value;
                 string txnId = GetTxnId();
                 string hashString = GetHashString(txnId, model);
                 string hash = Generatehash512(hashString).ToLower();
@@ -168,7 +117,7 @@ namespace Arthur_Clive.Helper
                 data.Add("hash", hash);
                 data.Add("txnid", txnId);
                 data.Add("key", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("key").First().Value);
-                string AmountForm = Convert.ToDecimal(model.Amount).ToString("g29");
+                string AmountForm = Convert.ToDecimal(model.Amount).ToString("F2");
                 data.Add("amount", AmountForm);
                 data.Add("firstname", model.FirstName);
                 data.Add("email", model.Email);
@@ -184,67 +133,14 @@ namespace Arthur_Clive.Helper
                 data.Add("state", model.State);
                 data.Add("country", model.Country);
                 data.Add("zipcode", model.ZipCode);
-                data.Add("udf1", "");
-                data.Add("udf2", "");
+                data.Add("udf1", model.OrderId);
+                data.Add("udf2", model.UserName);
                 data.Add("udf3", "");
                 data.Add("udf4", "");
                 data.Add("udf5", "");
                 data.Add("pg", "");
                 data.Add("service_provider", "PayUMoney");
                 return data;
-            }
-            catch (Exception ex)
-            {
-                LoggerDataAccess.CreateLog("PaymentController", "MakePayment", "MakePayment", ex.Message);
-                return null;
-            }
-        }
-
-        /// <summary>Generate form for payment gateway using PayUMoney</summary>
-        /// <param name="model">Data to be included in the form</param>
-        public static string GenerateForm(PaymentModel model)
-        {
-            try
-            {
-                string SuccessUrl = "http://localhost:5001/api/payment/success";
-                string FailureUrl = "http://localhost:5001/api/payment/failed";
-                string CancleUrl = "http://localhost:5001/api/payment/cancle";
-                string txnId = GetTxnId();
-                string hashString = GetHashString(txnId, model);
-                string hash = Generatehash512(hashString).ToLower();
-                string action = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("url").First().Value + "/_payment";
-                Hashtable data = new Hashtable();
-                data.Add("hash", hash);
-                data.Add("txnid", txnId);
-                data.Add("key", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("key").First().Value);
-                string AmountForm = Convert.ToDecimal(model.Amount).ToString("g29");
-                data.Add("amount", AmountForm);
-                data.Add("firstname", model.FirstName);
-                data.Add("email", model.Email);
-                data.Add("phone", model.PhoneNumber);
-                data.Add("productinfo", model.ProductInfo);
-                data.Add("surl", SuccessUrl);
-                data.Add("furl", FailureUrl);
-                data.Add("lastname", model.LastName);
-                data.Add("curl", CancleUrl);
-                data.Add("address1", model.AddressLine1);
-                data.Add("address2", model.AddressLine2);
-                data.Add("city", model.City);
-                data.Add("state", model.State);
-                data.Add("country", model.Country);
-                data.Add("zipcode", model.ZipCode);
-                data.Add("udf1", "");
-                data.Add("udf2", "");
-                data.Add("udf3", "");
-                data.Add("udf4", "");
-                data.Add("udf5", "");
-                data.Add("pg", "");
-                data.Add("service_provider", "PayUMoney");
-                string strForm = PreparePOSTForm(action, data);
-                var form = PreparePOSTForm(action, data);
-                dynamic UserInfo = new System.Dynamic.ExpandoObject();
-                UserInfo.form = form;
-                return UserInfo;
             }
             catch (Exception ex)
             {

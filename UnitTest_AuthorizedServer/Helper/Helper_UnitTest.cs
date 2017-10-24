@@ -19,7 +19,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void DoPassword()
+        public void AuthHelper_DoPassword_UnitTest_AuthorizedServer()
         {
             //Arrange
             var repo = new Mock<IRTokenRepository>();
@@ -40,7 +40,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void DoRefreshToken()
+        public void AuthHelper_DoRefreshToken_UnitTest_AuthorizedServer()
         {
             //Arrange
             var repo = new Mock<IRTokenRepository>();
@@ -61,7 +61,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void GetJWT()
+        public void AuthHelper_GetJWT_UnitTest_AuthorizedServer()
         {
             //Arrange
             var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
@@ -81,7 +81,7 @@ namespace UnitTest_AuthorizedServer.Helper
     public class EmailHelper_UnitTest
     {
         [TestMethod]
-        public void EmailHelper_GetCredentials()
+        public void EmailHelper_GetCredentials_UnitTest_AuthorizedServer()
         {
             //Arrange 
             var accesskeyFromXML = GlobalHelper.ReadXML().Elements("amazonses").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("accesskey").FirstOrDefault().Value;
@@ -100,7 +100,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void EmailHelper_SendEmail()
+        public void EmailHelper_SendEmail_UnitTest_AuthorizedServer()
         {
             //Arrange
 
@@ -111,7 +111,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void EmailHelper_CreateEmailBody()
+        public void EmailHelper_CreateEmailBody_UnitTest_AuthorizedServer()
         {
             //    //Arrange
             //    var linkFromXML = GlobalHelper.ReadXML().Elements("ipconfig").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("authorizedserver2");
@@ -142,7 +142,7 @@ namespace UnitTest_AuthorizedServer.Helper
     public class GlobalHelper_UnitTest
     {
         [TestMethod]
-        public void GlobalHelper_GetCurrentDir()
+        public void GlobalHelper_GetCurrentDir_UnitTest_AuthorizedServer()
         {
             //Arrange
             var expectedPath = "D:\\Arthur_Clive\\UnitTest_AuthorizedServer\\bin\\Debug\\netcoreapp2.0";
@@ -156,7 +156,7 @@ namespace UnitTest_AuthorizedServer.Helper
         }
         
         [TestMethod]
-        public void GlobalHelper_ReadXML()
+        public void GlobalHelper_ReadXML_UnitTest_AuthorizedServer()
         {
             //Arrange
             var dir = "D:\\Arthur_Clive\\UnitTest_AuthorizedServer\\bin\\Debug\\netcoreapp2.0";
@@ -173,7 +173,7 @@ namespace UnitTest_AuthorizedServer.Helper
         }
 
         [TestMethod]
-        public void GlobalHelper_GetIpConfig()
+        public void GlobalHelper_GetIpConfig_UnitTest_AuthorizedServer()
         {
             //Arrange
             var result = GlobalHelper.ReadXML().Elements("ipconfig").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("authorizedserver2").First().Value;
@@ -192,7 +192,7 @@ namespace UnitTest_AuthorizedServer.Helper
     public class MongoHelper_UnitTest
     {
         [TestMethod]
-        public void MongoHelper_GetClient()
+        public void MongoHelper_GetClient_UnitTest_AuthorizedServer()
         {
             //Arrange
             var ipFromXML = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("ip").First().Value;
@@ -224,7 +224,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_GetSingleObject()
+        public void MongoHelper_GetSingleObject_UnitTest_AuthorizedServer()
         {
             //Arrange
 
@@ -235,7 +235,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_GetListOfObjects()
+        public void MongoHelper_GetListOfObjects_UnitTest_AuthorizedServer()
         {
             //Arrange
 
@@ -246,7 +246,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_UpdateSingleObject()
+        public void MongoHelper_UpdateSingleObject_UnitTest_AuthorizedServer()
         {
             //Arrange
 
@@ -257,7 +257,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_CheckForDatas()
+        public void MongoHelper_CheckForDatas_UnitTest_AuthorizedServer()
         {
             //Arrange
 
@@ -268,7 +268,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void MongoHelper_RecordLoginAttempts()
+        public void MongoHelper_RecordLoginAttempts_UnitTest_AuthorizedServer()
         {
             //Arrange
 
@@ -282,7 +282,7 @@ namespace UnitTest_AuthorizedServer.Helper
     public class SMSHelper_UnitTest
     {
         [TestMethod]
-        public void SMSHlper_GetCredentials()
+        public void SMSHlper_GetCredentials_UnitTest_AuthorizedServer()
         {
             //Arrange
             var accessKeyFromXMl = GlobalHelper.ReadXML().Elements("amazonsns").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("accesskey").First().Value;
@@ -302,7 +302,7 @@ namespace UnitTest_AuthorizedServer.Helper
 
         //Pending
         //[TestMethod]
-        public void SMSHlper_SendSMS()
+        public void SMSHlper_SendSMS_UnitTest_AuthorizedServer()
         {
             //Arrange
 

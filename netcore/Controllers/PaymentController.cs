@@ -75,7 +75,7 @@ namespace Arthur_Clive.Controllers
                                 if (product.ProductStock - cart.ProductQuantity < 0)
                                 {
                                     updateQuantity = 0;
-                                    var emailResponce = EmailHelper.SendEmailToAdmin(paymentModel.UserName.ToString(), cart.ProductSKU, cart.ProductQuantity, product.ProductStock).Result;
+                                    var emailResponce = EmailHelper.SendEmailToAdmin(paymentModel.UserName.ToString(), cart.ProductSKU, cart.ProductQuantity, product.ProductStock, paymentModel.OrderId).Result;
                                 }
                                 var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", cart.ProductSKU), "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductStock", updateQuantity)).Result;
                             }

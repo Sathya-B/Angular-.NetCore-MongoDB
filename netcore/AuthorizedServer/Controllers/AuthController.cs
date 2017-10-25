@@ -18,6 +18,7 @@ using AuthorizedServer.Swagger;
 namespace AuthorizedServer.Controllers
 {
     /// <summary>Contoller to Authorize user and to perform other task related to user account</summary>
+    [Produces("application/json")]
     [Route("api/[controller]")]
     public class AuthController : Controller
     {
@@ -234,14 +235,10 @@ namespace AuthorizedServer.Controllers
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(checkUser);
                     if (verifyUser.Status == "Verified")
                     {
-                        RegisterModel registerModel = new RegisterModel();
-                        registerModel.UserName = user.UserName;
-                        registerModel.Password = user.Password;
+                        RegisterModel registerModel = new RegisterModel { UserName = user.UserName, Password = user.Password };
                         if (passwordHasher.VerifyHashedPassword(registerModel, verifyUser.Password, user.Password).ToString() == "Success")
                         {
-                            Parameters parameters = new Parameters();
-                            parameters.username = user.UserName;
-                            parameters.fullname = verifyUser.FullName;
+                            Parameters parameters = new Parameters { username = user.UserName, fullname = verifyUser.FullName };
                             return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
                         }
                         else
@@ -391,9 +388,8 @@ namespace AuthorizedServer.Controllers
                         if (smsHasher.VerifyHashedPassword(model, verifyUser.VerificationCode, otp).ToString() == "Success")
                         {
                             var update = Builders<BsonDocument>.Update.Set("Status", "Verified");
-                            var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result; Parameters parameters = new Parameters();
-                            parameters.username = username;
-                            parameters.fullname = verifyUser.FullName;
+                            var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
+                            Parameters parameters = new Parameters { username = username, fullname = verifyUser.FullName };
                             var response = authHelper.DoPassword(parameters, _repo, _settings);
                             response.Code = "201";
                             response.Message = "OTP Verified";
@@ -449,9 +445,9 @@ namespace AuthorizedServer.Controllers
         /// <response code="404">User not found</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("forgotpassword/changepassword")]
-        [SwaggerRequestExample(typeof(LoginModel), typeof(ChangePassword_ForgotPassword))]
+        [SwaggerRequestExample(typeof(ChangePassword_ForgotPasswordModel), typeof(ChangePassword_ForgotPassword))]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public ActionResult ChangePassword([FromBody]LoginModel data)
+        public ActionResult ChangePassword([FromBody]ChangePassword_ForgotPasswordModel data)
         {
             try
             {
@@ -589,9 +585,9 @@ namespace AuthorizedServer.Controllers
         /// <response code="404">User not found</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("deactivateaccount")]
-        [SwaggerRequestExample(typeof(LoginModel), typeof(DeactivateAccountDetails))]
+        [SwaggerRequestExample(typeof(DeactivateAccountModel), typeof(DeactivateAccountDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public ActionResult DeactivateAccount([FromBody]LoginModel data)
+        public ActionResult DeactivateAccount([FromBody]DeactivateAccountModel data)
         {
             try
             {
@@ -689,19 +685,19 @@ namespace AuthorizedServer.Controllers
                             var checkUser = MH.CheckForDatas("UserName", result.email, null, null, "Authentication", "Authentication");
                             if (checkUser == null)
                             {
-                                RegisterModel registerModel = new RegisterModel();
-                                registerModel.UserName = result.email;
-                                registerModel.UserRole = "User";
-                                registerModel.SocialId = result.sub;
-                                registerModel.FullName = result.name;
-                                registerModel.Status = "Verified";
-                                registerModel.Email = result.email;
+                                RegisterModel registerModel = new RegisterModel
+                                {
+                                    UserName = result.email,
+                                    UserRole = "User",
+                                    SocialId = result.sub,
+                                    FullName = result.name,
+                                    Status = "Verified",
+                                    Email = result.email
+                                };
                                 var authCollection = _db.GetCollection<RegisterModel>("Authentication");
                                 await authCollection.InsertOneAsync(registerModel);
                             }
-                            Parameters parameters = new Parameters();
-                            parameters.username = result.email;
-                            parameters.fullname = result.name; ;
+                            Parameters parameters = new Parameters { username = result.email, fullname = result.name };
                             return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
                         }
                         else
@@ -782,19 +778,19 @@ namespace AuthorizedServer.Controllers
                             var checkUser = MH.CheckForDatas("SocialId", data.ID, null, null, "Authentication", "Authentication");
                             if (checkUser == null)
                             {
-                                RegisterModel registerModel = new RegisterModel();
-                                registerModel.UserName = result.id;
-                                registerModel.UserRole = "User";
-                                registerModel.SocialId = result.id;
-                                registerModel.FullName = result.name;
-                                registerModel.Status = "Verified";
-                                registerModel.Email = data.Email;
+                                RegisterModel registerModel = new RegisterModel
+                                {
+                                    UserName = result.id,
+                                    UserRole = "User",
+                                    SocialId = result.id,
+                                    FullName = result.name,
+                                    Status = "Verified",
+                                    Email = data.Email
+                                };
                                 var authCollection = _db.GetCollection<RegisterModel>("Authentication");
                                 await authCollection.InsertOneAsync(registerModel);
                             }
-                            Parameters parameters = new Parameters();
-                            parameters.username = result.id;
-                            parameters.fullname = result.name; ;
+                            Parameters parameters = new Parameters { username = result.id, fullname = result.name };
                             return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
                         }
                         else
@@ -882,9 +878,7 @@ namespace AuthorizedServer.Controllers
                         else
                         {
                             var user = BsonSerializer.Deserialize<RegisterModel>(checkUser);
-                            Parameters parameters = new Parameters();
-                            parameters.username = result.id;
-                            parameters.fullname = user.FullName; ;
+                            Parameters parameters = new Parameters { username = result.id, fullname = user.FullName };
                             return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
                         }
                     }
@@ -918,7 +912,7 @@ namespace AuthorizedServer.Controllers
         /// <response code="404">User not found </response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpGet("userinfo/{username}")]
-        [ProducesResponseType(typeof(JsonResult), 200)]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult GetUserInfo(string username)
         {
             try
@@ -928,20 +922,19 @@ namespace AuthorizedServer.Controllers
                 {
                     var result = MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication").Result;
                     var userModel = BsonSerializer.Deserialize<RegisterModel>(result);
-                    UserInfo userInfo = new UserInfo
-                    {
-                        FullName = userModel.FullName,
-                        UserName = userModel.UserName,
-                        Email = userModel.Email,
-                        DialCode = userModel.DialCode,
-                        PhoneNumber = userModel.PhoneNumber
-                    };
                     return Ok(new ResponseData
                     {
                         Code = "200",
                         Message = "Success",
-                        Data = userInfo
-                    });
+                        Data = new UserInfo
+                        {
+                            FullName = userModel.FullName,
+                            UserName = userModel.UserName,
+                            Email = userModel.Email,
+                            DialCode = userModel.DialCode,
+                            PhoneNumber = userModel.PhoneNumber
+                        }
+                });
                 }
                 else
                 {
@@ -974,9 +967,9 @@ namespace AuthorizedServer.Controllers
         /// <response code="404">User not found </response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPut("updateuserinfo/fullname/{username}")]
-        [SwaggerRequestExample(typeof(UserInfoUpdateModel), typeof(UpdateFullNameDetails))]
-        [ProducesResponseType(typeof(JsonResult), 200)]
-        public async Task<ActionResult> UpdateFullName([FromBody]UserInfoUpdateModel data, string username)
+        [SwaggerRequestExample(typeof(FullNameUpdateModel), typeof(UpdateFullNameDetails))]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public async Task<ActionResult> UpdateFullName([FromBody]FullNameUpdateModel data,string username)
         {
             try
             {
@@ -1040,52 +1033,43 @@ namespace AuthorizedServer.Controllers
         /// <summary>Update user's fullname</summary>
         /// <param name="data">Update data for phonenumber</param>
         /// <param name="username">UserName of user whoes phonenumber need to be updated</param>        
-        /// <response code="200">PhoneNumber for user updated successfully</response>
-        /// <response code="401">PhoneNumber or dialcode update failed</response> 
+        /// <response code="200">PhoneNumber, dialcode and username for user updated successfully</response>
+        /// <response code="401">Update data for phonenumber not found</response> 
         /// <response code="402">Update data for dialcode not found</response> 
-        /// <response code="403">Update data for phonenumber not found</response> 
         /// <response code="404">User not found </response> 
         /// <response code="400">Process ran into an exception</response> 
-        [HttpPut("updateuserinfo/fullname/{username}")]
-        [SwaggerRequestExample(typeof(UserInfoUpdateModel), typeof(UpdatePhoneNumberDetails))]
-        [ProducesResponseType(typeof(JsonResult), 200)]
-        public async Task<ActionResult> UpdatePhoneNumber([FromBody]UserInfoUpdateModel data, string username)
+        [HttpPut("updateuserinfo/phonenumber/{username}")]
+        [SwaggerRequestExample(typeof(PhoneNumberUpdateModel), typeof(UpdatePhoneNumberDetails))]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public async Task<ActionResult> UpdatePhoneNumber([FromBody]PhoneNumberUpdateModel data, string username)
         {
             try
             {
                 var checkUser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
                 if (checkUser != null)
                 {
-                    if (data.DialCode != null )
+                    if (data.DialCode != null)
                     {
                         if (data.PhoneNumber != null)
                         {
                             var updateDialCode = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("DialCode", data.DialCode));
                             var updatePhoneNumber = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("PhoneNumber", data.PhoneNumber));
-                            if (updateDialCode == true & updatePhoneNumber == true)
+                            if(username == BsonSerializer.Deserialize<RegisterModel>(checkUser).PhoneNumber)
                             {
-                                return Ok(new ResponseData
-                                {
-                                    Code = "200",
-                                    Message = "PhoneNumber and dialcode updated successfully",
-                                    Data = null
-                                });
+                                var updateUserName = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("UserName", data.PhoneNumber));
                             }
-                            else
+                            return Ok(new ResponseData
                             {
-                                return BadRequest(new ResponseData
-                                {
-                                    Code = "401",
-                                    Message = "PhoneNumber or dialcode update failed",
-                                    Data = null
-                                });
-                            }
+                                Code = "200",
+                                Message = "PhoneNumber, dialcode and username updated successfully",
+                                Data = null
+                            });
                         }
                         else
                         {
                             return BadRequest(new ResponseData
                             {
-                                Code = "403",
+                                Code = "401",
                                 Message = "Update data for phonenumber not found",
                                 Data = null
                             });
@@ -1126,15 +1110,15 @@ namespace AuthorizedServer.Controllers
         /// <summary>Update user's email id</summary>
         /// <param name="data">Update data for email</param>
         /// <param name="username">UserName of user whoes email needs to be updated</param>
-        /// <response code="200">Email for user updated successfully</response>
+        /// <response code="200">Email and username for user updated successfully</response>
         /// <response code="401">Email update failed</response> 
         /// <response code="402">Update data for email not found</response> 
         /// <response code="404">User not found </response> 
         /// <response code="400">Process ran into an exception</response> 
-        [HttpPut("updateuserinfo/fullname/{username}")]
-        [SwaggerRequestExample(typeof(UserInfoUpdateModel), typeof(UpdateEmailDetails))]
-        [ProducesResponseType(typeof(JsonResult), 200)]
-        public async Task<ActionResult> UpdateEmailId([FromBody]RegisterModel data, string username)
+        [HttpPut("updateuserinfo/email/{username}")]
+        [SwaggerRequestExample(typeof(EmailUpdateModel), typeof(UpdateEmailDetails))]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public async Task<ActionResult> UpdateEmailId([FromBody]EmailUpdateModel data,string username)
         {
             try
             {
@@ -1144,12 +1128,16 @@ namespace AuthorizedServer.Controllers
                     if (data.Email != null)
                     {
                         var update = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("Email", data.Email));
+                        if (username == BsonSerializer.Deserialize<RegisterModel>(checkUser).Email)
+                        {
+                            var updateUserName = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("UserName", data.Email));
+                        }
                         if (update == true)
                         {
                             return Ok(new ResponseData
                             {
                                 Code = "200",
-                                Message = "Email updated successfully",
+                                Message = "Email and username updated successfully",
                                 Data = null
                             });
                         }
@@ -1196,28 +1184,83 @@ namespace AuthorizedServer.Controllers
         }
 
         /// <summary>Update user's fullname</summary>
-        /// <param name="data"></param>
-        /// <param name="username"></param>
+        /// <param name="data">Update data for password</param>
+        /// <param name="username">UserName of user whoes password needs to be changed</param>
         /// <response code="200">New password for user updated successfully</response>
-        /// <response code="401">New password update failed</response> 
+        /// <response code="401">Current password not found</response> 
+        /// <response code="402">New password not found</response> 
+        /// <response code="403">New password update failed</response> 
         /// <response code="404">User not found </response> 
+        /// <response code="404">Current password incorrect </response> 
         /// <response code="400">Process ran into an exception</response> 
-        [HttpPut("updateuserinfo/fullname/{username}")]
-        [SwaggerRequestExample(typeof(UserInfoUpdateModel), typeof(UpdatePasswordDetails))]
-        [ProducesResponseType(typeof(JsonResult), 200)]
-        public async Task<ActionResult> UpdatePassword([FromBody]RegisterModel data, string username)
+        [HttpPut("updateuserinfo/password/{username}")]
+        [SwaggerRequestExample(typeof(PasswordUpdateModel), typeof(UpdatePasswordDetails))]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public async Task<ActionResult> UpdatePassword([FromBody]PasswordUpdateModel data, string username)
         {
             try
             {
                 var checkUser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
                 if (checkUser != null)
                 {
-                    return Ok(new ResponseData
+                    var userData = BsonSerializer.Deserialize<RegisterModel>(checkUser);
+                    if (data.CurrentPassword == null)
                     {
-                        Code = "200",
-                        Message = "FullName updated successfully",
-                        Data = null
-                    });
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "401",
+                            Message = "Current password not found",
+                            Data = null
+                        });
+                    }
+                    else
+                    {
+                        if (data.NewPassword == null)
+                        {
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "402",
+                                Message = "New password not found",
+                                Data = null
+                            });
+                        }
+                        else
+                        {
+                            RegisterModel registerModel = new RegisterModel { UserName = username, Password = data.CurrentPassword };
+                            if (passwordHasher.VerifyHashedPassword(registerModel, userData.Password, data.CurrentPassword).ToString() == "Success")
+                            {
+                                var updateData = Builders<BsonDocument>.Update.Set("Password", passwordHasher.HashPassword(userData, data.NewPassword));
+                                var updatePassword = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", updateData);
+                                if (updatePassword == false)
+                                {
+                                    return BadRequest(new ResponseData
+                                    {
+                                        Code = "403",
+                                        Message = "New password update failed",
+                                        Data = null
+                                    });
+                                }
+                                else
+                                {
+                                    return Ok(new ResponseData
+                                    {
+                                        Code = "200",
+                                        Message = "Password Changed Successfully",
+                                        Data = null
+                                    });
+                                }
+                            }
+                            else
+                            {
+                                return BadRequest(new ResponseData
+                                {
+                                    Code = "405",
+                                    Message = "Current password incorrect",
+                                    Data = null
+                                });
+                            }
+                        }
+                    }
                 }
                 else
                 {

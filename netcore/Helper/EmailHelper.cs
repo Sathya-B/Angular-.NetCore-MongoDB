@@ -78,11 +78,12 @@ namespace Arthur_Clive.Helper
         }
 
         /// <summary>Send email to admin is the orders product quantity is higher than the product stock</summary>
-        public static async Task<string> SendEmailToAdmin(string userName,string productInfo,long orderQuantity,long productStock)
+        public static async Task<string> SendEmailToAdmin(string userName,string productInfo,long orderQuantity,long productStock,long orderId)
         {
             string emailSender = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsender").First().Value;
             string emailReceiver = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailreceiver").First().Value;
             string link = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("websitelink").First().Value;
+            string emailSubject = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsubject3").First().Value + "OrderId : " + orderId + "&" + "UserName : " + userName ;
             using (var client = new AmazonSimpleEmailServiceClient(GetCredentials("accesskey"), GetCredentials("secretkey"), Amazon.RegionEndpoint.USWest2))
             {
                 var sendRequest = new SendEmailRequest
@@ -91,10 +92,10 @@ namespace Arthur_Clive.Helper
                     Destination = new Destination { ToAddresses = new List<string> { emailReceiver } },
                     Message = new Message
                     {
-                        Subject = new Content(GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsubject3").First().Value),
+                        Subject = new Content(emailSubject),
                         Body = new Body
                         {
-                            Html = new Content(CreateEmailBody_ErrorReport(userName,productInfo,orderQuantity,productStock))
+                            Html = new Content(CreateEmailBody_ErrorReport(userName,productInfo,orderQuantity,productStock,orderId.ToString()))
                         }
                     }
                 };
@@ -116,7 +117,8 @@ namespace Arthur_Clive.Helper
         /// <param name="productInfo"></param>
         /// <param name="orderQuantity"></param>
         /// <param name="productStock"></param>
-        public static string CreateEmailBody_ErrorReport(string userName, string productInfo, long orderQuantity,long productStock)
+        /// <param name="orderId"></param>
+        public static string CreateEmailBody_ErrorReport(string userName, string productInfo, long orderQuantity,long productStock,string orderId)
         {
             string emailBody;
             var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
@@ -125,6 +127,7 @@ namespace Arthur_Clive.Helper
             {
                 emailBody = reader.ReadToEnd();
             }
+            emailBody = emailBody.Replace("{OrderId}",orderId);
             emailBody = emailBody.Replace("{UserName}", userName);
             emailBody = emailBody.Replace("{ProductInfo}", productInfo);
             emailBody = emailBody.Replace("{OrderQuantity}", orderQuantity.ToString());

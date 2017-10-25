@@ -13,7 +13,7 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new Product
+            return new 
             {
                 ProductFor = "Girls",
                 ProductType = "Tshirt",
@@ -38,7 +38,7 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new Product
+            return new
             {
                 ProductFor = "Men",
                 ProductType = "Shirt",
@@ -69,7 +69,7 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new Category
+            return new
             {
                 ProductFor = "Women",
                 ProductType = "Tops",
@@ -84,7 +84,7 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new Category
+            return new
             {
                 ProductFor = "Men",
                 ProductType = "Shirt",
@@ -103,7 +103,7 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new Coupon
+            return new
             {
                 Code = "CODE1",
                 ApplicableFor = "All",
@@ -121,7 +121,7 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new Coupon
+            return new
             {
                 UsageCount = 1
             };
@@ -138,7 +138,7 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new AddressList()
+            return new
             {
                 ListOfAddress = new List<Address>
                 {
@@ -185,7 +185,7 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new CartList()
+            return new
             {
                 ListOfProducts = new List<Cart>
                 {
@@ -234,43 +234,43 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new WishlistList()
+            return new
             {
-                //ListOfProducts =
-                //{
-                //    new WishList
-                //    {
-                //        UserName="sample@gamil.com",
-                //        ProductSKU="Men-Tshirt-Om-Black-S",
-                //        MinioObject_URL="https://s3.ap-south-1.amazonaws.com/arthurclive-products/Men-Tshirt-Om-Black-S.jpg",
-                //        ProductFor="Men",
-                //        ProductType="Tshirt",
-                //        ProductDesign = "Om",
-                //        ProductBrand = "Arthur Clive",
-                //        ProductPrice = 695,
-                //        ProductDiscount = 0,
-                //        ProductDiscountPrice = 695,
-                //        ProductSize = "S",
-                //        ProductColour = "Black",
-                //        ProductDescription = "Tshirt for men"
-                //    },
-                //    new WishList
-                //    {
-                //        UserName="sample@gamil.com",
-                //        ProductSKU="Men-Tshirt-Om-Black-L",
-                //        MinioObject_URL="https://s3.ap-south-1.amazonaws.com/arthurclive-products/Men-Tshirt-Om-Black-L.jpg",
-                //        ProductFor="Men",
-                //        ProductType="Tshirt",
-                //        ProductDesign = "Om",
-                //        ProductBrand = "Arthur Clive",
-                //        ProductPrice = 695,
-                //        ProductDiscount = 0,
-                //        ProductDiscountPrice = 695,
-                //        ProductSize = "L",
-                //        ProductColour = "Black",
-                //        ProductDescription = "Tshirt for men"
-                //    }
-                //}
+                ListOfProducts = new List<WishList>
+                {
+                    new WishList
+                    {
+                        UserName = "sample@gamil.com",
+                        ProductSKU = "Men-Tshirt-Om-Black-S",
+                        MinioObject_URL = "https://s3.ap-south-1.amazonaws.com/arthurclive-products/Men-Tshirt-Om-Black-S.jpg",
+                        ProductFor = "Men",
+                        ProductType = "Tshirt",
+                        ProductDesign = "Om",
+                        ProductBrand = "Arthur Clive",
+                        ProductPrice = 695,
+                        ProductDiscount = 0,
+                        ProductDiscountPrice = 695,
+                        ProductSize = "S",
+                        ProductColour = "Black",
+                        ProductDescription = "Tshirt for men"
+                    },
+                    new WishList
+                    {
+                        UserName = "sample@gamil.com",
+                        ProductSKU = "Men-Tshirt-Om-Black-L",
+                        MinioObject_URL = "https://s3.ap-south-1.amazonaws.com/arthurclive-products/Men-Tshirt-Om-Black-L.jpg",
+                        ProductFor = "Men",
+                        ProductType = "Tshirt",
+                        ProductDesign = "Om",
+                        ProductBrand = "Arthur Clive",
+                        ProductPrice = 695,
+                        ProductDiscount = 0,
+                        ProductDiscountPrice = 695,
+                        ProductSize = "L",
+                        ProductColour = "Black",
+                        ProductDescription = "Tshirt for men"
+                    }
+                }
             };
         }
     }
@@ -285,7 +285,7 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new PaymentModel()
+            return new
             {
                 FirstName = "Sample",
                 LastName = "User",
@@ -314,7 +314,7 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new OrderInfo
+            return new
             {
                 CouponDiscount = 0
             };
@@ -327,7 +327,7 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new OrderInfo
+            return new
             {
                 OrderId = 1,
             };
@@ -340,7 +340,7 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new StatusUpdate
+            return new
             {
                 OrderId = 1,
                 Status = "Delivered",

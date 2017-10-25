@@ -9,16 +9,14 @@
   },
   "profiles": {
     "IIS Express": {
-        "commandName": "IISExpress",
-        //"launchBrowser": true,
-        "launchUrl": "api/category",
-        "environmentVariables": {
-            "ASPNETCORE_ENVIRONMENT": "Development"
-        }
+      "commandName": "IISExpress",
+      "launchUrl": "api/category",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     },
     "Arthur_Clive": {
       "commandName": "Project",
-      //"launchBrowser": true,
       "launchUrl": "api/category",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

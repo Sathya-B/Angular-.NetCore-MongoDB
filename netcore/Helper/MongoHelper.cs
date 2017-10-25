@@ -57,25 +57,34 @@ namespace Arthur_Clive.Helper
         /// <param name="collectionName"></param>
         public static async Task<List<BsonDocument>> GetListOfObjects(string filterField1, dynamic filterData1, string filterField2, dynamic filterData2, string filterField3, dynamic filterData3, string dbName, string collectionName)
         {
-            var collection = _client.GetDatabase(dbName).GetCollection<BsonDocument>(collectionName);
-            if (filterField1 == null & filterField2 == null & filterField3 == null)
+            try
             {
-                filter = FilterDefinition<BsonDocument>.Empty;
+                var db = _client.GetDatabase(dbName);
+                var collection = db.GetCollection<BsonDocument>(collectionName);
+                if (filterField1 == null & filterField2 == null & filterField3 == null)
+                {
+                    filter = FilterDefinition<BsonDocument>.Empty;
+                }
+                else if (filterField1 != null & filterField2 == null & filterField3 == null)
+                {
+                    filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1);
+                }
+                else if (filterField1 != null & filterField2 != null & filterField3 == null)
+                {
+                    filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2);
+                }
+                else if (filterField1 != null & filterField2 != null & filterField3 != null)
+                {
+                    filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2) & Builders<BsonDocument>.Filter.Eq(filterField3, filterData3);
+                }
+                IAsyncCursor<BsonDocument> cursor = await collection.FindAsync(filter);
+                return cursor.ToList();
             }
-            else if (filterField1 != null & filterField2 == null & filterField3 == null)
+            catch(Exception ex)
             {
-                filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1);
+                LoggerDataAccess.CreateLog("MongoHelper", "GetListOfObjects", "GetListOfObjects", ex.Message);
+                return null;
             }
-            else if (filterField1 != null & filterField2 != null & filterField3 == null)
-            {
-                filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2);
-            }
-            else if (filterField1 != null & filterField2 != null & filterField3 != null)
-            {
-                filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2) & Builders<BsonDocument>.Filter.Eq(filterField3, filterData3);
-            }
-            IAsyncCursor<BsonDocument> cursor = await collection.FindAsync(filter);
-            return cursor.ToList();
         }
 
         /// <summary>Update single object in MongoDB </summary>
@@ -162,7 +171,6 @@ namespace Arthur_Clive.Helper
 
         /// <summary></summary>
         /// <param name="objectId"></param>
-        /// <param name="productSKU"></param>
         /// <param name="updateData"></param>
         /// <param name="updateField"></param>
         /// <param name="objectName"></param>

@@ -78,10 +78,10 @@ namespace Arthur_Clive.Helper
         }
 
         /// <summary>Send email to admin is the orders product quantity is higher than the product stock</summary>
-        public static async Task<string> SendEmailToAdmin(string userName,string productInfo,long orderQuantity,long productStock,long orderId)
+        public static async Task<string> SendEmailToAdmin(string userName,string email,string productInfo,long orderQuantity,long productStock,long orderId)
         {
             string emailSender = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsender").First().Value;
-            string emailReceiver = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailreceiver").First().Value;
+            string emailReceiver = email;
             string link = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("websitelink").First().Value;
             string emailSubject = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsubject3").First().Value + "OrderId : " + orderId + "&" + "UserName : " + userName ;
             using (var client = new AmazonSimpleEmailServiceClient(GetCredentials("accesskey"), GetCredentials("secretkey"), Amazon.RegionEndpoint.USWest2))

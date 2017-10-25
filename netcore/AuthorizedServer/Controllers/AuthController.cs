@@ -136,56 +136,6 @@ namespace AuthorizedServer.Controllers
             }
         }
 
-        /// <summary>Get User Info</summary>
-        /// <remarks>This api is get user information</remarks>
-        /// <param name="username">UserName of user whose information to be retrieved</param>
-        /// <response code="200">User information returned</response>
-        /// <response code="401">Not Authorised</response>     
-        /// <response code="404">User not found </response> 
-        /// <response code="400">Process ran into an exception</response> 
-        [HttpGet("userinfo/{username}")]
-        [ProducesResponseType(typeof(JsonResult), 200)]
-        public ActionResult UserInfo(string username)
-        {
-            try
-            {
-                var checkUser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
-                if (checkUser != null)
-                {
-
-                    var filter = Builders<BsonDocument>.Filter.Eq("UserName", username);
-                    var result = MH.GetSingleObject(filter, "Authentication", "Authentication").Result;
-                    var userModel = BsonSerializer.Deserialize<RegisterModel>(result);
-                    UserInfo userInfo = new UserInfo();
-                    userInfo.FullName = userModel.FullName;
-                    userInfo.UserName = userModel.UserName;
-                    userInfo.Email = userModel.Email;
-                    userInfo.DialCode = userModel.DialCode;
-                    userInfo.PhoneNumber = userModel.PhoneNumber;
-                    return Ok(Json(userInfo));
-                }
-                else
-                {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "User Not Found",
-                        Data = null
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                LoggerDataAccess.CreateLog("AuthController", "UserInfo", "UserInfo", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = null
-                });
-            }
-        }
-
         /// <summary>Verify user using SMS or Email</summary>
         /// <remarks>This api is used to verify registered</remarks>
         /// <param name="username">UserName of user who needs to get verified</param>
@@ -952,6 +902,336 @@ namespace AuthorizedServer.Controllers
             catch (Exception ex)
             {
                 LoggerDataAccess.CreateLog("AuthController", "GoogleLogin", "GoogleLogin", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
+            }
+        }
+
+        /// <summary>Get User Info</summary>
+        /// <remarks>This api is get user information</remarks>
+        /// <param name="username">UserName of user whose information to be retrieved</param>
+        /// <response code="200">User information returned</response>
+        /// <response code="404">User not found </response> 
+        /// <response code="400">Process ran into an exception</response> 
+        [HttpGet("userinfo/{username}")]
+        [ProducesResponseType(typeof(JsonResult), 200)]
+        public ActionResult GetUserInfo(string username)
+        {
+            try
+            {
+                var checkUser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
+                if (checkUser != null)
+                {
+                    var result = MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication").Result;
+                    var userModel = BsonSerializer.Deserialize<RegisterModel>(result);
+                    UserInfo userInfo = new UserInfo
+                    {
+                        FullName = userModel.FullName,
+                        UserName = userModel.UserName,
+                        Email = userModel.Email,
+                        DialCode = userModel.DialCode,
+                        PhoneNumber = userModel.PhoneNumber
+                    };
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Success",
+                        Data = userInfo
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "User Not Found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AuthController", "GetUserInfo", "GetUserInfo", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
+            }
+        }
+
+        /// <summary>Update user's fullname</summary>
+        /// <param name="data">Update data for fullname</param>
+        /// <param name="username">UserName of user whoes fullname needs to be updated</param>
+        /// <response code="200">FullName for user updated successfully</response>
+        /// <response code="401">FullName update failed</response> 
+        /// <response code="402">Update data for fullname not found</response> 
+        /// <response code="404">User not found </response> 
+        /// <response code="400">Process ran into an exception</response> 
+        [HttpPut("updateuserinfo/fullname/{username}")]
+        [SwaggerRequestExample(typeof(UserInfoUpdateModel), typeof(UpdateFullNameDetails))]
+        [ProducesResponseType(typeof(JsonResult), 200)]
+        public async Task<ActionResult> UpdateFullName([FromBody]UserInfoUpdateModel data, string username)
+        {
+            try
+            {
+                var checkUser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
+                if (checkUser != null)
+                {
+                    if (data.FullName != null)
+                    {
+                        var update = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("FullName", data.FullName));
+                        if (update == true)
+                        {
+                            return Ok(new ResponseData
+                            {
+                                Code = "200",
+                                Message = "FullName updated successfully",
+                                Data = null
+                            });
+                        }
+                        else
+                        {
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "401",
+                                Message = "FullName update failed",
+                                Data = null
+                            });
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "402",
+                            Message = "Update data for fullname not found",
+                            Data = null
+                        });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "User Not Found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AuthController", "UpdateFullName", "UpdateFullName", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
+            }
+        }
+
+        /// <summary>Update user's fullname</summary>
+        /// <param name="data">Update data for phonenumber</param>
+        /// <param name="username">UserName of user whoes phonenumber need to be updated</param>        
+        /// <response code="200">PhoneNumber for user updated successfully</response>
+        /// <response code="401">PhoneNumber or dialcode update failed</response> 
+        /// <response code="402">Update data for dialcode not found</response> 
+        /// <response code="403">Update data for phonenumber not found</response> 
+        /// <response code="404">User not found </response> 
+        /// <response code="400">Process ran into an exception</response> 
+        [HttpPut("updateuserinfo/fullname/{username}")]
+        [SwaggerRequestExample(typeof(UserInfoUpdateModel), typeof(UpdatePhoneNumberDetails))]
+        [ProducesResponseType(typeof(JsonResult), 200)]
+        public async Task<ActionResult> UpdatePhoneNumber([FromBody]UserInfoUpdateModel data, string username)
+        {
+            try
+            {
+                var checkUser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
+                if (checkUser != null)
+                {
+                    if (data.DialCode != null )
+                    {
+                        if (data.PhoneNumber != null)
+                        {
+                            var updateDialCode = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("DialCode", data.DialCode));
+                            var updatePhoneNumber = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("PhoneNumber", data.PhoneNumber));
+                            if (updateDialCode == true & updatePhoneNumber == true)
+                            {
+                                return Ok(new ResponseData
+                                {
+                                    Code = "200",
+                                    Message = "PhoneNumber and dialcode updated successfully",
+                                    Data = null
+                                });
+                            }
+                            else
+                            {
+                                return BadRequest(new ResponseData
+                                {
+                                    Code = "401",
+                                    Message = "PhoneNumber or dialcode update failed",
+                                    Data = null
+                                });
+                            }
+                        }
+                        else
+                        {
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "403",
+                                Message = "Update data for phonenumber not found",
+                                Data = null
+                            });
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "402",
+                            Message = "Update data for dialcode not found",
+                            Data = null
+                        });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "User Not Found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AuthController", "UpdatePhoneNumber", "UpdatePhoneNumber", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
+            }
+        }
+
+        /// <summary>Update user's email id</summary>
+        /// <param name="data">Update data for email</param>
+        /// <param name="username">UserName of user whoes email needs to be updated</param>
+        /// <response code="200">Email for user updated successfully</response>
+        /// <response code="401">Email update failed</response> 
+        /// <response code="402">Update data for email not found</response> 
+        /// <response code="404">User not found </response> 
+        /// <response code="400">Process ran into an exception</response> 
+        [HttpPut("updateuserinfo/fullname/{username}")]
+        [SwaggerRequestExample(typeof(UserInfoUpdateModel), typeof(UpdateEmailDetails))]
+        [ProducesResponseType(typeof(JsonResult), 200)]
+        public async Task<ActionResult> UpdateEmailId([FromBody]RegisterModel data, string username)
+        {
+            try
+            {
+                var checkUser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
+                if (checkUser != null)
+                {
+                    if (data.Email != null)
+                    {
+                        var update = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("Email", data.Email));
+                        if (update == true)
+                        {
+                            return Ok(new ResponseData
+                            {
+                                Code = "200",
+                                Message = "Email updated successfully",
+                                Data = null
+                            });
+                        }
+                        else
+                        {
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "401",
+                                Message = "FullName update failed",
+                                Data = null
+                            });
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "402",
+                            Message = "Update data for email not found",
+                            Data = null
+                        });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "User Not Found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AuthController", "UpdateEmailId", "UpdateEmailId", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = null
+                });
+            }
+        }
+
+        /// <summary>Update user's fullname</summary>
+        /// <param name="data"></param>
+        /// <param name="username"></param>
+        /// <response code="200">New password for user updated successfully</response>
+        /// <response code="401">New password update failed</response> 
+        /// <response code="404">User not found </response> 
+        /// <response code="400">Process ran into an exception</response> 
+        [HttpPut("updateuserinfo/fullname/{username}")]
+        [SwaggerRequestExample(typeof(UserInfoUpdateModel), typeof(UpdatePasswordDetails))]
+        [ProducesResponseType(typeof(JsonResult), 200)]
+        public async Task<ActionResult> UpdatePassword([FromBody]RegisterModel data, string username)
+        {
+            try
+            {
+                var checkUser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
+                if (checkUser != null)
+                {
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "FullName updated successfully",
+                        Data = null
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "User Not Found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AuthController", "UpdateFullName", "UpdateFullName", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

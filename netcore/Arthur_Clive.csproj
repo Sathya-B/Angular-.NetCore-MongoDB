@@ -9,6 +9,10 @@
     <DocumentationFile>bin\Debug\netcoreapp2.0\Arthur_Clive.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netcoreapp2.0\Arthur_Clive.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="AuthorizedServer\**" />
     <Compile Remove="wwwroot\swagger\css\**" />

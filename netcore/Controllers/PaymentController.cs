@@ -14,6 +14,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace Arthur_Clive.Controllers
 {
@@ -80,7 +81,7 @@ namespace Arthur_Clive.Controllers
                             }
                         }
                         var removeCartItems = _db.GetCollection<Cart>("Cart").DeleteMany(Builders<Cart>.Filter.Eq("UserName", paymentModel.UserName));
-                        return Redirect("http://localhost:3000/#/paymentsuccess");
+                        return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectsuccess").First().Value);
                     }
                     else
                     {
@@ -95,7 +96,7 @@ namespace Arthur_Clive.Controllers
                         statusCodeList.Add(new StatusCode { StatusId = 3, Description = "Payment failed", Date = DateTime.UtcNow });
                         paymentDetails.Status = statusCodeList;
                         var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
-                        return Redirect("http://localhost:3000/#/paymenterror");
+                        return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
                     }
 
                 }
@@ -113,12 +114,12 @@ namespace Arthur_Clive.Controllers
                     statusCodeList.Add(new StatusCode { StatusId = 3, Description = "Payment failed", Date = DateTime.UtcNow });
                     paymentDetails.Status = statusCodeList;
                     var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
-                    return Redirect("http://localhost:3000/#/paymenterror");
+                    return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
                 }
             }
             else
             {
-                return Redirect("http://localhost:3000/#/paymenterror");
+                return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
             }
 
         }
@@ -151,11 +152,11 @@ namespace Arthur_Clive.Controllers
                 statusCodeList.Add(new StatusCode { StatusId = 3, Description = "Payment failed", Date = DateTime.UtcNow });
                 paymentDetails.Status = statusCodeList;
                 var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
-                return Redirect("http://localhost:3000/#/paymenterror");
+                return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
             }
             else
             {
-                return Redirect("http://localhost:3000/#/paymenterror");
+                return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
             }
         }
 

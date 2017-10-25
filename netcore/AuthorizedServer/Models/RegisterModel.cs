@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
 
@@ -167,5 +166,22 @@ namespace AuthorizedServer.Models
         /// <summary>Name of the used obtained from the facebook token</summary>
         [Required]
         public string name { get; set; }
+    }
+
+    /// <summary>Contains data needed for updating userinfo</summary>
+    public class UserInfoUpdateModel
+    {
+        /// <summary>Update data for fullname</summary>
+        public string FullName { get; set; }
+        /// <summary>Update data for dial code</summary>
+        public string DialCode { get; set; }
+        /// <summary>Update data for phonenumber</summary>
+        public string PhoneNumber { get; set; }
+        /// <summary>Update data for email</summary>
+        public string Email { get; set; }
+        /// <summary>Current password of user</summary>
+        public string CurrentPassword { get; set; }
+        /// <summary>Update data for password</summary>
+        public string NewPassword { get; set; }
     }
 }

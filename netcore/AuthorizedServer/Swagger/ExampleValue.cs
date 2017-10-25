@@ -132,5 +132,59 @@ namespace AuthorizedServer.Swagger
         }
     }
 
+    /// <summary></summary>
+    public class UpdateFullNameDetails : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new UserInfoUpdateModel
+            {
+                FullName = "Updated Sample User"
+            };
+        }
+    }
+
+    /// <summary></summary>
+    public class UpdatePhoneNumberDetails : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new UserInfoUpdateModel
+            {
+                DialCode = "+11",
+                PhoneNumber = "23452345"
+            };
+        }
+    }
+
+    /// <summary></summary>
+    public class UpdateEmailDetails : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new UserInfoUpdateModel
+            {
+                Email = "updatedsample@email.com"
+            };
+        }
+    }
+
+    /// <summary></summary>
+    public class UpdatePasswordDetails : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new UserInfoUpdateModel
+            {
+                CurrentPassword = "asd123",
+                NewPassword = "qwe123"
+            };
+        }
+    }
+
     #endregion
 }

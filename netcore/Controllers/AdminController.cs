@@ -1,4 +1,4 @@
-﻿    using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Arthur_Clive.Data;
@@ -34,11 +34,9 @@ namespace Arthur_Clive.Controllers
             {
                 if (username != null)
                 {
-                    var user = MH.CheckForDatas("UserName", username, null, null, "SubscribeDB", "SubscribedUsers");
-                    if (user == null)
+                    if (MH.CheckForDatas("UserName", username, null, null, "SubscribeDB", "SubscribedUsers") == null)
                     {
-                        var collection = _db.GetCollection<Subscribe>("SubscribedUsers");
-                        await collection.InsertOneAsync(new Subscribe { UserName = username });
+                        await _db.GetCollection<Subscribe>("SubscribedUsers").InsertOneAsync(new Subscribe { UserName = username });
                         return Ok(new ResponseData
                         {
                             Code = "200",
@@ -93,8 +91,7 @@ namespace Arthur_Clive.Controllers
             {
                 if (username != null)
                 {
-                    var user = MH.CheckForDatas("UserName", username, null, null, "SubscribeDB", "SubscribedUsers");
-                    if (user != null)
+                    if (MH.CheckForDatas("UserName", username, null, null, "SubscribeDB", "SubscribedUsers") != null)
                     {
                         var filter = Builders<BsonDocument>.Filter.Eq("UserName", username);
                         MH.DeleteSingleObject(filter, "SubscribeDB", "SubscribedUsers");
@@ -149,9 +146,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var collection = _db.GetCollection<Subscribe>("SubscribedUsers");
-                var filter = FilterDefinition<Subscribe>.Empty;
-                IAsyncCursor<Subscribe> cursor = await collection.FindAsync(filter);
+                IAsyncCursor<Subscribe> cursor = await _db.GetCollection<Subscribe>("SubscribedUsers").FindAsync(FilterDefinition<Subscribe>.Empty);
                 var users = cursor.ToList();
                 if (users.Count > 0)
                 {

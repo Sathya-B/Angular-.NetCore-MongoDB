@@ -26,6 +26,7 @@ namespace Arthur_Clive.Data
         /// <summary>Payment method and status of the payment</summary>
         public PaymentMethod PaymentDetails { get; set; }
         /// <summary>Discounted amount</summary>
+        [Required]
         public double CouponDiscount { get; set; }
         /// <summary>Address details of user</summary>
         public List<Address> Address { get; set; }

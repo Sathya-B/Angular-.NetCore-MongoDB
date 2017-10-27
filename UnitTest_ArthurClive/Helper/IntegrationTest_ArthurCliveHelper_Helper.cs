@@ -7,7 +7,7 @@ using MongoDB.Driver;
 
 namespace UnitTest_ArthurClive.Helper
 {
-    class UnitTestHelper
+    class IntegrationTest_ArthurCliveHelper_Helper
     {
         public static IMongoDatabase db = MongoHelper._client.GetDatabase("UnitTestDB");
 

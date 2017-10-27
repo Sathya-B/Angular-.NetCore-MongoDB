@@ -316,7 +316,9 @@ namespace Arthur_Clive.Swagger
         {
             return new
             {
-                CouponDiscount = 0
+                CouponDiscount = 0,
+                TotalAmount = 700,
+                EstimatedTax = 5
             };
         }
     }

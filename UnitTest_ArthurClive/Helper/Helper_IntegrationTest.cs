@@ -4,7 +4,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System.Xml.Linq;
 using System.Collections;
-using System.Text;
 using Minio;
 using Amazon.S3;
 using MongoDB.Driver;
@@ -199,9 +198,9 @@ namespace UnitTest_ArthurClive.Helper
     {
         public MongoHelper_IntegrationTest()
         {
-            UnitTestHelper.InsertData_SampleCategory();
-            UnitTestHelper.InsertData_SampleOrder();
-            UnitTestHelper.InsertData_SampleProduct();
+            IntegrationTest_ArthurCliveHelper_Helper.InsertData_SampleCategory();
+            IntegrationTest_ArthurCliveHelper_Helper.InsertData_SampleOrder();
+            IntegrationTest_ArthurCliveHelper_Helper.InsertData_SampleProduct();
         }
 
         [TestMethod]
@@ -470,10 +469,11 @@ namespace UnitTest_ArthurClive.Helper
                 FirstName = "Sample",
                 Email = "sample@gmail.com"
             };
-            var hastString = "gtKFFx|477d56ca6f1c3d22552a|100|Tshirt|Sample|sample@gmail.com|||||||||||eCwWELxi";
+            var hastString = "gtKFFx|477d56ca6f1c3d22552a|100.00|Tshirt|Sample|sample@gmail.com|0||||||||||eCwWELxi";
 
             //Act
             var result = PayUHelper.GetHashString(txnId, paymentModel) as string;
+
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(hastString, result);

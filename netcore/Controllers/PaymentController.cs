@@ -37,7 +37,6 @@ namespace Arthur_Clive.Controllers
         {
             if (paymentResponse != null)
             {
-                string responseHash = paymentResponse["hash"];
                 PaymentModel paymentModel = new PaymentModel
                 {
                     Email = paymentResponse["email"],
@@ -49,11 +48,8 @@ namespace Arthur_Clive.Controllers
                 };
                 try
                 {
-                    string hashedReverseHash = PU.Generatehash512(PU.GetReverseHashString(paymentResponse["txnid"], paymentModel));
-                    if (hashedReverseHash == responseHash)
+                    if (PU.Generatehash512(PU.GetReverseHashString(paymentResponse["txnid"], paymentModel)) == paymentResponse["hash"])
                     {
-                        var status = paymentResponse["status"];
-                        var country = paymentResponse["country"];
                         var updatePaymentMethod = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
                         PaymentMethod paymentDetails = new PaymentMethod();
                         List<StatusCode> statusCodeList = new List<StatusCode>();
@@ -157,6 +153,42 @@ namespace Arthur_Clive.Controllers
             else
             {
                 return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
+            }
+        }
+
+        /// <summary>Cancel responce from the PayU payment gateway</summary>
+        /// <param name="paymentResponse">Responce data from PayU</param>
+        [HttpPost("cancel")]
+        public async Task<ActionResult> Paymentcancelled(IFormCollection paymentResponse)
+        {
+            if (paymentResponse != null)
+            {
+                string responseHash = paymentResponse["hash"];
+                PaymentModel paymentModel = new PaymentModel
+                {
+                    Email = paymentResponse["email"],
+                    OrderId = Convert.ToInt16(paymentResponse["udf1"]),
+                    UserName = paymentResponse["udf2"],
+                    ProductInfo = paymentResponse["productinfo"],
+                    FirstName = paymentResponse["firstname"],
+                    Amount = paymentResponse["amount"],
+                };
+                var updatePaymentMethod = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
+                PaymentMethod paymentDetails = new PaymentMethod();
+                List<StatusCode> statusCodeList = new List<StatusCode>();
+                var orderData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo").Result);
+                foreach (var detail in orderData.PaymentDetails.Status)
+                {
+                    statusCodeList.Add(detail);
+                }
+                statusCodeList.Add(new StatusCode { StatusId = 4, Description = "Payment cancelled", Date = DateTime.UtcNow });
+                paymentDetails.Status = statusCodeList;
+                var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
+                return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectcancelled").First().Value);
+            }
+            else
+            {
+                return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectcancelled").First().Value);
             }
         }
 

@@ -8,14 +8,13 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MH = Arthur_Clive.Helper.MongoHelper;
-using GH = Arthur_Clive.Helper.GlobalHelper;
 using Swashbuckle.AspNetCore.Examples;
 using Arthur_Clive.Swagger;
 using Arthur_Clive.Helper;
 
 namespace Arthur_Clive.Controllers
 {
-    /// <summary>Controller to view,cancle, return and place orders</summary>
+    /// <summary>Controller to view,cancel, return and place orders</summary>
     [Produces("application/json")]
     [Route("api/[controller]")]
     public class OrderController : Controller
@@ -54,8 +53,7 @@ namespace Arthur_Clive.Controllers
                     var cartDatas = cartCursor.ToList();
                     if (cartDatas.Count > 0)
                     {
-                        var ordersCollection = order_db.GetCollection<OrderInfo>("OrderInfo");
-                        var ordersCount = ordersCollection.Find(Builders<OrderInfo>.Filter.Empty).Count();
+                        var ordersCount = order_db.GetCollection<OrderInfo>("OrderInfo").Find(Builders<OrderInfo>.Filter.Empty).Count();
                         data.OrderId = ordersCount + 1;
                         data.UserName = username;
                         data.PaymentMethod = "Nil";
@@ -100,7 +98,7 @@ namespace Arthur_Clive.Controllers
                                 productDetails.ProductSKU = cart.ProductSKU;
                                 productDetails.Status = "Order Placed";
                                 List<StatusCode> productStatus = new List<StatusCode>();
-                                productStatus.Add(new StatusCode { StatusId = 1, Date = DateTime.UtcNow, Description = "OrderPlaced" });
+                                productStatus.Add(new StatusCode { StatusId = 1, Date = DateTime.UtcNow, Description = "Order Placed" });
                                 productDetails.StatusCode = productStatus;
                                 productDetails.ProductInCart = cart;
                                 productList.Add(productDetails);
@@ -113,7 +111,6 @@ namespace Arthur_Clive.Controllers
                         {
                             productInfoList.Add(cart.ProductSKU);
                         }
-
                         string productInfo = String.Join(":", productInfoList);
                         RegisterModel userInfo = BsonSerializer.Deserialize<RegisterModel>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication").Result);
                         Address addressInfo = BsonSerializer.Deserialize<Address>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "UserInfo", "UserInfo").Result);
@@ -246,14 +243,14 @@ namespace Arthur_Clive.Controllers
             }
         }
 
-        /// <summary>Cancle order placed by a user</summary>
-        /// <remarks>This api is user ro cancle a order placed by a user</remarks>
-        /// <param name="data">Info of order which needs to be cancled</param>
-        /// <param name="username">UserName of user who needs to cancle an order</param>
-        /// <param name="productSKU">SKU of product whos order needs to be cancled</param>
-        /// <response code="200">Order successfully cancled</response>
+        /// <summary>Cancel order placed by a user</summary>
+        /// <remarks>This api is user ro cancel a order placed by a user</remarks>
+        /// <param name="data">Info of order which needs to be cancelled</param>
+        /// <param name="username">UserName of user who needs to cancel an order</param>
+        /// <param name="productSKU">SKU of product whos order needs to be cancelled</param>
+        /// <response code="200">Order successfully cancelled</response>
         /// <response code="404">No orders found</response> 
-        /// <response code="401">Order cancle request failed</response> 
+        /// <response code="401">Order cancel request failed</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost("cancel/{username}/{productSKU}")]
         [SwaggerRequestExample(typeof(OrderInfo), typeof(OrderRequestDetails))]
@@ -262,8 +259,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var orders = MH.GetOrders(username, order_db).Result;
-                if (orders == null)
+                if (MH.GetOrders(username, order_db).Result == null)
                 {
                     return BadRequest(new ResponseData
                     {
@@ -287,12 +283,12 @@ namespace Arthur_Clive.Controllers
                     }
                     foreach (var productDetails in order.ProductDetails)
                     {
-                        if (productDetails.Status == "Cancled" || productDetails.Status == "Refunded" || productDetails.Status == "Replaced" || productDetails.Status == "Delivered")
+                        if (productDetails.Status == "cancelled" || productDetails.Status == "Refunded" || productDetails.Status == "Replaced" || productDetails.Status == "Delivered")
                         {
                             return BadRequest(new ResponseData
                             {
                                 Code = "401",
-                                Message = "Order Cancle Request Failed",
+                                Message = "Order Cancel Request Failed",
                                 Data = null
                             });
                         }
@@ -315,10 +311,10 @@ namespace Arthur_Clive.Controllers
                                 {
                                     ProductDetails details = new ProductDetails();
                                     details.ProductSKU = productSKU;
-                                    details.Status = "Order cancled";
+                                    details.Status = "Order cancelled";
                                     List<StatusCode> productStatusList = new List<StatusCode>();
                                     foreach (var status in product.StatusCode) { productStatusList.Add(status); }
-                                    StatusCode productStatus = new StatusCode { StatusId = 3, Date = DateTime.UtcNow, Description = "Order cancled" };
+                                    StatusCode productStatus = new StatusCode { StatusId = 3, Date = DateTime.UtcNow, Description = "Order cancelled" };
                                     productStatusList.Add(productStatus);
                                     details.StatusCode = productStatusList;
                                     details.ProductInCart = product.ProductInCart;
@@ -333,8 +329,7 @@ namespace Arthur_Clive.Controllers
                         }
                     }
                     IAsyncCursor<OrderInfo> orderCursorAfterUpdate = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("UserName", username) & Builders<OrderInfo>.Filter.Eq("OrderId", data.OrderId));
-                    var orderAfterUpdate = orderCursorAfterUpdate.FirstOrDefaultAsync().Result;
-                    foreach (var product in orderAfterUpdate.ProductDetails)
+                    foreach (var product in orderCursorAfterUpdate.FirstOrDefaultAsync().Result.ProductDetails)
                     {
                         if (product.ProductSKU == productSKU)
                         {
@@ -353,7 +348,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("OrderController", "CancleOrder", "CancleOrder", ex.Message);
+                LoggerDataAccess.CreateLog("OrderController", "CancelOrder", "CancelOrder", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -369,7 +364,6 @@ namespace Arthur_Clive.Controllers
         /// <param name="request">Request needed to process return of product</param>
         /// <param name="username">UserName of user who need to return a product</param>
         /// <param name="productSKU">SKU of product which needs to be returned</param>
-        /// <returns></returns>
         /// <response code="200">Return request successfully initiated for this product</response>
         /// <response code="404">No orders found</response> 
         /// <response code="401">Product return request failed</response> 
@@ -611,7 +605,7 @@ namespace Arthur_Clive.Controllers
                     }
                 }
                 else if (data.Status == "Refunded" || data.Status == "Replaced" || data.Status == "Refund Failed" || data.Status == "Replacement Failed"
-                            || data.Status == "Refund Cancle" || data.Status == "Replacement Cancled")
+                            || data.Status == "Refund Cancel" || data.Status == "Replacement cancelled")
                 {
                     int i = 1;
                     foreach (var status in order.PaymentDetails.Status)

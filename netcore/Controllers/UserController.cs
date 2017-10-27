@@ -37,9 +37,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var userCollection = _db.GetCollection<Address>("UserInfo");
-                var filter = Builders<Address>.Filter.Eq("UserName", username) & Builders<Address>.Filter.Eq("DefaultAddress", true);
-                IAsyncCursor<Address> cursor = await userCollection.FindAsync(filter);
+                IAsyncCursor<Address> cursor = await _db.GetCollection<Address>("UserInfo").FindAsync(Builders<Address>.Filter.Eq("UserName", username) & Builders<Address>.Filter.Eq("DefaultAddress", true));
                 var userInfo = cursor.ToList();
                 return Ok(new ResponseData
                 {
@@ -73,14 +71,11 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var addressFilter = Builders<Address>.Filter.Eq("UserName", username);
-                var addressCollection = _db.GetCollection<Address>("UserInfo");
-                var result = addressCollection.DeleteManyAsync(addressFilter).Result;
+                var result = _db.GetCollection<Address>("UserInfo").DeleteManyAsync(Builders<Address>.Filter.Eq("UserName", username)).Result;
                 if (data.ListOfAddress.Count > 0)
                 {
                     data.ListOfAddress.ToList().ForEach(c => c.UserName = username);
-                    var authCollection = _db.GetCollection<Address>("UserInfo");
-                    await authCollection.InsertManyAsync(data.ListOfAddress);
+                    await _db.GetCollection<Address>("UserInfo").InsertManyAsync(data.ListOfAddress);
                 }
                 return Ok(new ResponseData
                 {
@@ -112,9 +107,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var collection = _db.GetCollection<Cart>("Cart");
-                var filter = Builders<Cart>.Filter.Eq("UserName", username);
-                IAsyncCursor<Cart> cursor = await collection.FindAsync(filter);
+                IAsyncCursor<Cart> cursor = await _db.GetCollection<Cart>("Cart").FindAsync(Builders<Cart>.Filter.Eq("UserName", username));
                 var products = cursor.ToList();
                 foreach (var data in products)
                 {
@@ -155,14 +148,11 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var cartFilter = Builders<Cart>.Filter.Eq("UserName", username);
-                var cartCollection = _db.GetCollection<Cart>("Cart");
-                var result = cartCollection.DeleteManyAsync(cartFilter).Result;
+                var result = _db.GetCollection<Cart>("Cart").DeleteManyAsync(Builders<Cart>.Filter.Eq("UserName", username)).Result;
                 if (data.ListOfProducts.Count > 0)
                 {
                     data.ListOfProducts.ToList().ForEach(c => c.UserName = username);
-                    var authCollection = _db.GetCollection<Cart>("Cart");
-                    await authCollection.InsertManyAsync(data.ListOfProducts);
+                    await _db.GetCollection<Cart>("Cart").InsertManyAsync(data.ListOfProducts);
                 }
                 return Ok(new ResponseData
                 {
@@ -194,9 +184,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var collection = _db.GetCollection<WishList>("WishList");
-                var filter = Builders<WishList>.Filter.Eq("UserName", username);
-                IAsyncCursor<WishList> cursor = await collection.FindAsync(filter);
+                IAsyncCursor<WishList> cursor = await _db.GetCollection<WishList>("WishList").FindAsync(Builders<WishList>.Filter.Eq("UserName", username));
                 var products = cursor.ToList();
                 foreach (var data in products)
                 {
@@ -237,14 +225,11 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var wishlistFilter = Builders<WishList>.Filter.Eq("UserName", username);
-                var wishlistCollection = _db.GetCollection<WishList>("WishList");
-                var result = wishlistCollection.DeleteManyAsync(wishlistFilter).Result;
+                var result = _db.GetCollection<WishList>("WishList").DeleteManyAsync(Builders<WishList>.Filter.Eq("UserName", username)).Result;
                 if (data.ListOfProducts.Count > 0)
                 {
                     data.ListOfProducts.ToList().ForEach(c => c.UserName = username);
-                    var authCollection = _db.GetCollection<WishList>("WishList");
-                    await authCollection.InsertManyAsync(data.ListOfProducts);
+                    await _db.GetCollection<WishList>("WishList").InsertManyAsync(data.ListOfProducts);
                 }
                 return Ok(new ResponseData
                 {

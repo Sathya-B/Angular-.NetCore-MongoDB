@@ -34,9 +34,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var collection = _db.GetCollection<Category>("Category");
-                var filter = FilterDefinition<Category>.Empty;
-                IAsyncCursor<Category> cursor = await collection.FindAsync(filter);
+                IAsyncCursor<Category> cursor = await _db.GetCollection<Category>("Category").FindAsync(FilterDefinition<Category>.Empty);
                 var categories = cursor.ToList();
                 if (categories.Count > 0)
                 {
@@ -92,8 +90,7 @@ namespace Arthur_Clive.Controllers
                 //product.MinioObject_URL = WH.GetMinioObject("products", objectName).Result;
                 //product.MinioObject_URL = AH.GetAmazonS3Object("product-category", objectName);
                 category.MinioObject_URL = AH.GetS3Object("product-category", objectName);
-                var collection = _db.GetCollection<Category>("Category");
-                await collection.InsertOneAsync(category);
+                await _db.GetCollection<Category>("Category").InsertOneAsync(category);
                 return Ok(new ResponseData
                 {
                     Code = "200",
@@ -170,7 +167,7 @@ namespace Arthur_Clive.Controllers
         [HttpPut("{productFor}/{productType}")]
         [SwaggerRequestExample(typeof(Category), typeof(UpdateCategory))]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> UpdateCategory([FromBody]Category data, string productFor, string productType)
+        public async Task<ActionResult> Update([FromBody]Category data, string productFor, string productType)
         {
             try
             {
@@ -181,15 +178,13 @@ namespace Arthur_Clive.Controllers
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", objectId);
                     if(data.ProductFor!= null)
                     {
-                        var value = BsonSerializer.Deserialize<Category>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Category")).ProductType;
-                        var objectName = data.ProductFor + "-" + value;
-                        await MH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor,productType, data.ProductFor, "ProductFor", objectName);
+                        var objectName = data.ProductFor + "-" + BsonSerializer.Deserialize<Category>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Category")).ProductType;
+                        await MH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor,productType, data.ProductFor, "ProductFor", objectName + ".jpg");
                     }
                     if(data.ProductType != null)
                     {
-                        var value = BsonSerializer.Deserialize<Category>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Category")).ProductFor;
-                        var objectName = value + "-" + data.ProductType;
-                        await MH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor, productType, data.ProductType, "ProductType", objectName);
+                        var objectName = BsonSerializer.Deserialize<Category>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Category")).ProductFor + "-" + data.ProductType;
+                        await MH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor, productType, data.ProductType, "ProductType", objectName + ".jpg");
                     }
                     if(data.Description != null)
                     {
@@ -214,7 +209,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CategoryController", "UpdateCategory", "UpdateCategory", ex.Message);
+                LoggerDataAccess.CreateLog("CategoryController", "Update", "Update", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

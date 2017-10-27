@@ -33,11 +33,9 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var checkData = MH.CheckForDatas("Code", data.Code, null, null, "CouponDB", "Coupon");
-                if (checkData == null)
+                if (MH.CheckForDatas("Code", data.Code, null, null, "CouponDB", "Coupon") == null)
                 {
-                    var collection = _db.GetCollection<Coupon>("Coupon");
-                    await collection.InsertOneAsync(data);
+                    await _db.GetCollection<Coupon>("Coupon").InsertOneAsync(data);
                     return Ok(new ResponseData
                     {
                         Code = "200",

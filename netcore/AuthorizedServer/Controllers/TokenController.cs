@@ -40,8 +40,6 @@ namespace AuthorizedServer.Controllers
         [SwaggerRequestExample(typeof(Parameters), typeof(ParameterDetails))]
         [ProducesResponseType(typeof(ResponseData), 999)]
         [ProducesResponseType(typeof(ResponseData), 909)]
-        [ProducesResponseType(typeof(ResponseData), 901)]
-        [ProducesResponseType(typeof(ResponseData), 904)]
         public ActionResult Auth([FromQuery]Parameters parameters)
         {
             try

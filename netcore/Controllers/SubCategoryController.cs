@@ -32,9 +32,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var collection = _db.GetCollection<Product>("Product");
-                var filter = Builders<Product>.Filter.Eq("ProductFor", productFor) & Builders<Product>.Filter.Eq("ProductType", productType);
-                IAsyncCursor<Product> cursor = await collection.FindAsync(filter);
+                IAsyncCursor<Product> cursor = await _db.GetCollection<Product>("Product").FindAsync(Builders<Product>.Filter.Eq("ProductFor", productFor) & Builders<Product>.Filter.Eq("ProductType", productType));
                 var products = cursor.ToList();
                 if (products.Count > 0)
                 {

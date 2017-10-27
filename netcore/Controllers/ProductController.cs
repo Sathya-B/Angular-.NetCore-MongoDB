@@ -9,7 +9,6 @@ using MongoDB.Driver;
 using AH = Arthur_Clive.Helper.AmazonHelper;
 using WH = Arthur_Clive.Helper.MinioHelper;
 using MH = Arthur_Clive.Helper.MongoHelper;
-using GH = Arthur_Clive.Helper.GlobalHelper;
 using Swashbuckle.AspNetCore.Examples;
 using Arthur_Clive.Swagger;
 using MongoDB.Bson.Serialization;
@@ -151,8 +150,7 @@ namespace Arthur_Clive.Controllers
                 //product.MinioObject_URL = WH.GetMinioObject("arthurclive-products", objectName).Result;
                 //product.MinioObject_URL = AH.GetAmazonS3Object("arthurclive-products", objectName);
                 product.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
-                var collection = _db.GetCollection<Product>("Product");
-                await collection.InsertOneAsync(product);
+                await _db.GetCollection<Product>("Product").InsertOneAsync(product);
                 return Ok(new ResponseData
                 {
                     Code = "200",
@@ -184,12 +182,10 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var filter = Builders<BsonDocument>.Filter.Eq("Product_SKU", productSKU);
-                var product = MH.GetSingleObject(filter, "ProductDB", "Product").Result;
+                var product = MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", productSKU), "ProductDB", "Product").Result;
                 if (product != null)
                 {
-                    var authCollection = _db.GetCollection<Product>("Product");
-                    var response = authCollection.DeleteOneAsync(product);
+                    var response = _db.GetCollection<Product>("Product").DeleteOneAsync(product);
                     return Ok(new ResponseData
                     {
                         Code = "200",
@@ -228,7 +224,7 @@ namespace Arthur_Clive.Controllers
         [HttpPut("{productSKU}")]
         [SwaggerRequestExample(typeof(Product), typeof(UpdateProduct))]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> UpdateProduct([FromBody]Product data,string productSKU)
+        public async Task<ActionResult> Update([FromBody]Product data,string productSKU)
         {
             try
             {
@@ -246,13 +242,13 @@ namespace Arthur_Clive.Controllers
                     if (data.ProductType != null)
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
-                        var objectName = productSKU.Split('-')[0] + "-" + data.ProductType + "-" + productSKU.Split('-')[2] + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4];
+                        var objectName = productSKU.Split('-')[0] + "-" + data.ProductType + "-" + productSKU.Split('-')[2] + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4] ;
                         await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductType, "ProductType",objectName);
                     }
                     if (data.ProductDesign != null)
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
-                        var objectName = productSKU.Split('-')[0] + "-" + productSKU.Split('-')[1] + "-" + data.ProductDesign + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4];
+                        var objectName = productSKU.Split('-')[0] + "-" + productSKU.Split('-')[1] + "-" + data.ProductDesign + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4] ;
                         await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductDesign, "ProductDesign",objectName);
                     }
                     if (data.ProductBrand != null)
@@ -332,6 +328,8 @@ namespace Arthur_Clive.Controllers
                     {
                         var update = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductDescription", data.ProductDescription));
                     }
+                    var MinioObject_URl = "https://s3.ap-south-1.amazonaws.com/arthurclive-products/" + data.ProductFor + "-" + data.ProductType + "-" + data.ProductDesign + "-" + data.ProductColour + "-" + data.ProductSize + ".jpg";
+                    var updateURL = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("MinioObject_URL", MinioObject_URl));
                     return Ok(new ResponseData
                     {
                         Code = "200",
@@ -351,7 +349,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "UpdateProduct", "UpdateProduct", ex.Message);
+                LoggerDataAccess.CreateLog("ProductController", "Update", "Update", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

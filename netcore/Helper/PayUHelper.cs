@@ -108,7 +108,7 @@ namespace Arthur_Clive.Helper
             {
                 string SuccessUrl = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("successurl").First().Value;
                 string FailureUrl = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("failureurl").First().Value;
-                string CancleUrl = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("cancleurl").First().Value;
+                string CancelUrl = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("cancelurl").First().Value;
                 string txnId = GetTxnId();
                 string hashString = GetHashString(txnId, model);
                 string hash = Generatehash512(hashString).ToLower();
@@ -126,7 +126,7 @@ namespace Arthur_Clive.Helper
                 data.Add("surl", SuccessUrl);
                 data.Add("furl", FailureUrl);
                 data.Add("lastname", model.LastName);
-                data.Add("curl", CancleUrl);
+                data.Add("curl", CancelUrl);
                 data.Add("address1", model.AddressLine1);
                 data.Add("address2", model.AddressLine2);
                 data.Add("city", model.City);

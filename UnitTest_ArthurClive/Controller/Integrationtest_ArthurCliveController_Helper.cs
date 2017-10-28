@@ -2,8 +2,11 @@
 using System.IO;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Threading.Tasks;
+using Arthur_Clive.Controllers;
 using Arthur_Clive.Data;
 using Arthur_Clive.Helper;
+using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 
 namespace UnitTest_ArthurClive.Controller
@@ -41,14 +44,13 @@ namespace UnitTest_ArthurClive.Controller
 
         public async static void InsertRegiterModeldata(RegisterModel registerModel)
         {
-            try
-            {
-                await db.GetCollection<RegisterModel>("Authentication").InsertOneAsync(registerModel);
-            }
-            catch(Exception ex)
-            {
+            await db.GetCollection<RegisterModel>("Authentication").InsertOneAsync(registerModel);  
+        }
 
-            }
+        public async static Task<ActionResult> GetCategories(CategoryController controller)
+        {
+            var result = await controller.Get() as ActionResult;
+            return result;
         }
     }
 }

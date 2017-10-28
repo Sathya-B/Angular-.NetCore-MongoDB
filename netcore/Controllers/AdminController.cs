@@ -4,9 +4,12 @@ using System.Threading.Tasks;
 using Arthur_Clive.Data;
 using Arthur_Clive.Helper;
 using Arthur_Clive.Logger;
+using Arthur_Clive.Swagger;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Swashbuckle.AspNetCore.Examples;
 using MH = Arthur_Clive.Helper.MongoHelper;
 
 namespace Arthur_Clive.Controllers
@@ -174,6 +177,65 @@ namespace Arthur_Clive.Controllers
             catch (Exception ex)
             {
                 LoggerDataAccess.CreateLog("AdminContoller", "PublicPost", "PublicPost", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        /// <summary>Upload image to amazon s3 object storage</summary>
+        /// <param name="data">Details to image to be uploaded</param>
+        /// <response code="200">Image uploaded</response>
+        /// <response code="401">Image upload failed</response>   
+        /// <response code="404">Image upload data not found</response>   
+        /// <response code="400">Process ran into an exception</response>
+        [HttpPost("uploadimage")]
+        [SwaggerRequestExample(typeof(ImageData), typeof(ImageUploadDetails))]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public ActionResult UploadImageToS3([FromForm]ImageData data)
+        {
+            try
+            {
+                if (data != null)
+                {
+                    var objectName = data.ObjectName + ".jpg";
+                    var result = AmazonHelper.UploadImageToS3(data.Image, data.BucketName, objectName);
+                    var Image_Url = AmazonHelper.GetS3Object(data.BucketName, objectName);
+                    if (result.Result == true)
+                    {
+                        return Ok(new ResponseData
+                        {
+                            Code = "200",
+                            Message = "Image uploaded",
+                            Data = Image_Url
+                        });
+                    }
+                    else
+                    {
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "401",
+                            Message = "Image upload failed",
+                            Data = null
+                        });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "Image upload data not found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AdminContoller", "UploadImageToS3", "UploadImageToS3", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

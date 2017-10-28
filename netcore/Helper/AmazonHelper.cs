@@ -1,8 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using Amazon.S3;
 using Amazon.S3.Model;
+using Amazon.S3.Transfer;
+using Arthur_Clive.Data;
+using Arthur_Clive.Logger;
+using Microsoft.AspNetCore.Http;
 
 namespace Arthur_Clive.Helper
 {
@@ -11,7 +19,7 @@ namespace Arthur_Clive.Helper
     {
         /// <summary>Amazon s3 client</summary>
         public static IAmazonS3 s3Client;
-                
+
         /// <summary>Get Amazon S3 client</summary>
         public static IAmazonS3 GetAmazonS3Client()
         {
@@ -54,6 +62,36 @@ namespace Arthur_Clive.Helper
             string s3PrefixUrl = "https://s3.ap-south-1.amazonaws.com/";
             string presignedUrl = s3PrefixUrl + bucketName + "/" + objectName;
             return presignedUrl;
+        }
+
+        /// <summary>Upload image to s3</summary>
+        /// <param name="file">Details of image</param>
+        /// <param name="bucketName">Details of image</param>
+        /// <param name="objectName">Details of image</param>
+        public async static Task<bool> UploadImageToS3(IFormFile file,string bucketName,string objectName)
+        {
+            try
+            {
+                IAmazonS3 client;
+                using (client = GetAmazonS3Client())
+                {
+                    var request = new PutObjectRequest()
+                    {
+                        BucketName = bucketName,
+                        CannedACL = S3CannedACL.PublicRead,
+                        Key = string.Format(objectName),
+                        InputStream = file.OpenReadStream()
+                    };
+
+                    await client.PutObjectAsync(request);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AmazonHelper", "UploadImageToS3", "UploadImageToS3", ex.Message);
+                return false;
+            }
         }
     }
 }

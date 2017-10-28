@@ -11,6 +11,8 @@ using MongoDB.Driver;
 using MH = Arthur_Clive.Helper.MongoHelper;
 using TH = UnitTest_ArthurClive.Controller.Integrationtest_ArthurCliveController_Helper;
 using PH = Arthur_Clive.Helper.PayUHelper;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace UnitTest_ArthurClive.Controller
 {
@@ -124,14 +126,19 @@ namespace UnitTest_ArthurClive.Controller
             List<Category> categoryList = new List<Category>();
 
             //Act
-            var result = controller.Get() as Task<ActionResult>;
+            Task<ActionResult> result = TH.GetCategories(controller);
+            var ress = result.Result.ToJson();
+            dynamic xx = JsonConvert.DeserializeObject(ress);
+            //var obj = JObject.Parse(ress);
+            //var url = (string)obj["data"]["img_url"];
             var responseData = TH.DeserializedResponceData_CategoryList(result.Result.ToJson());
 
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(responseData.Code, expectedCode);
             Assert.AreEqual(responseData.Message, expectedMessage);
-            Assert.AreEqual(categoryList.Count, expectedDataCount);
+            Assert.IsNotNull(responseData.Data);
+            //Assert.AreEqual(categoryList.Count, expectedDataCount);
         }
 
         [TestMethod]
@@ -728,7 +735,7 @@ namespace UnitTest_ArthurClive.Controller
             CartList ListOfCart = new CartList();
             ListOfCart.ListOfProducts = cartList;
             OrderInfo orderInfo = new OrderInfo { CouponDiscount = 0 , TotalAmount = 95 , EstimatedTax = 5};
-            RegisterModel userInfo = new RegisterModel
+            RegisterModel registerModel = new RegisterModel
             {
                 Title = "Mr",
                 FullName = "SampleName",
@@ -745,10 +752,10 @@ namespace UnitTest_ArthurClive.Controller
             var expectedMessage = "Order Placed";
 
             //Insert data to db for testing
-            //var insertAddress = TH.DeserializedResponceData(userController.RefreshUserInfo(ListOfAddress, username).Result.ToJson());
-            //var insertProduct = TH.DeserializedResponceData(productController.Post(product).Result.ToJson());
-            //var insertCart = TH.DeserializedResponceData(userController.RefreshCart(ListOfCart, username).Result.ToJson());
-            //TH.InsertRegiterModeldata(userInfo);
+            var insertAddress = TH.DeserializedResponceData(userController.RefreshUserInfo(ListOfAddress, username).Result.ToJson());
+            var insertProduct = TH.DeserializedResponceData(productController.Post(product).Result.ToJson());
+            var insertCart = TH.DeserializedResponceData(userController.RefreshCart(ListOfCart, username).Result.ToJson());
+            TH.InsertRegiterModeldata(registerModel);
 
             //Act
             var result = controller.PlaceOrder(orderInfo,username) as Task<ActionResult>;
@@ -758,15 +765,15 @@ namespace UnitTest_ArthurClive.Controller
             var insertedData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName",username), "OrderDB", "OrderInfo").Result);
 
             //Assert
-            //Assert.IsNotNull(insertAddress);
-            //Assert.IsNotNull(insertProduct);
-            //Assert.IsNotNull(insertCart);
-            //Assert.AreEqual(insertAddress.Code,expectedCode);
-            //Assert.AreEqual(insertProduct.Code, expectedCode);
-            //Assert.AreEqual(insertCart.Code, expectedCode);
-            //Assert.AreEqual(insertAddress.Message, "Inserted");
-            //Assert.AreEqual(insertProduct.Message, "Inserted");
-            //Assert.AreEqual(insertCart.Message, "Inserted");
+            Assert.IsNotNull(insertAddress);
+            Assert.IsNotNull(insertProduct);
+            Assert.IsNotNull(insertCart);
+            Assert.AreEqual(insertAddress.Code, expectedCode);
+            Assert.AreEqual(insertProduct.Code, expectedCode);
+            Assert.AreEqual(insertCart.Code, expectedCode);
+            Assert.AreEqual(insertAddress.Message, "Inserted");
+            Assert.AreEqual(insertProduct.Message, "Inserted");
+            Assert.AreEqual(insertCart.Message, "Inserted");
             Assert.IsNotNull(result.Result);
             Assert.AreEqual(responseData.Code,expectedCode);
             Assert.AreEqual(responseData.Message,expectedMessage);
@@ -821,10 +828,10 @@ namespace UnitTest_ArthurClive.Controller
             {
                 var delete = MH.DeleteSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "UserInfo", "UserInfo");
             }
-            var checkData2 = MH.CheckForDatas("ProductSKU", product.ProductSKU, null, null, "ProductDB", "Product");
+            var checkData2 = MH.CheckForDatas("ProductSKU", cart.ProductSKU, null, null, "ProductDB", "Product");
             if (checkData2 != null)
             {
-                var delete = MH.DeleteSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", product.ProductSKU), "ProductDB", "Product");
+                var delete = MH.DeleteSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", cart.ProductSKU), "ProductDB", "Product");
             }
             var checkData3 = MH.CheckForDatas("UserName", username, null, null, "UserInfo", "Cart");
             if (checkData3 != null)
@@ -836,7 +843,209 @@ namespace UnitTest_ArthurClive.Controller
             {
                 var delete = MH.DeleteSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "OrderDB", "OrderInfo");
             }
+            var checkData5 = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
+            if (checkData5 != null)
+            {
+                var delete = MH.DeleteSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication");
+            }
         }
 
+        //[TestMethod]
+        public void OrderController_GetOrdersOfUser_IntegrationTest_ArthurClive()
+        {
+
+        }
+
+    }
+
+    [TestClass]
+    public class UserController_IntegrationTest
+    {
+        public UserController controller = new UserController();
+
+        [TestMethod]
+        public void UserController_RefreshUserInfo_IntegrationTest_ArthurClive()
+        {
+            //Arrange
+            var username = "SampleUser";
+            List<Address> addressList = new List<Address>();
+            Address address = new Address
+            {
+                UserName = username,
+                Name = "SampleName",
+                PhoneNumber = "12341234",
+                AddressLines = "SampleAddressLines",
+                PostOffice = "SamplePostOffice",
+                City = "CBE",
+                State = "TN",
+                Country = "India",
+                PinCode = "641035",
+                Landmark = "SampleLandMark",
+                BillingAddress = true,
+                ShippingAddress = true,
+                DefaultAddress = true
+            };
+            addressList.Add(address);
+            AddressList ListOfAddress = new AddressList();
+            ListOfAddress.ListOfAddress = addressList;
+            var expectedCode = "200";
+            var expectedMessage = "Inserted";
+
+            //Act
+            var result = controller.RefreshUserInfo(ListOfAddress, username) as Task<ActionResult>;
+            var responseData = TH.DeserializedResponceData(result.Result.ToJson());
+
+            //Check inserted data
+            var insertedData = BsonSerializer.Deserialize<Address>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "UserInfo", "UserInfo").Result);
+
+            //Assert
+            Assert.IsNotNull(result.Result);
+            Assert.AreEqual(responseData.Code,expectedCode);
+            Assert.AreEqual(responseData.Message,expectedMessage);
+            Assert.AreEqual(insertedData.UserName,username);
+            Assert.AreEqual(insertedData.Name, address.Name);
+            Assert.AreEqual(insertedData.PhoneNumber, address.PhoneNumber);
+            Assert.AreEqual(insertedData.AddressLines, address.AddressLines);
+            Assert.AreEqual(insertedData.PostOffice, address.PostOffice);
+            Assert.AreEqual(insertedData.City, address.City);
+            Assert.AreEqual(insertedData.State, address.State);
+            Assert.AreEqual(insertedData.Country, address.Country);
+            Assert.AreEqual(insertedData.PinCode, address.PinCode);
+            Assert.AreEqual(insertedData.Landmark, address.Landmark);
+            Assert.AreEqual(insertedData.BillingAddress, address.BillingAddress);
+            Assert.AreEqual(insertedData.ShippingAddress, address.ShippingAddress);
+            Assert.AreEqual(insertedData.DefaultAddress, address.DefaultAddress);
+
+            //Delete inserted test data
+            var checkData = MH.CheckForDatas("UserName", username, null, null, "UserInfo", "UserInfo");
+            if (checkData != null)
+            {
+                var delete = MH.DeleteSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "UserInfo", "UserInfo");
+            }
+        }
+
+        [TestMethod]
+        public void UserController_RefreshCart_IntegrationTest_ArthurClive()
+        {
+            //Arrange
+            var username = "SampleUser";
+            List<Cart> cartList = new List<Cart>();
+            Cart cart = new Cart
+            {
+                UserName = username,
+                ProductSKU = "SampleFor-SampleType-SampleDesign-Black-S",
+                MinioObject_URL = "https://s3.ap-south-1.amazonaws.com/arthurclive-products/SampleFor-SampleType-SampleDesign-Black-S.jpg",
+                ProductFor = "SampleFor",
+                ProductType = "SampleType",
+                ProductDesign = "SampleDesign",
+                ProductBrand = "Arthur Clive",
+                ProductPrice = 100,
+                ProductDiscount = 10,
+                ProductDiscountPrice = 90,
+                ProductQuantity = 1,
+                ProductSize = "S",
+                ProductColour = "Black",
+                ProductDescription = "SampleDescription"
+            };
+            cartList.Add(cart);
+            CartList ListOfCart = new CartList();
+            ListOfCart.ListOfProducts = cartList;
+            var expectedCode = "200";
+            var expectedMessage = "Inserted";
+
+            //Act
+            var result = controller.RefreshCart(ListOfCart, username) as Task<ActionResult>;
+            var responseData = TH.DeserializedResponceData(result.Result.ToJson());
+
+            //Check inserted data
+            var insertedData = BsonSerializer.Deserialize<Cart>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "UserInfo", "Cart").Result);
+
+            //Assert
+            Assert.IsNotNull(result.Result);
+            Assert.AreEqual(responseData.Code, expectedCode);
+            Assert.AreEqual(responseData.Message, expectedMessage);
+            Assert.AreEqual(insertedData.UserName, username);
+            Assert.AreEqual(insertedData.ProductSKU, cart.ProductSKU);
+            Assert.AreEqual(insertedData.MinioObject_URL, cart.MinioObject_URL);
+            Assert.AreEqual(insertedData.ProductFor, cart.ProductFor);
+            Assert.AreEqual(insertedData.ProductType, cart.ProductType);
+            Assert.AreEqual(insertedData.ProductDesign, cart.ProductDesign);
+            Assert.AreEqual(insertedData.ProductBrand, cart.ProductBrand);
+            Assert.AreEqual(insertedData.ProductPrice, cart.ProductPrice);
+            Assert.AreEqual(insertedData.ProductDiscount, cart.ProductDiscount);
+            Assert.AreEqual(insertedData.ProductDiscountPrice, cart.ProductDiscountPrice);
+            Assert.AreEqual(insertedData.ProductQuantity, cart.ProductQuantity);
+            Assert.AreEqual(insertedData.ProductSize, cart.ProductSize);
+            Assert.AreEqual(insertedData.ProductColour, cart.ProductColour);
+            Assert.AreEqual(insertedData.ProductDescription, cart.ProductDescription);
+
+            //Delete inserted test data
+            var checkData = MH.CheckForDatas("UserName", username, null, null, "UserInfo", "Cart");
+            if (checkData != null)
+            {
+                var delete = MH.DeleteSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "UserInfo", "Cart");
+            }
+        }
+
+        [TestMethod]
+        public void UserController_RefreshWishList_IntegrationTest_ArthurClive()
+        {
+            //Arrange
+            var username = "SampleUser";
+            List<WishList> wishlistList = new List<WishList>();
+            WishList wishlist = new WishList
+            {
+                UserName = username,
+                ProductSKU = "SampleFor-SampleType-SampleDesign-Black-S",
+                MinioObject_URL = "https://s3.ap-south-1.amazonaws.com/arthurclive-products/SampleFor-SampleType-SampleDesign-Black-S.jpg",
+                ProductFor = "SampleFor",
+                ProductType = "SampleType",
+                ProductDesign = "SampleDesign",
+                ProductBrand = "Arthur Clive",
+                ProductPrice = 100,
+                ProductDiscount = 10,
+                ProductDiscountPrice = 90,
+                ProductSize = "S",
+                ProductColour = "Black",
+                ProductDescription = "SampleDescription"
+            };
+            wishlistList.Add(wishlist);
+            WishlistList ListOfWishlist = new WishlistList();
+            ListOfWishlist.ListOfProducts = wishlistList;
+            var expectedCode = "200";
+            var expectedMessage = "Inserted";
+
+            //Act
+            var result = controller.RefreshWishList(ListOfWishlist, username) as Task<ActionResult>;
+            var responseData = TH.DeserializedResponceData(result.Result.ToJson());
+
+            //Check inserted data
+            var insertedData = BsonSerializer.Deserialize<WishList>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "UserInfo", "WishList").Result);
+
+            //Assert
+            Assert.IsNotNull(result.Result);
+            Assert.AreEqual(responseData.Code, expectedCode);
+            Assert.AreEqual(responseData.Message, expectedMessage);
+            Assert.AreEqual(insertedData.UserName, username);
+            Assert.AreEqual(insertedData.ProductSKU, wishlist.ProductSKU);
+            Assert.AreEqual(insertedData.MinioObject_URL, wishlist.MinioObject_URL);
+            Assert.AreEqual(insertedData.ProductFor, wishlist.ProductFor);
+            Assert.AreEqual(insertedData.ProductType, wishlist.ProductType);
+            Assert.AreEqual(insertedData.ProductDesign, wishlist.ProductDesign);
+            Assert.AreEqual(insertedData.ProductBrand, wishlist.ProductBrand);
+            Assert.AreEqual(insertedData.ProductPrice, wishlist.ProductPrice);
+            Assert.AreEqual(insertedData.ProductDiscount, wishlist.ProductDiscount);
+            Assert.AreEqual(insertedData.ProductDiscountPrice, wishlist.ProductDiscountPrice);
+            Assert.AreEqual(insertedData.ProductSize, wishlist.ProductSize);
+            Assert.AreEqual(insertedData.ProductColour, wishlist.ProductColour);
+            Assert.AreEqual(insertedData.ProductDescription, wishlist.ProductDescription);
+
+            //Delete inserted test data
+            var checkData = MH.CheckForDatas("UserName", username, null, null, "UserInfo", "WishList");
+            if (checkData != null)
+            {
+                var delete = MH.DeleteSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "UserInfo", "WishList");
+            }
+        }
     }
 }

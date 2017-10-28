@@ -351,4 +351,23 @@ namespace Arthur_Clive.Swagger
     }
 
     #endregion
+
+    #region AdminController
+
+    /// <summary></summary>
+    public class ImageUploadDetails : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new
+            {
+                LocalPath = "D'\\ac\\EmailTemplate\\Arthur Clive_files",
+                BucketName = "product-category",
+                ObjectName = "sampleobject"
+            };
+        }
+    }
+
+    #endregion
 }

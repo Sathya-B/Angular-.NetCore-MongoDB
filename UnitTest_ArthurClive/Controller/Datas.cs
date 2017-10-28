@@ -27,7 +27,7 @@ namespace UnitTest_ArthurClive.Controller
     public class ActionResultModel_CategoryList
     {
         public dynamic _t { get; set; }
-        public dynamic Value { get; set; }
+        public ResponceData_CategoryList Value { get; set; }
         public dynamic Formatters { get; set; }
         public dynamic ContentTypes { get; set; }
         public dynamic DeclaredType { get; set; }
@@ -52,7 +52,7 @@ namespace UnitTest_ArthurClive.Controller
     public class Category
     {
         public dynamic _t { get; set; }
-        public ObjectId Id { get; set; }
+        public dynamic _id { get; set; }
         public string ProductFor { get; set; }
         public string ProductType { get; set; }
         public string MinioObject_URL { get; set; }

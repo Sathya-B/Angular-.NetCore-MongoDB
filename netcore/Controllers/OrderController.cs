@@ -105,6 +105,7 @@ namespace Arthur_Clive.Controllers
                             }
                         }
                         data.ProductDetails = productList;
+                        data.OrderStatus = "Order Placed";
                         await order_db.GetCollection<OrderInfo>("OrderInfo").InsertOneAsync(data);
                         List<string> productInfoList = new List<string>();
                         foreach (var cart in cartDatas)
@@ -243,105 +244,207 @@ namespace Arthur_Clive.Controllers
             }
         }
 
-        /// <summary>Cancel order placed by a user</summary>
-        /// <remarks>This api is user ro cancel a order placed by a user</remarks>
-        /// <param name="data">Info of order which needs to be cancelled</param>
-        /// <param name="username">UserName of user who needs to cancel an order</param>
-        /// <param name="productSKU">SKU of product whos order needs to be cancelled</param>
-        /// <response code="200">Order successfully cancelled</response>
+        /// <summary>Update order status</summary>
+        /// <param name="orderid">order status update details</param>
+        /// <param name="status">order status update details</param>
+        /// <response code="200">Order status updated</response>
+        /// <response code="401">Order status update failed</response> 
+        /// <response code="402">Product details status update failed</response> 
         /// <response code="404">No orders found</response> 
-        /// <response code="401">Order cancel request failed</response> 
         /// <response code="400">Process ran into an exception</response> 
-        [HttpPost("cancel/{username}/{productSKU}")]
-        [SwaggerRequestExample(typeof(OrderInfo), typeof(OrderRequestDetails))]
+        [HttpPut("deliverystatus/update/{orderid}/{status}")]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> CancelOrder([FromBody]OrderInfo data, string username, string productSKU)
+        public ActionResult UpdateDeliveryStatus(int orderid, string status)
         {
             try
             {
-                if (MH.GetOrders(username, order_db).Result == null)
+                var checkData = MH.CheckForDatas("OrderId", orderid, null, null, "OrderDB", "OrderInfo");
+                if (checkData != null)
                 {
-                    return BadRequest(new ResponseData
+                    var orderDetails = BsonSerializer.Deserialize<OrderInfo>(checkData);
+                    var updateOrderStatus = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderid), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("OrderStatus", status)).Result;
+                    if (updateOrderStatus == false)
                     {
-                        Code = "404",
-                        Message = "No orders found",
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "401",
+                            Message = "Order status update failed",
+                            Data = null
+                        });
+                    }
+                    List<ProductDetails> productDetails = new List<ProductDetails>();
+                    foreach (var product in orderDetails.ProductDetails)
+                    {
+                        product.Status = status;
+                        List<StatusCode> statusList = new List<Data.StatusCode>();
+                        foreach (var data in product.StatusCode)
+                        {
+                            statusList.Add(data);
+                        }
+                        int statusId = 0;
+                        if (status == "Order ready to be shipped") { statusId = 2; }
+                        else if (status == "Order Shipped") { statusId = 3; }
+                        else if (status == "Order Out For Delivery") { statusId = 4; }
+                        else if (status == "Order Delivered") { statusId = 5; }
+                        else if (status == "Product Replaced") { statusId = 8; }
+                        else if (status == "Payment Refunded") { statusId = 10; }
+                        statusList.Add(new StatusCode { StatusId = statusId, Date = DateTime.UtcNow, Description = status });
+                        product.StatusCode = statusList;
+                        productDetails.Add(product);
+                    }
+                    var updateProductDetails = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderid), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("ProductDetails", productDetails)).Result;
+                    if (updateProductDetails == false)
+                    {
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "402",
+                            Message = "Product details order status update failed",
+                            Data = null
+                        });
+                    }
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Status updated",
                         Data = null
                     });
                 }
                 else
                 {
-                    IAsyncCursor<OrderInfo> orderCursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("UserName", username) & Builders<OrderInfo>.Filter.Eq("OrderId", data.OrderId));
-                    var order = orderCursor.FirstOrDefaultAsync().Result;
-                    if (order == null)
+                    return BadRequest(new ResponseData
                     {
-                        return BadRequest(new ResponseData
+                        Code = "404",
+                        Message = "Order not found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("OrderController", "UpdateDeliveryStatus", "UpdateDeliveryStatus", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        /// <summary>Cancel placed order</summary>
+        /// <param name="orderid">id of order placed</param>
+        /// <param name="productSKU">SKU of product which needs to be cancelled</param>
+        /// <response code="200">Order cancelled</response>
+        /// <response code="401">Cancel request cannot be processed as the product is delivered</response> 
+        /// <response code="402">Order already cancelled</response> 
+        /// <response code="403">Order request cannot be processed</response> 
+        /// <response code="404">No orders found</response> 
+        /// <response code="405">Order status update failed</response> 
+        /// <response code="406">Product order status update failed</response> 
+        /// <response code="407">Product not found</response> 
+        /// <response code="400">Process ran into an exception</response> 
+        [HttpPut("cancel/{orderid}/{productSKU}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public ActionResult CancelOrder(int orderid, string productSKU)
+        {
+            try
+            {
+                var checkData = MH.CheckForDatas("OrderId", orderid, null, null, "OrderDB", "OrderInfo");
+                if (checkData != null)
+                {
+                    var orderDetails = BsonSerializer.Deserialize<OrderInfo>(checkData);
+                    if (MH.CheckForDatas("ProductSKU", productSKU, null, null, "ProductDB", "Product") != null)
+                    {
+                        List<ProductDetails> productDetails = new List<ProductDetails>();
+                        foreach (var product in orderDetails.ProductDetails)
                         {
-                            Code = "404",
-                            Message = "Order Not Found",
-                            Data = null
-                        });
-                    }
-                    foreach (var productDetails in order.ProductDetails)
-                    {
-                        if (productDetails.Status == "cancelled" || productDetails.Status == "Refunded" || productDetails.Status == "Replaced" || productDetails.Status == "Delivered")
+                            if (product.ProductSKU == productSKU)
+                            {
+                                if (product.Status == "Order delivered")
+                                {
+                                    return BadRequest(new ResponseData
+                                    {
+                                        Code = "401",
+                                        Message = "Cancel request cannot be processed as the product is delivered",
+                                        Data = null
+                                    });
+                                }
+                                else if (product.Status == "Order cancelled")
+                                {
+                                    return BadRequest(new ResponseData
+                                    {
+                                        Code = "402",
+                                        Message = "Order already cancelled",
+                                        Data = null
+                                    });
+                                }
+                                else if (product.Status == "Order replaced" || orderDetails.OrderStatus == "Order refunded")
+                                {
+                                    return BadRequest(new ResponseData
+                                    {
+                                        Code = "403",
+                                        Message = "Cancel request cannot be processed as the order status is " + orderDetails.OrderStatus,
+                                        Data = null
+                                    });
+                                }
+                                product.Status = "Order cancelled";
+                                List<StatusCode> statusCode = new List<StatusCode>();
+                                foreach (var status in product.StatusCode)
+                                {
+                                    statusCode.Add(status);
+                                }
+                                statusCode.Add(new StatusCode { Date = DateTime.UtcNow, StatusId = 5, Description = "Order cancelled" });
+                                product.StatusCode = statusCode;
+                            }
+                            productDetails.Add(product);
+                        }
+                        var updateOrderStatus = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderid), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("OrderStatus", "Order Cancelled")).Result;
+                        if (updateOrderStatus == false)
                         {
                             return BadRequest(new ResponseData
                             {
-                                Code = "401",
-                                Message = "Order Cancel Request Failed",
+                                Code = "405",
+                                Message = "Order status update failed",
                                 Data = null
                             });
                         }
-                        else
+                        var updateProductDetails = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderid), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("ProductDetails", productDetails)).Result;
+                        if (updateProductDetails == false)
                         {
-                            PaymentMethod paymentMethod = new PaymentMethod();
-                            List<StatusCode> paymentList = new List<StatusCode>();
-                            foreach (var status in order.PaymentDetails.Status)
+                            return BadRequest(new ResponseData
                             {
-                                paymentList.Add(status);
-                            }
-                            StatusCode paymentStatus = new StatusCode { StatusId = 3, Date = DateTime.UtcNow, Description = "Payment refund initiated" };
-                            paymentList.Add(paymentStatus);
-                            paymentMethod.Status = paymentList;
-                            var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentMethod)).Result;
-                            List<ProductDetails> productDetailsList = new List<ProductDetails>();
-                            foreach (var product in order.ProductDetails)
-                            {
-                                if (product.ProductSKU == productSKU)
-                                {
-                                    ProductDetails details = new ProductDetails();
-                                    details.ProductSKU = productSKU;
-                                    details.Status = "Order cancelled";
-                                    List<StatusCode> productStatusList = new List<StatusCode>();
-                                    foreach (var status in product.StatusCode) { productStatusList.Add(status); }
-                                    StatusCode productStatus = new StatusCode { StatusId = 3, Date = DateTime.UtcNow, Description = "Order cancelled" };
-                                    productStatusList.Add(productStatus);
-                                    details.StatusCode = productStatusList;
-                                    details.ProductInCart = product.ProductInCart;
-                                    productDetailsList.Add(details);
-                                }
-                                else
-                                {
-                                    productDetailsList.Add(product);
-                                }
-                            }
-                            var responce = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("ProductDetails", productDetailsList)).Result;
+                                Code = "406",
+                                Message = "Order cancelled status update failed",
+                                Data = null
+                            });
                         }
-                    }
-                    IAsyncCursor<OrderInfo> orderCursorAfterUpdate = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("UserName", username) & Builders<OrderInfo>.Filter.Eq("OrderId", data.OrderId));
-                    foreach (var product in orderCursorAfterUpdate.FirstOrDefaultAsync().Result.ProductDetails)
-                    {
-                        if (product.ProductSKU == productSKU)
+                        //if(orderDetails.PaymentMethod != "COD")
+                        //{
+                        //Need to refund amount
+                        //}
+                        return Ok(new ResponseData
                         {
-                            IAsyncCursor<Product> productCursor = await product_db.GetCollection<Product>("Product").FindAsync(Builders<Product>.Filter.Eq("ProductSKU", productSKU));
-                            var productData = productCursor.FirstOrDefaultAsync().Result;
-                            var responce = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", productSKU), "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductStock", productData.ProductStock + product.ProductInCart.ProductQuantity)).Result;
-                        }
+                            Code = "200",
+                            Message = "Order cancelled",
+                            Data = null
+                        });
                     }
-                    return Ok(new ResponseData
+                    else
                     {
-                        Code = "200",
-                        Message = "Success",
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "407",
+                            Message = "Product not found",
+                            Data = null
+                        });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "Order not found",
                         Data = null
                     });
                 }
@@ -358,315 +461,189 @@ namespace Arthur_Clive.Controllers
             }
         }
 
-        /// <summary>Return a product placed by a user</summary>
-        /// <remarks>This api is user to return a product to get refund or replacement for the product</remarks>
-        /// <param name="data">Data of product which needs to be retuned</param>
-        /// <param name="request">Request needed to process return of product</param>
-        /// <param name="username">UserName of user who need to return a product</param>
-        /// <param name="productSKU">SKU of product which needs to be returned</param>
-        /// <response code="200">Return request successfully initiated for this product</response>
-        /// <response code="404">No orders found</response> 
-        /// <response code="401">Product return request failed</response> 
-        /// <response code="402">Refund not appliccable for this product</response> 
-        /// <response code="403">Replacement not aplicable for this product</response> 
-        /// <response code="405">Resuest is not valid</response> 
-        /// <response code="400">Process ran into an exception</response> 
-        [HttpPost("{request}/{username}/{productSKU}")]
-        [SwaggerRequestExample(typeof(OrderInfo), typeof(OrderDetails))]
-        [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> ReturnProduct([FromBody]OrderInfo data, string request, string username, string productSKU)
+        [HttpPut("return/{request}/{orderid}/{productSKU}")]
+        public ActionResult ReturnOrder(string request, int orderid, string productSKU)
         {
-            try
+            if (request == "refund" || request == "replace")
             {
-                if (request == "refund" || request == "replace")
+                try
                 {
-                    var orders = MH.GetOrders(username, order_db).Result;
-                    if (orders == null)
+                    var checkData = MH.CheckForDatas("OrderId", orderid, null, null, "OrderDB", "OrderInfo");
+                    if (checkData != null)
+                    {
+                        var orderDetails = BsonSerializer.Deserialize<OrderInfo>(checkData);
+                        if (orderDetails.OrderStatus == "Order delivered")
+                        {
+                            foreach (var product in orderDetails.ProductDetails)
+                            {
+                                if (product.ProductSKU == productSKU)
+                                {
+                                    foreach (var status in product.StatusCode)
+                                    {
+                                        if (status.Description == "Order delivered")
+                                        {
+                                            if (DateTime.UtcNow > status.Date.AddDays(15))
+                                            {
+                                                return BadRequest(new ResponseData
+                                                {
+                                                    Code = "407",
+                                                    Message = "Return request cannot be processed as it has been more than 15 days from delivery",
+                                                    Data = null
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            var checkProduct = MH.CheckForDatas("ProductSKU", productSKU, null, null, "ProductDB", "Product");
+                            if (checkProduct != null)
+                            {
+                                var productData = BsonSerializer.Deserialize<Product>(checkData);
+                                if (request == "refund")
+                                {
+                                    if (productData.RefundApplicable == true)
+                                    {
+                                        List<ProductDetails> productDetails = new List<ProductDetails>();
+                                        foreach (var product in orderDetails.ProductDetails)
+                                        {
+                                            if (product.ProductSKU == productSKU)
+                                            {
+                                                product.Status = "Refund initiated";
+                                                List<StatusCode> statusList = new List<StatusCode>();
+                                                foreach (var status in product.StatusCode)
+                                                {
+                                                    statusList.Add(status);
+                                                }
+                                                statusList.Add(new StatusCode { Date = DateTime.UtcNow, StatusId = 9, Description = "Refund initiated" });
+                                            }
+                                            productDetails.Add(product);
+                                        }
+                                        var updateProductDetails = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderid), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("ProductDetails", productDetails)).Result;
+                                        if (updateProductDetails == false)
+                                        {
+                                            return BadRequest(new ResponseData
+                                            {
+                                                Code = "408",
+                                                Message = "Product details status update failed",
+                                                Data = null
+                                            });
+                                        }
+                                        //if(orderDetails.PaymentMethod != "COD")
+                                        //{
+                                        //Need to refund amount
+                                        //}
+                                        return Ok(new ResponseData
+                                        {
+                                            Code = "201",
+                                            Message = "Payment refund initiated",
+                                            Data = null
+                                        });
+                                    }
+                                    else
+                                    {
+                                        return BadRequest(new ResponseData
+                                        {
+                                            Code = "403",
+                                            Message = "Refund not applicable for this product",
+                                            Data = null
+                                        });
+                                    }
+                                }
+                                else
+                                {
+                                    if (productData.ReplacementApplicable == true)
+                                    {
+                                        List<ProductDetails> productDetails = new List<ProductDetails>();
+                                        foreach (var product in orderDetails.ProductDetails)
+                                        {
+                                            if (product.ProductSKU == productSKU)
+                                            {
+                                                product.Status = "Product replacement initiated";
+                                                List<StatusCode> statusList = new List<StatusCode>();
+                                                foreach (var status in product.StatusCode)
+                                                {
+                                                    statusList.Add(status);
+                                                }
+                                                statusList.Add(new StatusCode { Date = DateTime.UtcNow, StatusId = 7, Description = "Product replacement initiated" });
+                                            }
+                                            productDetails.Add(product);
+                                        }
+                                        var updateProductDetails = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderid), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("ProductDetails", productDetails)).Result;
+                                        if (updateProductDetails == false)
+                                        {
+                                            return BadRequest(new ResponseData
+                                            {
+                                                Code = "408",
+                                                Message = "Product details status update failed",
+                                                Data = null
+                                            });
+                                        }
+                                        return Ok(new ResponseData
+                                        {
+                                            Code = "202",
+                                            Message = "Product replacement initiated",
+                                            Data = null
+                                        });
+                                    }
+                                    else
+                                    {
+                                        return BadRequest(new ResponseData
+                                        {
+                                            Code = "405",
+                                            Message = "replacement not applicable for this product",
+                                            Data = null
+                                        });
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                return BadRequest(new ResponseData
+                                {
+                                    Code = "402",
+                                    Message = "product not found",
+                                    Data = null
+                                });
+                            }
+                        }
+                        else
+                        {
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "406",
+                                Message = "Return request cannot be processed as the product is not delivered",
+                                Data = null
+                            });
+                        }
+                    }
+                    else
                     {
                         return BadRequest(new ResponseData
                         {
                             Code = "404",
-                            Message = "No orders found",
-                            Data = null
-                        });
-                    }
-                    else
-                    {
-                        IAsyncCursor<OrderInfo> orderCursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("OrderId", data.OrderId));
-                        var order = orderCursor.FirstOrDefaultAsync().Result;
-                        if (order == null)
-                        {
-                            return BadRequest(new ResponseData
-                            {
-                                Code = "404",
-                                Message = "Order Not Found",
-                                Data = null
-                            });
-                        }
-                        foreach (var productDetails in order.ProductDetails)
-                        {
-                            if (productDetails.ProductSKU == productSKU)
-                            {
-                                var productData = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", productSKU), "ProductDB", "Product").Result);
-                                if (productDetails.Status != "Order delivered")
-                                {
-                                    return BadRequest(new ResponseData
-                                    {
-                                        Code = "401",
-                                        Message = "Order Return Request Failed",
-                                        Data = null
-                                    });
-                                }
-                                else
-                                {
-                                    if (request == "refund")
-                                    {
-                                        if (productData.RefundApplicable == false)
-                                        {
-                                            return BadRequest(new ResponseData
-                                            {
-                                                Code = "402",
-                                                Message = "Refund not applicable for this product",
-                                                Data = null
-                                            });
-                                        }
-                                    }
-                                    if (request == "replace")
-                                    {
-                                        if (productData.ReplacementApplicable == false)
-                                        {
-                                            return BadRequest(new ResponseData
-                                            {
-                                                Code = "403",
-                                                Message = "Replacement not applicable for this product",
-                                                Data = null
-                                            });
-                                        }
-                                    }
-                                    if (request == "refund")
-                                    {
-                                        PaymentMethod paymentMethod = new PaymentMethod();
-                                        List<StatusCode> paymentList = new List<StatusCode>();
-                                        foreach (var status in order.PaymentDetails.Status)
-                                        {
-                                            paymentList.Add(status);
-                                        }
-                                        StatusCode paymentStatus = new StatusCode { StatusId = 3, Date = DateTime.UtcNow, Description = "Payment refund initiated" };
-                                        paymentList.Add(paymentStatus);
-                                        paymentMethod.Status = paymentList;
-                                        var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentMethod)).Result;
-                                    }
-                                    List<ProductDetails> productDetailsList = new List<ProductDetails>();
-                                    foreach (var product in order.ProductDetails)
-                                    {
-                                        if (product.ProductSKU == productSKU)
-                                        {
-                                            ProductDetails details = new ProductDetails();
-                                            details.ProductSKU = productSKU;
-                                            details.Status = "Refund Initiated";
-                                            List<StatusCode> productStatusList = new List<StatusCode>();
-                                            foreach (var status in product.StatusCode){ productStatusList.Add(status); }
-                                            StatusCode productStatus = new StatusCode();
-                                            productStatus.Date = DateTime.UtcNow;
-                                            if (request == "refund")
-                                            {
-                                                productStatus.StatusId = 6;
-                                                productStatus.Description = "Order refund initiated";
-                                            }
-                                            if (request == "replace")
-                                            {
-                                                productStatus.StatusId = 4;
-                                                productStatus.Description = "Order replacement initiated";
-                                            }
-                                            productStatusList.Add(productStatus);
-                                            details.StatusCode = productStatusList;
-                                            details.ProductInCart = product.ProductInCart;
-                                            productDetailsList.Add(details);
-                                        }
-                                        else
-                                        {
-                                            productDetailsList.Add(product);
-                                        }
-                                    }
-                                    var responce = MH.UpdateSingleObject( Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("ProductDetails", productDetailsList)).Result;
-                                }
-                            }
-                        }
-                        return Ok(new ResponseData
-                        {
-                            Code = "200",
-                            Message = "Success",
+                            Message = "Order not found",
                             Data = null
                         });
                     }
                 }
-                else
+                catch (Exception ex)
                 {
+                    LoggerDataAccess.CreateLog("OrderController", "CancelOrder", "CancelOrder", ex.Message);
                     return BadRequest(new ResponseData
                     {
-                        Code = "405",
-                        Message = "Invalid Request",
-                        Data = null
+                        Code = "400",
+                        Message = "Failed",
+                        Data = ex.Message
                     });
                 }
             }
-            catch (Exception ex)
+            else
             {
-                LoggerDataAccess.CreateLog("OrderController", "ReturnProduct", "ReturnProduct", ex.Message);
                 return BadRequest(new ResponseData
                 {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
-            }
-        }
-
-        /// <summary>
-        /// Update status of order placed by a user
-        /// </summary>
-        /// <remarks>This api is used to update status of a product</remarks>
-        /// <param name="data">Data required to update status</param>
-        /// <param name="username">UserName of user whoes status needs to be updated</param>
-        /// <param name="productSKU">SKU of product whoes status needs to be updated</param>
-        /// <returns></returns>
-        /// <response code="200">Status for product is updated successfully</response>
-        /// <response code="404">Order not found</response> 
-        /// <response code="401">Status is empty</response> 
-        /// <response code="400">Process ran into an exception</response> 
-        [HttpPost("updatestatus/{username}/{productSKU}")]
-        [SwaggerRequestExample(typeof(StatusUpdate), typeof(StatusUpdateDetails))]
-        [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> UpdateOrder([FromBody]StatusUpdate data, string username, string productSKU)
-        {
-            try
-            {
-                if (data.Status == null)
-                {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "401",
-                        Message = "Status cannot be empty",
-                        Data = null
-                    });
-                }
-                IAsyncCursor<OrderInfo> orderCursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("OrderId", data.OrderId));
-                var order = orderCursor.FirstOrDefaultAsync().Result;
-                if (order == null)
-                {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "Order Not Found",
-                        Data = null
-                    });
-                }
-                PaymentMethod paymentMethod = new PaymentMethod();
-                List<StatusCode> statusList = new List<StatusCode>();
-                List<ProductDetails> productList = new List<ProductDetails>();
-                if (data.Status == "Delivered")
-                {
-                    int i = 1;
-                    foreach (var status in order.PaymentDetails.Status)
-                    {
-                        statusList.Add(status);
-                        i++;
-                    }
-                    if (order.PaymentMethod == "COD")
-                    {
-                        statusList.Add(new StatusCode { StatusId = i, Date = DateTime.UtcNow, Description = "Payment Received" });
-                    }
-                    paymentMethod.Status = statusList;
-
-                    foreach (var product in order.ProductDetails)
-                    {
-                        if (product.ProductSKU == productSKU)
-                        {
-                            ProductDetails details = new ProductDetails();
-                            details.ProductSKU = productSKU;
-                            details.Status = order.PaymentMethod;
-                            List<StatusCode> productStatusList = new List<StatusCode>();
-                            int j = 1;
-                            foreach (var status in product.StatusCode)
-                            {
-                                productStatusList.Add(status);
-                                j++;
-                            }
-                            StatusCode productStatus = new StatusCode { StatusId = j, Date = DateTime.UtcNow, Description = data.Status };
-                            productStatusList.Add(productStatus);
-                            details.StatusCode = productStatusList;
-                            details.ProductInCart = product.ProductInCart;
-                            productList.Add(details);
-                        }
-                        else
-                        {
-                            productList.Add(product);
-                        }
-                    }
-                }
-                else if (data.Status == "Refunded" || data.Status == "Replaced" || data.Status == "Refund Failed" || data.Status == "Replacement Failed"
-                            || data.Status == "Refund Cancel" || data.Status == "Replacement cancelled")
-                {
-                    int i = 1;
-                    foreach (var status in order.PaymentDetails.Status)
-                    {
-                        statusList.Add(status);
-                        i++;
-                    }
-                    if (order.PaymentMethod == "Cash On Delivery")
-                    {
-                        if (data.Status == "Refunded")
-                        {
-                            statusList.Add(new StatusCode { StatusId = i, Date = DateTime.UtcNow, Description = "Payment Refund Initiated" });
-                        }
-                    }
-                    paymentMethod.Status = statusList;
-
-                    foreach (var product in order.ProductDetails)
-                    {
-                        if (product.ProductSKU == productSKU)
-                        {
-                            ProductDetails details = new ProductDetails();
-                            details.ProductSKU = productSKU;
-                            details.Status = order.PaymentMethod;
-                            List<StatusCode> productStatusList = new List<StatusCode>();
-                            int j = 1;
-                            foreach (var status in product.StatusCode)
-                            {
-                                productStatusList.Add(status);
-                                j++;
-                            }
-                            StatusCode productStatus = new StatusCode { StatusId = j, Date = DateTime.UtcNow, Description = data.Status };
-                            productStatusList.Add(productStatus);
-                            details.StatusCode = productStatusList;
-                            details.ProductInCart = product.ProductInCart;
-                            productList.Add(details);
-                        }
-                        else
-                        {
-                            productList.Add(product);
-                        }
-                    }
-                }
-                var paymentUpdate = Builders<BsonDocument>.Update.Set("PaymentDetails", paymentMethod);
-                var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username) & Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", paymentUpdate).Result;
-                var productUpdate = Builders<BsonDocument>.Update.Set("ProductDetails", productList);
-                var responce = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username) & Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", productUpdate).Result;
-                return Ok(new ResponseData
-                {
-                    Code = "200",
-                    Message = "Success",
+                    Code = "401",
+                    Message = "Invalid request",
                     Data = null
-                });
-            }
-            catch (Exception ex)
-            {
-                LoggerDataAccess.CreateLog("OrderController", "UpdateOrder", "UpdateOrder", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
                 });
             }
         }

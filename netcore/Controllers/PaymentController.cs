@@ -58,7 +58,7 @@ namespace Arthur_Clive.Controllers
                         {
                             statusCodeList.Add(detail);
                         }
-                        statusCodeList.Add(new StatusCode { StatusId = 2, Description = "Payment received", Date = DateTime.UtcNow });
+                        statusCodeList.Add(new StatusCode { StatusId = 2, Description = "Payment Received", Date = DateTime.UtcNow });
                         paymentDetails.Status = statusCodeList;
                         var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
                         IAsyncCursor<Cart> cartCursor = await _db.GetCollection<Cart>("Cart").FindAsync(Builders<Cart>.Filter.Eq("UserName", paymentModel.UserName));
@@ -89,7 +89,7 @@ namespace Arthur_Clive.Controllers
                         {
                             statusCodeList.Add(detail);
                         }
-                        statusCodeList.Add(new StatusCode { StatusId = 3, Description = "Payment failed", Date = DateTime.UtcNow });
+                        statusCodeList.Add(new StatusCode { StatusId = 3, Description = "Payment Failed", Date = DateTime.UtcNow });
                         paymentDetails.Status = statusCodeList;
                         var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
                         return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
@@ -107,7 +107,7 @@ namespace Arthur_Clive.Controllers
                     {
                         statusCodeList.Add(detail);
                     }
-                    statusCodeList.Add(new StatusCode { StatusId = 3, Description = "Payment failed", Date = DateTime.UtcNow });
+                    statusCodeList.Add(new StatusCode { StatusId = 3, Description = "Payment Failed", Date = DateTime.UtcNow });
                     paymentDetails.Status = statusCodeList;
                     var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
                     return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
@@ -145,7 +145,7 @@ namespace Arthur_Clive.Controllers
                 {
                     statusCodeList.Add(detail);
                 }
-                statusCodeList.Add(new StatusCode { StatusId = 3, Description = "Payment failed", Date = DateTime.UtcNow });
+                statusCodeList.Add(new StatusCode { StatusId = 3, Description = "Payment Failed", Date = DateTime.UtcNow });
                 paymentDetails.Status = statusCodeList;
                 var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
                 return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
@@ -181,7 +181,7 @@ namespace Arthur_Clive.Controllers
                 {
                     statusCodeList.Add(detail);
                 }
-                statusCodeList.Add(new StatusCode { StatusId = 4, Description = "Payment cancelled", Date = DateTime.UtcNow });
+                statusCodeList.Add(new StatusCode { StatusId = 4, Description = "Payment Cancelled", Date = DateTime.UtcNow });
                 paymentDetails.Status = statusCodeList;
                 var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
                 return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectcancelled").First().Value);

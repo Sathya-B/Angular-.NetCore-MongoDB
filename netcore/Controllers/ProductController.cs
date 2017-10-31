@@ -308,7 +308,19 @@ namespace Arthur_Clive.Controllers
                     }
                     if (data.ProductReviews != null)
                     {
-                        var update = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductReviews", data.ProductReviews));
+                        var reviews = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id",objectId,null,null,"ProductDB","Product")).ProductReviews;
+                        Review[] reviewArray = new Review[reviews.Length + 1];
+                        reviewArray[0] = data.ProductReviews[0];
+                        if (reviews.Length != 0)
+                        {
+                            int i = 1;
+                            foreach (var review in reviews)
+                            {
+                                reviewArray[i] = review;
+                                i++;
+                            }
+                        }
+                        var update = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductReviews", reviewArray));
                     }
                     if (data.ProductColour != null)
                     {

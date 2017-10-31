@@ -7,6 +7,7 @@ using TH = UnitTest_AuthorizedServer.Controller.Integrationtest_AuthorizedServer
 using MH = AuthorizedServer.Helper.MongoHelper;
 using MongoDB.Driver;
 using MongoDB.Bson.Serialization;
+using AuthorizedServer;
 
 namespace UnitTest_AuthorizedServer
 {
@@ -14,7 +15,7 @@ namespace UnitTest_AuthorizedServer
     public class AuthController_IntegrationTest
     {
         [TestMethod]
-        public void AuthController_Register_IntegrationTest_ArthurClive()
+        public void AuthController_Register_IntegrationTest_AuthorizedServer()
         {
             //Arrange
             var username = "12341234";
@@ -56,6 +57,43 @@ namespace UnitTest_AuthorizedServer
             Assert.IsNotNull(insertedData.VerificationCode);
             Assert.AreEqual(insertedData.Status, "Registered");
             Assert.AreEqual(insertedData.WrongAttemptCount, 0);
+        }
+    }
+
+    [TestClass]
+    public class TokenController_IntegrationTest
+    {
+        [TestMethod]
+        public void TokenController_Auth_IntegrationTest_AuthorizedServer()
+        {
+            //Arrange
+            Parameters parameters1 = new Parameters
+            {
+                grant_type = "password",
+                username = "SampleUser1",
+                fullname = "SampleName1"
+            };
+            var expectedCode1 = "200";
+            var expectedMessage1 = "User Registered";
+
+            //Act
+            var result1 = TH.GetTokenController().Auth(parameters1) as ActionResult;
+            var responseData1 = TH.DeserializedResponceData(result1.ToJson());
+            Parameters parameters2 = new Parameters
+            {
+                grant_type = "refresh_token",
+                username = parameters1.username,
+                fullname = parameters1.fullname
+            };
+            var result2 = TH.GetTokenController().Auth(parameters2) as ActionResult;
+            var responseData2 = TH.DeserializedResponceData(result2.ToJson());
+
+            //Check if user is unsubscribed
+            //var insertedData = BsonSerializer.Deserialize<RegisterModel>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication").Result);
+
+            //Assert
+            Assert.IsNotNull(result1);
+            Assert.IsNotNull(result2);
         }
     }
 }

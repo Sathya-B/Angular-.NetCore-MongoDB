@@ -25,6 +25,12 @@ namespace UnitTest_AuthorizedServer.Controller
             return authController;
         }
 
+        public static TokenController GetTokenController()
+        {
+            TokenController tokenController = new TokenController(_settings,_repo);
+            return tokenController; 
+        }
+
         public static ResponceData DeserializedResponceData(dynamic data)
         {
             ActionResultModel deserializedResponce = new ActionResultModel();

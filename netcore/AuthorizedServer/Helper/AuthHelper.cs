@@ -109,7 +109,7 @@ namespace AuthorizedServer.Helper
                     {
                         Code = "999",
                         Message = "OK",
-                        Data = GetJwt(parameters.client_id, refresh_token, _settings, BsonSerializer.Deserialize<RegisterModel>(MongoHelper.CheckForDatas("UserName", parameters.username, null, null, "Authentication", "Authentication")).UserRole)
+                        Data = GetJwt(parameters.client_id, refresh_token, _settings, BsonSerializer.Deserialize<RegisterModel>(MongoHelper.CheckForDatas("UserName", parameters.client_id, null, null, "Authentication", "Authentication")).UserRole)
                     };
                 }
                 else
@@ -124,7 +124,7 @@ namespace AuthorizedServer.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthHelper", "DoRefreshPassword", "DoRefreshPassword", ex.Message);
+                LoggerDataAccess.CreateLog("AuthHelper", "DoRefreshToken", "DoRefreshToken", ex.Message);
                 return new ResponseData
                 {
                     Code = "400",
@@ -159,13 +159,13 @@ namespace AuthorizedServer.Helper
                     audience: _settings.Value.Aud,
                     claims: claims,
                     notBefore: now,
-                    expires: now.Add(TimeSpan.FromMinutes(1)),
+                    expires: now.Add(TimeSpan.FromMinutes(5)),
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256));
                 var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
                 var response = new
                 {
                     access_token = encodedJwt,
-                    expires_in = (int)TimeSpan.FromMinutes(1).TotalSeconds,
+                    expires_in = (int)TimeSpan.FromMinutes(5).TotalSeconds,
                     refresh_token = refresh_token,
                 };
                 return JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented });

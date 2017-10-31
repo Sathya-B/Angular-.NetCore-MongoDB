@@ -23,6 +23,8 @@ namespace Arthur_Clive.Data
         public double EstimatedTax { get; set; }
         /// <summary>Payment method prefered by the user</summary>
         public string PaymentMethod { get; set; }
+        /// <summary>Status of order</summary>
+        public string OrderStatus { get; set; }
         /// <summary>Payment method and status of the payment</summary>
         public PaymentMethod PaymentDetails { get; set; }
         /// <summary>Discounted amount</summary>
@@ -57,7 +59,7 @@ namespace Arthur_Clive.Data
         /// <summary>Date and time when the status is registered</summary>
         public DateTime Date { get; set; }
     }
-        
+            
     /// <summary>Contails update details for the order</summary>
     public class StatusUpdate
     {

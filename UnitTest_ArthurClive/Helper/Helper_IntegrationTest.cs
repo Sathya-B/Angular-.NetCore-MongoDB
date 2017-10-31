@@ -318,24 +318,6 @@ namespace UnitTest_ArthurClive.Helper
             Assert.AreEqual(result.ProductFor, "Men");
             Assert.AreEqual(result.ProductType, "Tshirt");
         }
-
-        //[TestMethod]
-        public void MongoHelper_GetOrders_IntegrationTest_ArthurClive()
-        {
-            //Arrange
-            IMongoDatabase db = MongoHelper._client.GetDatabase("UnitTestDB");
-            var username = "sample@gmail.com";
-
-            //Act
-            var result = MongoHelper.GetOrders(username, db).Result as List<OrderInfo>;
-
-            //Assert
-            Assert.IsNotNull(result);
-            foreach (var order in result)
-            {
-                Assert.AreEqual(username, order.UserName);
-            }
-        }
         
         //[TestMethod]
         public void MongoHelper_GetProducts_IntegrationTest_ArthurClive()

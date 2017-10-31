@@ -144,5 +144,17 @@ namespace AuthorizedServer.Helper
                 return "Failed";
             }
         }
+
+        /// <summary>Delete single object from MongoDB</summary>
+        /// <param name="filter"></param>
+        /// <param name="dbName"></param>
+        /// <param name="collectionName"></param>
+        public static bool DeleteSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName)
+        {
+            var data = GetSingleObject(filter, dbName, collectionName).Result;
+            var collection = _mongodb.GetCollection<BsonDocument>(collectionName);
+            var response = collection.DeleteOneAsync(data);
+            return response.Result.DeletedCount > 0;
+        }
     }
 }

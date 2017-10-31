@@ -156,6 +156,49 @@ namespace Arthur_Clive.Controllers
             }
         }
 
+        /// <summary>Get orders by order id</summary>
+        /// <param name="orderid">Id of order</param>
+        /// <response code="200">Returns order that matches the order id</response>
+        /// <response code="404">No orders found</response> 
+        /// <response code="400">Process ran into an exception</response> 
+        [HttpGet("viewsingleorder/{orderid}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public ActionResult GetOrderById(int orderid)
+        {
+            try
+            {
+                var checkData = MH.CheckForDatas("OrderId",orderid,null,null,"OrderDB","OrderInfo");
+                if (checkData != null)
+                {
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Success",
+                        Data = BsonSerializer.Deserialize<OrderInfo>(checkData)
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "No orders found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("OrderController", "GetOrdersOfUser", "GetOrdersOfUser", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
+
         /// <summary>Get orders placed by a user</summary>
         /// <param name="username">UserName of user whos orders need to be found</param>
         /// <remarks>This api is user to view all the orders placed by the user</remarks>
@@ -168,9 +211,14 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var orders = MH.GetOrders(username, order_db);
-                if (orders != null)
+                var orderList = MH.GetListOfObjects("UserName", username,null,null,null,null,"OrderDB","OrderInfo").Result;
+                if (orderList != null)
                 {
+                    List<OrderInfo> orders = new List<OrderInfo>();
+                    foreach(var order in orderList)
+                    {
+                        orders.Add(BsonSerializer.Deserialize<OrderInfo>(order));
+                    }
                     return Ok(new ResponseData
                     {
                         Code = "200",
@@ -250,7 +298,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Order status updated</response>
         /// <response code="401">Order status update failed</response> 
         /// <response code="402">Product details status update failed</response> 
-        /// <response code="404">No orders found</response> 
+        /// <response code="404">Order not found</response> 
         /// <response code="400">Process ran into an exception</response> 
         [HttpPut("deliverystatus/update/{orderid}/{status}")]
         [ProducesResponseType(typeof(ResponseData), 200)]
@@ -262,15 +310,18 @@ namespace Arthur_Clive.Controllers
                 if (checkData != null)
                 {
                     var orderDetails = BsonSerializer.Deserialize<OrderInfo>(checkData);
-                    var updateOrderStatus = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderid), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("OrderStatus", status)).Result;
-                    if (updateOrderStatus == false)
+                    if (status != "Product Replaced" || status != "Payment Refunded")
                     {
-                        return BadRequest(new ResponseData
+                        var updateOrderStatus = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderid), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("OrderStatus", status)).Result;
+                        if (updateOrderStatus == false)
                         {
-                            Code = "401",
-                            Message = "Order status update failed",
-                            Data = null
-                        });
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "401",
+                                Message = "Order status update failed",
+                                Data = null
+                            });
+                        }
                     }
                     List<ProductDetails> productDetails = new List<ProductDetails>();
                     foreach (var product in orderDetails.ProductDetails)
@@ -282,7 +333,7 @@ namespace Arthur_Clive.Controllers
                             statusList.Add(data);
                         }
                         int statusId = 0;
-                        if (status == "Order ready to be shipped") { statusId = 2; }
+                        if (status == "Order Ready To Be Shipped") { statusId = 2; }
                         else if (status == "Order Shipped") { statusId = 3; }
                         else if (status == "Order Out For Delivery") { statusId = 4; }
                         else if (status == "Order Delivered") { statusId = 5; }
@@ -338,7 +389,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="401">Cancel request cannot be processed as the product is delivered</response> 
         /// <response code="402">Order already cancelled</response> 
         /// <response code="403">Order request cannot be processed</response> 
-        /// <response code="404">No orders found</response> 
+        /// <response code="404">Order not found</response> 
         /// <response code="405">Order status update failed</response> 
         /// <response code="406">Product order status update failed</response> 
         /// <response code="407">Product not found</response> 
@@ -387,13 +438,13 @@ namespace Arthur_Clive.Controllers
                                         Data = null
                                     });
                                 }
-                                product.Status = "Order cancelled";
+                                product.Status = "Order Cancelled";
                                 List<StatusCode> statusCode = new List<StatusCode>();
                                 foreach (var status in product.StatusCode)
                                 {
                                     statusCode.Add(status);
                                 }
-                                statusCode.Add(new StatusCode { Date = DateTime.UtcNow, StatusId = 5, Description = "Order cancelled" });
+                                statusCode.Add(new StatusCode { Date = DateTime.UtcNow, StatusId = 5, Description = "Order Cancelled" });
                                 product.StatusCode = statusCode;
                             }
                             productDetails.Add(product);
@@ -461,7 +512,23 @@ namespace Arthur_Clive.Controllers
             }
         }
 
+        /// <summary>Return a product</summary>
+        /// <param name="request">return request</param>
+        /// <param name="orderid">Id of oder to be returned</param>
+        /// <param name="productSKU">SKU of product to be returned</param>
+        /// <response code="201">Payment refund initiated</response>
+        /// <response code="202">Product replacemnet initiated</response>
+        /// <response code="401">Invalid request</response> 
+        /// <response code="402">Product not found</response> 
+        /// <response code="403">Refund not applicable for this product</response> 
+        /// <response code="404">Order not found</response> 
+        /// <response code="405">Replacement not applicable for this product</response> 
+        /// <response code="406">"Return request cannot be processed as the product is not delivered</response> 
+        /// <response code="407">Return request cannot be processed as it has been more than 15 days from delivery</response> 
+        /// <response code="408">Product details status update failed</response>
+        /// <response code="400">Process ran into an exception</response> 
         [HttpPut("return/{request}/{orderid}/{productSKU}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult ReturnOrder(string request, int orderid, string productSKU)
         {
             if (request == "refund" || request == "replace")
@@ -472,7 +539,7 @@ namespace Arthur_Clive.Controllers
                     if (checkData != null)
                     {
                         var orderDetails = BsonSerializer.Deserialize<OrderInfo>(checkData);
-                        if (orderDetails.OrderStatus == "Order delivered")
+                        if (orderDetails.OrderStatus == "Order Delivered")
                         {
                             foreach (var product in orderDetails.ProductDetails)
                             {
@@ -480,7 +547,7 @@ namespace Arthur_Clive.Controllers
                                 {
                                     foreach (var status in product.StatusCode)
                                     {
-                                        if (status.Description == "Order delivered")
+                                        if (status.Description == "Order Delivered")
                                         {
                                             if (DateTime.UtcNow > status.Date.AddDays(15))
                                             {
@@ -508,7 +575,7 @@ namespace Arthur_Clive.Controllers
                                         {
                                             if (product.ProductSKU == productSKU)
                                             {
-                                                product.Status = "Refund initiated";
+                                                product.Status = "Refund Initiated";
                                                 List<StatusCode> statusList = new List<StatusCode>();
                                                 foreach (var status in product.StatusCode)
                                                 {
@@ -535,7 +602,7 @@ namespace Arthur_Clive.Controllers
                                         return Ok(new ResponseData
                                         {
                                             Code = "201",
-                                            Message = "Payment refund initiated",
+                                            Message = "Payment Refund Initiated",
                                             Data = null
                                         });
                                     }
@@ -558,7 +625,7 @@ namespace Arthur_Clive.Controllers
                                         {
                                             if (product.ProductSKU == productSKU)
                                             {
-                                                product.Status = "Product replacement initiated";
+                                                product.Status = "Product Replacement Initiated";
                                                 List<StatusCode> statusList = new List<StatusCode>();
                                                 foreach (var status in product.StatusCode)
                                                 {
@@ -590,7 +657,7 @@ namespace Arthur_Clive.Controllers
                                         return BadRequest(new ResponseData
                                         {
                                             Code = "405",
-                                            Message = "replacement not applicable for this product",
+                                            Message = "Replacement not applicable for this product",
                                             Data = null
                                         });
                                     }
@@ -601,7 +668,7 @@ namespace Arthur_Clive.Controllers
                                 return BadRequest(new ResponseData
                                 {
                                     Code = "402",
-                                    Message = "product not found",
+                                    Message = "Product not found",
                                     Data = null
                                 });
                             }

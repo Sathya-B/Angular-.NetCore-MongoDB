@@ -132,24 +132,6 @@ namespace Arthur_Clive.Helper
             }
             return GetSingleObject(filter, dbName, collectionName).Result;
         }
-        
-        /// <summary>Get order list from MongoDB</summary>
-        /// <param name="username"></param>
-        /// <param name="order_db"></param>
-        public async static Task<List<OrderInfo>> GetOrders(string username, IMongoDatabase order_db)
-        {
-            try
-            {
-                IAsyncCursor<OrderInfo> cursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("UserName", username));
-                var orders = cursor.ToList();
-                return orders;
-            }
-            catch (Exception ex)
-            {
-                LoggerDataAccess.CreateLog("GlobalHelper", "GetOrders", "GetOrders", ex.Message);
-                return null;
-            }
-        }
 
         /// <summary>Get product list  from MongoDB</summary>
         /// <param name="productSKU"></param>

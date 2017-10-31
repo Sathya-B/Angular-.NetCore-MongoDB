@@ -1,10 +1,15 @@
 ﻿using System.IO;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Threading.Tasks;
 using AuthorizedServer;
 using AuthorizedServer.Controllers;
+using AuthorizedServer.Helper;
+using AuthorizedServer.Models;
 using AuthorizedServer.Repositories;
 using Microsoft.Extensions.Options;
+using MongoDB.Driver;
+using Moq;
 
 namespace UnitTest_AuthorizedServer.Controller
 {
@@ -27,7 +32,9 @@ namespace UnitTest_AuthorizedServer.Controller
 
         public static TokenController GetTokenController()
         {
-            TokenController tokenController = new TokenController(_settings,_repo);
+            Mock<IOptions<Audience>> mockedSettings = new Mock<IOptions<Audience>>();
+            Mock<IRTokenRepository> mockedRepo = new Mock<IRTokenRepository>();
+            TokenController tokenController = new TokenController(mockedSettings.Object,mockedRepo.Object);
             return tokenController; 
         }
 
@@ -39,6 +46,14 @@ namespace UnitTest_AuthorizedServer.Controller
             deserializedResponce = ser.ReadObject(ms) as ActionResultModel;
             ms.Close();
             return deserializedResponce.Value;
+        }
+
+        public static IMongoDatabase db = MongoHelper._client.GetDatabase("Authentication");
+
+        public async static Task<string> InsertRegiterModeldata(RegisterModel registerModel)
+        {
+            await db.GetCollection<RegisterModel>("Authentication").InsertOneAsync(registerModel);
+            return "Success";
         }
     }
 }

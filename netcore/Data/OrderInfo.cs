@@ -59,18 +59,7 @@ namespace Arthur_Clive.Data
         /// <summary>Date and time when the status is registered</summary>
         public DateTime Date { get; set; }
     }
-            
-    /// <summary>Contails update details for the order</summary>
-    public class StatusUpdate
-    {
-        /// <summary>Id of the order for which the status is to be updated</summary>
-        [Required]
-        public int OrderId { get; set; }
-        /// <summary>Status to be updated</summary>
-        [Required]
-        public string Status { get; set; }
-    }
-
+      
     /// <summary>Contails payment details for the product</summary>
     public class PaymentMethod
     {   

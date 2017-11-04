@@ -100,7 +100,7 @@ namespace UnitTest_ArthurClive.Helper
             var message = "Message to be sent to user through email";
 
             //Act
-            var result = EmailHelper.SendEmail(fullNameOfReceiver, emailOfReceiver, message).Result as string;
+            var result = EmailHelper.SendEmail_ToUsers(fullNameOfReceiver, emailOfReceiver, message).Result as string;
 
             //Assert
             Assert.IsNotNull(result);

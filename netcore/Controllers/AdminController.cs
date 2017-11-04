@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Arthur_Clive.Data;
 using Arthur_Clive.Helper;
 using Arthur_Clive.Logger;
 using Arthur_Clive.Swagger;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Swashbuckle.AspNetCore.Examples;
 using MH = Arthur_Clive.Helper.MongoHelper;
@@ -21,6 +22,8 @@ namespace Arthur_Clive.Controllers
     {
         /// <summary></summary>
         public IMongoDatabase _db = MH._client.GetDatabase("SubscribeDB");
+        /// <summary></summary>
+        public IMongoDatabase user_db = MH._client.GetDatabase("UserInfo");
 
         /// <summary>Subscribe user</summary>
         /// <param name="username">UserName of user who needs to be subscribed</param>
@@ -155,7 +158,7 @@ namespace Arthur_Clive.Controllers
                 {
                     foreach (var user in users)
                     {
-                        await EmailHelper.SendEmail(user.UserName, user.UserName, message);
+                        await EmailHelper.SendEmail_ToUsers(user.UserName, user.UserName, message);
                     }
                     return Ok(new ResponseData
                     {
@@ -245,31 +248,179 @@ namespace Arthur_Clive.Controllers
             }
         }
 
-        ///// <summary>Assign roles to users</summary>
-        ///// <param name="username">Details of role</param>
-        ///// <param name="rolename">Details of role</param>
-        //[HttpPost("roles/{username}/{rolename}")]
-        //public async Task<ActionResult> InsertRoles(string username,string rolename)
-        //{
-        //    try
-        //    {
-        //        return Ok(new ResponseData
-        //        {
-        //            Code = "200",
-        //            Message = "Subscribed Succesfully",
-        //            Data = null
-        //        });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LoggerDataAccess.CreateLog("AdminContoller", "InsertRoles", "InsertRoles", ex.Message);
-        //        return BadRequest(new ResponseData
-        //        {
-        //            Code = "400",
-        //            Message = "Failed",
-        //            Data = ex.Message
-        //        });
-        //    }
-        //}
+        /// <summary>Get all the users</summary>
+        /// <response code="200">Returns all the users</response>   
+        /// <response code="404">No users found</response>   
+        /// <response code="400">Process ran into an exception</response>
+        [HttpGet("getallusers")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public ActionResult GetAllUsers()
+        {
+            try
+            {
+                var getlist = MH.GetListOfObjects(null, null, null, null, null, null, "Authentication", "Authentication").Result;
+                if (getlist != null)
+                {
+                    List<UserInfomation> userList = new List<UserInfomation>();
+                    foreach (var user in getlist)
+                    {
+                        var userInfo = BsonSerializer.Deserialize<RegisterModel>(user);
+                        var billingAddressData = MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", userInfo.UserName) & Builders<BsonDocument>.Filter.Eq("BillingAddress", true), "UserInfo", "UserInfo").Result;
+                        Address billingAddress = new Address();
+                        if (billingAddressData != null)
+                        {
+                            billingAddress = BsonSerializer.Deserialize<Address>(billingAddressData);
+                        }
+                        else
+                        {
+                            billingAddress = null;
+                        }
+                        var shippingAddressData = MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", userInfo.UserName) & Builders<BsonDocument>.Filter.Eq("ShippingAddress", true), "UserInfo", "UserInfo").Result;
+                        Address shippingAddress = new Address();
+                        if (shippingAddressData != null)
+                        {
+                            shippingAddress = BsonSerializer.Deserialize<Address>(shippingAddressData);
+                        }
+                        else
+                        {
+                            shippingAddress = null;
+                        }
+                        UserInfomation userInfomation = new UserInfomation
+                        {
+                            FullName = userInfo.FullName,
+                            PhoneNumber = userInfo.PhoneNumber,
+                            Email = userInfo.Email,
+                            BillingAddress = billingAddress,
+                            ShippingAddress = shippingAddress
+                        };
+                        userList.Add(userInfomation);
+                    }
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Success",
+                        Data = userList
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "No users found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AdminContoller", "GetAllUsers", "GetAllUsers", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        /// <summary>Insert new role</summary>
+        /// <param name="data">Details of role to be inserted</param>
+        /// <response code="200">Role inserted successfully</response>   
+        /// <response code="401">Another role with same name is found</response> 
+        /// <response code="402">Another role with same role id is found</response>   
+        /// <response code="400">Process ran into an exception</response>
+        [HttpPost("roles/insert")]
+        [SwaggerRequestExample(typeof(Roles), typeof(RoleDetails))]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public async Task<ActionResult> InsertRole([FromBody]Roles data)
+        {
+            try
+            {
+                if (MH.CheckForDatas("RoleName", data.RoleName, null, null, "RolesDB", "Roles") != null)
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "401",
+                        Message = "Another role with same name is found",
+                        Data = null
+                    });
+                }
+                else if (MH.CheckForDatas("RoleID", data.RoleID, null, null, "RolesDB", "Roles") != null)
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "402",
+                        Message = "Another role with same role id is found",
+                        Data = null
+                    });
+                }
+                else
+                {
+                    await MH._client.GetDatabase("RolesDB").GetCollection<Roles>("Roles").InsertOneAsync(data);
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Role inserted successfully",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AdminContoller", "InsertRole", "InsertRole", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        /// <summary>Assign role to user</summary>
+        /// <param name="username">UserName of user whoes role needs to be assigned</param>
+        /// <param name="rolename">Role name</param>
+        /// <response code="200">Role assigned to user.</response>   
+        /// <response code="404">User not found</response>   
+        /// <response code="400">Process ran into an exception</response>
+        [HttpPut("roles/assign/{username}/{rolename}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public ActionResult AssignRole(string username, string rolename)
+        {
+            try
+            {
+                var checkuser = MH.CheckForDatas("UserName",username,null,null,"Authentication", "Authentication");
+                if (checkuser != null)
+                {
+                    var updateRole = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName",username), "Authentication", "Authentication",Builders<BsonDocument>.Update.Set("UserRole",rolename));
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Role assigned to user",
+                        Data = null
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "User not found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AdminContoller", "InsertRoles", "InsertRoles", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
     }
 }

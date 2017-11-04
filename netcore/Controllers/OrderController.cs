@@ -97,6 +97,7 @@ namespace Arthur_Clive.Controllers
                                 ProductDetails productDetails = new ProductDetails();
                                 productDetails.ProductSKU = cart.ProductSKU;
                                 productDetails.Status = "Order Placed";
+                                productDetails.Reviewed = false;
                                 List<StatusCode> productStatus = new List<StatusCode>();
                                 productStatus.Add(new StatusCode { StatusId = 1, Date = DateTime.UtcNow, Description = "Order Placed" });
                                 productDetails.StatusCode = productStatus;
@@ -155,7 +156,7 @@ namespace Arthur_Clive.Controllers
                 });
             }
         }
-
+        
         /// <summary>Get orders by order id</summary>
         /// <param name="orderid">Id of order</param>
         /// <response code="200">Returns order that matches the order id</response>
@@ -310,7 +311,7 @@ namespace Arthur_Clive.Controllers
                 if (checkData != null)
                 {
                     var orderDetails = BsonSerializer.Deserialize<OrderInfo>(checkData);
-                    if (status != "Product Replaced" || status != "Payment Refunded")
+                    if (status != "Order Replaced" || status != "Order Refunded")
                     {
                         var updateOrderStatus = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderid), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("OrderStatus", status)).Result;
                         if (updateOrderStatus == false)
@@ -333,12 +334,11 @@ namespace Arthur_Clive.Controllers
                             statusList.Add(data);
                         }
                         int statusId = 0;
-                        if (status == "Order Ready To Be Shipped") { statusId = 2; }
-                        else if (status == "Order Shipped") { statusId = 3; }
-                        else if (status == "Order Out For Delivery") { statusId = 4; }
+                        if (status == "Packing In Progress") { statusId = 2; }
+                        else if (status == "Order Shipped") { statusId =3; }
                         else if (status == "Order Delivered") { statusId = 5; }
-                        else if (status == "Product Replaced") { statusId = 8; }
-                        else if (status == "Payment Refunded") { statusId = 10; }
+                        else if (status == "Order Replaced") { statusId = 7; }
+                        else if (status == "Order Refunded") { statusId = 9; }
                         statusList.Add(new StatusCode { StatusId = statusId, Date = DateTime.UtcNow, Description = status });
                         product.StatusCode = statusList;
                         productDetails.Add(product);
@@ -411,7 +411,7 @@ namespace Arthur_Clive.Controllers
                         {
                             if (product.ProductSKU == productSKU)
                             {
-                                if (product.Status == "Order delivered")
+                                if (product.Status == "Order Delivered")
                                 {
                                     return BadRequest(new ResponseData
                                     {
@@ -420,7 +420,7 @@ namespace Arthur_Clive.Controllers
                                         Data = null
                                     });
                                 }
-                                else if (product.Status == "Order cancelled")
+                                else if (product.Status == "Order Cancelled")
                                 {
                                     return BadRequest(new ResponseData
                                     {
@@ -429,7 +429,7 @@ namespace Arthur_Clive.Controllers
                                         Data = null
                                     });
                                 }
-                                else if (product.Status == "Order replaced" || orderDetails.OrderStatus == "Order refunded")
+                                else if (product.Status == "Order Replaced" || orderDetails.OrderStatus == "Order Refunded")
                                 {
                                     return BadRequest(new ResponseData
                                     {
@@ -444,7 +444,7 @@ namespace Arthur_Clive.Controllers
                                 {
                                     statusCode.Add(status);
                                 }
-                                statusCode.Add(new StatusCode { Date = DateTime.UtcNow, StatusId = 5, Description = "Order Cancelled" });
+                                statusCode.Add(new StatusCode { Date = DateTime.UtcNow, StatusId = 4, Description = "Order Cancelled" });
                                 product.StatusCode = statusCode;
                             }
                             productDetails.Add(product);
@@ -575,13 +575,13 @@ namespace Arthur_Clive.Controllers
                                         {
                                             if (product.ProductSKU == productSKU)
                                             {
-                                                product.Status = "Refund Initiated";
+                                                product.Status = "Order Refund Initiated";
                                                 List<StatusCode> statusList = new List<StatusCode>();
                                                 foreach (var status in product.StatusCode)
                                                 {
                                                     statusList.Add(status);
                                                 }
-                                                statusList.Add(new StatusCode { Date = DateTime.UtcNow, StatusId = 9, Description = "Refund initiated" });
+                                                statusList.Add(new StatusCode { Date = DateTime.UtcNow, StatusId = 8, Description = "Order Refund Initiated" });
                                             }
                                             productDetails.Add(product);
                                         }
@@ -625,13 +625,13 @@ namespace Arthur_Clive.Controllers
                                         {
                                             if (product.ProductSKU == productSKU)
                                             {
-                                                product.Status = "Product Replacement Initiated";
+                                                product.Status = "Order Replacement Initiated";
                                                 List<StatusCode> statusList = new List<StatusCode>();
                                                 foreach (var status in product.StatusCode)
                                                 {
                                                     statusList.Add(status);
                                                 }
-                                                statusList.Add(new StatusCode { Date = DateTime.UtcNow, StatusId = 7, Description = "Product replacement initiated" });
+                                                statusList.Add(new StatusCode { Date = DateTime.UtcNow, StatusId = 6, Description = "Order Replacement Initiated" });
                                             }
                                             productDetails.Add(product);
                                         }

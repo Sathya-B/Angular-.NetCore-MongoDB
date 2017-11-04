@@ -8,7 +8,7 @@ namespace Arthur_Clive.Swagger
 {
     #region ProductController
     /// <summary></summary>
-    public class InsertProduct : IExamplesProvider
+    public class InsertProductDetails : IExamplesProvider
     {
         /// <summary></summary>
         public object GetExamples()
@@ -33,7 +33,7 @@ namespace Arthur_Clive.Swagger
     }
 
     /// <summary></summary>
-    public class UpdateProduct : IExamplesProvider
+    public class UpdateProductDetails : IExamplesProvider
     {
         /// <summary></summary>
         public object GetExamples()
@@ -52,9 +52,37 @@ namespace Arthur_Clive.Swagger
                 ReplacementApplicable = false,
                 ProductDescription = "Updated description",
                 RefundApplicable = false,
-                ProductMaterial = "Flax",
-                ProductRating = 4.5,
-                ProductReviews = new Review[] { new Review { Name = "Sample1", Comment = "Good" }, new Review { Name = "Sample2", Comment = "Bad" } }
+                ProductMaterial = "Flax"
+            };
+        }
+    }
+
+    /// <summary></summary>
+    public class InsertReviewDetails : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new 
+            {
+                Name = "Sample1",
+                Comment = "Good",
+                Rating = 4,
+                OrderId = 1
+            };
+        }
+    }
+
+    /// <summary></summary>
+    public class UpdateReviewDetails : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new 
+            {
+                Id = 1,
+                Approved = true
             };
         }
     }
@@ -64,7 +92,7 @@ namespace Arthur_Clive.Swagger
     #region CategoryController
 
     /// <summary></summary>
-    public class InsertCategory : IExamplesProvider
+    public class InsertCategoryDetails : IExamplesProvider
     {
         /// <summary></summary>
         public object GetExamples()
@@ -79,7 +107,7 @@ namespace Arthur_Clive.Swagger
     }
 
     /// <summary></summary>
-    public class UpdateCategory : IExamplesProvider
+    public class UpdateCategoryDetails : IExamplesProvider
     {
         /// <summary></summary>
         public object GetExamples()
@@ -123,7 +151,8 @@ namespace Arthur_Clive.Swagger
         {
             return new
             {
-                UsageCount = 1
+                UsageCount = 1,
+                Amount = 100
             };
         }
     }
@@ -144,8 +173,9 @@ namespace Arthur_Clive.Swagger
                 {
                     new Address
                     {
-                        UserName = "sample@gmail.com",
+                        UserName = "12341234",
                         Name = "Sample",
+                        DialCode = "+91",
                         PhoneNumber = "12341234",
                         AddressLines = "GSK street",
                         PostOffice = "Saravanampati",
@@ -160,8 +190,9 @@ namespace Arthur_Clive.Swagger
                     },
                     new Address
                     {
-                        UserName = "sample@gmail.com",
+                        UserName = "12341234",
                         Name = "Sample",
+                        DialCode = "+91",
                         PhoneNumber = "12341234",
                         AddressLines = "GSK street",
                         PostOffice = "Saravanampati",
@@ -209,19 +240,15 @@ namespace Arthur_Clive.Swagger
                     new Cart
                     {
                         UserName="sample@gamil.com",
-                        ProductSKU="Men-Tshirt-Om-Black-L",
-                        MinioObject_URL="https://s3.ap-south-1.amazonaws.com/arthurclive-products/Men-Tshirt-Om-Black-L.jpg",
-                        ProductFor="Men",
-                        ProductType="Tshirt",
-                        ProductDesign = "Om",
+                        ProductSKU="All-Gifts-BirthDay--",
+                        MinioObject_URL="https://s3.ap-south-1.amazonaws.com/arthurclive-products/All-Gifts-BirthDay--.jpg",
+                        ProductFor="recipient@gmail.com",
+                        ProductType="Gifts",
+                        ProductDesign = "BirthDay",
                         ProductBrand = "Arthur Clive",
-                        ProductPrice = 695,
-                        ProductDiscount = 0,
-                        ProductDiscountPrice = 695,
+                        ProductPrice = 100,
                         ProductQuantity = 1,
-                        ProductSize = "L",
-                        ProductColour = "Black",
-                        ProductDescription = "Tshirt for men"
+                        ProductDescription = "Gift for birthday"
                     }
                 }
             };
@@ -365,6 +392,21 @@ namespace Arthur_Clive.Swagger
                 LocalPath = "D'\\ac\\EmailTemplate\\Arthur Clive_files",
                 BucketName = "product-category",
                 ObjectName = "sampleobject"
+            };
+        }
+    }
+
+    /// <summary></summary>
+    public class RoleDetails : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new 
+            {
+                RoleID = 4,
+                RoleName = "SampleRole",
+                LevelOfAccess = new List<string> { "Level1Access", "Level2Access", "Level3Access" }
             };
         }
     }

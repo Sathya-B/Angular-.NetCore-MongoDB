@@ -5,8 +5,6 @@ namespace AuthorizedServer.Models
     /// <summary>UserInfo</summary>
     public class UserInfo
     {
-        /// <summary>ObjectId given by MongoDB</summary>
-        public ObjectId _id { get; set; }
         /// <summary>Fullname of user</summary>
         public string FullName { get; set; }
         /// <summary>Username of user</summary>

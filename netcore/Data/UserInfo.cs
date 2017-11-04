@@ -45,6 +45,9 @@ namespace Arthur_Clive.Data
         /// <summary>FullName of user</summary>
         [Required]
         public string Name { get; set; }
+        /// <summary>Dial code of user</summary>
+        [Required]
+        public string DialCode { get; set; }
         /// <summary>PhoneNumber of user</summary>
         [Required]
         public string PhoneNumber { get; set; }
@@ -189,5 +192,20 @@ namespace Arthur_Clive.Data
         /// <summary>Description about the product</summary>
         [Required]
         public string ProductDescription { get; set; }
+    }
+
+    /// <summary>User information</summary>
+    public class UserInfomation
+    {
+        /// <summary>Full name of user</summary>
+        public string FullName { get; set; }
+        /// <summary>Phone number of user</summary>
+        public string PhoneNumber { get; set; }
+        /// <summary>Email of user</summary>
+        public string Email { get; set; }
+        /// <summary>Billing address of user</summary>
+        public Address BillingAddress { get; set; }
+        /// <summary>Shipping address of user</summary>
+        public Address ShippingAddress { get; set; }
     }
 }

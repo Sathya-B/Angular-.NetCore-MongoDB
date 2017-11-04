@@ -20,7 +20,7 @@ namespace UnitTest_ArthurClive.Controller
     public class AdminController_IntegrationTest
     {
         public AdminController controller = new AdminController();
-
+        
         [TestMethod]
         public void AdminController_Subscribe_IntegrationTest_ArthurClive()
         {
@@ -116,29 +116,24 @@ namespace UnitTest_ArthurClive.Controller
     {
         public CategoryController controller = new CategoryController();
 
-        //[TestMethod]
+        [TestMethod]
         public void CategoryController_Get_IntegrationTest_ArthurClive()
         {
             //Arrange
             var expectedCode = "200";
             var expectedMessage = "Success";
-            var expectedDataCount = 5;
-            List<Category> categoryList = new List<Category>();
+            var expectedDataCount = 6;
 
             //Act
-            Task<ActionResult> result = TH.GetCategories(controller);
-            var ress = result.Result.ToJson();
-            dynamic xx = JsonConvert.DeserializeObject(ress);
-            //var obj = JObject.Parse(ress);
-            //var url = (string)obj["data"]["img_url"];
-            var responseData = TH.DeserializedResponceData_CategoryList(result.Result.ToJson());
+            var result = controller.Get() as Task<ActionResult>;
+            var responseData = TH.DeserializedResponceData_CategoryController_Get(result.Result.ToJson());
 
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(responseData.Code, expectedCode);
             Assert.AreEqual(responseData.Message, expectedMessage);
             Assert.IsNotNull(responseData.Data);
-            //Assert.AreEqual(categoryList.Count, expectedDataCount);
+            Assert.AreEqual(responseData.Data._v.Count, expectedDataCount);
         }
 
         [TestMethod]
@@ -160,7 +155,7 @@ namespace UnitTest_ArthurClive.Controller
             var responseData = TH.DeserializedResponceData(result.Result.ToJson());
 
             //Check inserted data
-            var insertedData = BsonSerializer.Deserialize<Category>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("ProductFor", category.ProductFor) & Builders<BsonDocument>.Filter.Eq("ProductType", category.ProductType), "ProductDB", "Category").Result);
+            var insertedData = BsonSerializer.Deserialize<Arthur_Clive.Data.Category>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("ProductFor", category.ProductFor) & Builders<BsonDocument>.Filter.Eq("ProductType", category.ProductType), "ProductDB", "Category").Result);
 
             //Assert
             Assert.IsNotNull(result);
@@ -223,7 +218,7 @@ namespace UnitTest_ArthurClive.Controller
                 ProductType = "SampleType",
                 Description = "SampleDescription"
             };
-            Arthur_Clive.Data.Category updateCategory = new Arthur_Clive.Data.Category
+            Arthur_Clive.Data.UpdateCategory updateCategory = new Arthur_Clive.Data.UpdateCategory
             {
                 ProductFor = "UpdatedSampleFor",
                 ProductType = "UpdatedSampleType",
@@ -270,31 +265,30 @@ namespace UnitTest_ArthurClive.Controller
     {
         public ProductController controller = new ProductController();
 
-        //[TestMethod]
+        [TestMethod]
         public void ProductController_Get_IntegrationTest_ArthurClive()
         {
             //Arrange
             var expectedCode = "200";
             var expectedMessage = "Success";
-            var expectedDataCount = 5;
-            List<Category> categoryList = new List<Category>();
+            var expectedDataCount = 67;
 
             //Act
             var result = controller.Get() as Task<ActionResult>;
-            var responseData = TH.DeserializedResponceData_CategoryList(result.Result.ToJson());
+            var responseData = TH.DeserializedResponceData_ProductController_Get(result.Result.ToJson());
 
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(responseData.Code, expectedCode);
             Assert.AreEqual(responseData.Message, expectedMessage);
-            Assert.AreEqual(categoryList.Count, expectedDataCount);
+            Assert.AreEqual(responseData.Data._v.Count, expectedDataCount);
         }
 
         [TestMethod]
         public void ProductController_Post_IntegrationTest_ArthurClive()
         {
             //Arrange
-            Product product = new Product
+            Arthur_Clive.Data.Product product = new Arthur_Clive.Data.Product
             {
                 ProductFor = "SampleFor",
                 ProductType = "SampleType",
@@ -321,7 +315,7 @@ namespace UnitTest_ArthurClive.Controller
             var responseData = TH.DeserializedResponceData(result.Result.ToJson());
 
             //Check inserted data
-            var insertedData = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", product.ProductSKU), "ProductDB", "Product").Result);
+            var insertedData = BsonSerializer.Deserialize<Arthur_Clive.Data.Product>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", product.ProductSKU), "ProductDB", "Product").Result);
 
             //Assert
             Assert.IsNotNull(result);
@@ -402,7 +396,7 @@ namespace UnitTest_ArthurClive.Controller
         {
 
             //Arrange
-            Product product = new Product
+            Arthur_Clive.Data.Product product = new Arthur_Clive.Data.Product
             {
                 ProductFor = "SampleFor",
                 ProductType = "SampleType",
@@ -418,7 +412,7 @@ namespace UnitTest_ArthurClive.Controller
                 ProductDescription = "SampleDescription",
                 ProductMaterial = "Cotton",
             };
-            Product updateProduct = new Product
+            UpdateProduct updateProduct = new UpdateProduct
             {
                 ProductFor = "UpdatedSampleFor",
                 ProductType = "UpdatedSampleType",
@@ -492,10 +486,56 @@ namespace UnitTest_ArthurClive.Controller
     {
         public SubCategoryController controller = new SubCategoryController();
 
-        //[TestMethod]
+        [TestMethod]
         public void SubCategoryController_Get_IntegrationTest_ArthurClive()
         {
+            //Arrange
+            var expectedCode = "200";
+            var expectedMessage = "Success";
+            var expectedDataCount_Men_Tshirt = 20;
+            var expectedDataCount_Women_Tshirt = 20;
+            var expectedDataCount_Boys_Tshirt = 8;
+            var expectedDataCount_Girls_Tshirt = 8;
+            var expectedDataCount_WallArt = 6;
+            var expectedDataCount_Gifts = 5;
+            CategoryController categoryController = new CategoryController();
 
+            //Act
+            var categories = TH.DeserializedResponceData_CategoryController_Get(categoryController.Get().Result.ToJson()).Data._v;
+            foreach(var category in categories)
+            {
+                var result = controller.Get(category.ProductFor, category.ProductType) as Task<ActionResult>;
+                var responseData = TH.DeserializedResponceData_ProductController_Get(result.Result.ToJson());
+
+                //Assert
+                Assert.IsNotNull(result);
+                Assert.AreEqual(responseData.Code, expectedCode);
+                Assert.AreEqual(responseData.Message, expectedMessage);
+                if (category.ProductFor == "Men" & category.ProductType == "Tshirt")
+                {
+                    Assert.AreEqual(responseData.Data._v.Count, expectedDataCount_Men_Tshirt);
+                }
+                else if (category.ProductFor == "Women" & category.ProductType == "Tshirt")
+                {
+                    Assert.AreEqual(responseData.Data._v.Count, expectedDataCount_Women_Tshirt);
+                }
+                else if (category.ProductFor == "Boys" & category.ProductType == "Tshirt")
+                {
+                    Assert.AreEqual(responseData.Data._v.Count, expectedDataCount_Boys_Tshirt);
+                }
+                else if (category.ProductFor == "Girls" & category.ProductType == "Tshirt")
+                {
+                    Assert.AreEqual(responseData.Data._v.Count, expectedDataCount_Girls_Tshirt);
+                }
+                else if (category.ProductFor == "All" & category.ProductType == "Art")
+                {
+                    Assert.AreEqual(responseData.Data._v.Count, expectedDataCount_WallArt);
+                }
+                else if (category.ProductFor == "All" & category.ProductType == "Gifts")
+                {
+                    Assert.AreEqual(responseData.Data._v.Count, expectedDataCount_Gifts);
+                }
+            }
         }
     }
 
@@ -621,7 +661,7 @@ namespace UnitTest_ArthurClive.Controller
                 Value = 10,
                 Percentage = true,
             };
-            Coupon updateCoupon = new Coupon
+            UpdateCoupon updateCoupon = new UpdateCoupon
             {
                 ApplicableFor = "SampleUser",
                 ExpiryTime = DateTime.UtcNow.AddMonths(1),
@@ -677,8 +717,8 @@ namespace UnitTest_ArthurClive.Controller
         {
             //Arrange
             var username = "SampleUser";
-            List<Address> addressList = new List<Address>();
-            Address address = new Address
+            List<Arthur_Clive.Data.Address> addressList = new List<Arthur_Clive.Data.Address>();
+            Arthur_Clive.Data.Address address = new Arthur_Clive.Data.Address
             {
                 UserName = username,
                 Name = "SampleName",
@@ -695,9 +735,9 @@ namespace UnitTest_ArthurClive.Controller
                 DefaultAddress = true
             };
             addressList.Add(address);
-            AddressList ListOfAddress = new AddressList();
+            Arthur_Clive.Data.AddressList ListOfAddress = new Arthur_Clive.Data.AddressList();
             ListOfAddress.ListOfAddress = addressList;
-            Product product = new Product
+            Arthur_Clive.Data.Product product = new Arthur_Clive.Data.Product
             {
                 ProductFor = "SampleFor",
                 ProductType = "SampleType",
@@ -713,8 +753,8 @@ namespace UnitTest_ArthurClive.Controller
                 ProductDescription = "SampleDescription",
                 ProductMaterial = "Cotton",
             };
-            List<Cart> cartList = new List<Cart>();
-            Cart cart = new Cart
+            List<Arthur_Clive.Data.Cart> cartList = new List<Arthur_Clive.Data.Cart>();
+            Arthur_Clive.Data.Cart cart = new Arthur_Clive.Data.Cart
             {
                 UserName = username,
                 ProductSKU = "SampleFor-SampleType-SampleDesign-Black-S",
@@ -732,10 +772,10 @@ namespace UnitTest_ArthurClive.Controller
                 ProductDescription = "SampleDescription"
             };
             cartList.Add(cart);
-            CartList ListOfCart = new CartList();
+            Arthur_Clive.Data.CartList ListOfCart = new Arthur_Clive.Data.CartList();
             ListOfCart.ListOfProducts = cartList;
-            OrderInfo orderInfo = new OrderInfo { CouponDiscount = 0 , TotalAmount = 95 , EstimatedTax = 5};
-            RegisterModel registerModel = new RegisterModel
+            Arthur_Clive.Data.OrderInfo orderInfo = new Arthur_Clive.Data.OrderInfo { CouponDiscount = 0 , TotalAmount = 95 , EstimatedTax = 5};
+            Arthur_Clive.Data.RegisterModel registerModel = new Arthur_Clive.Data.RegisterModel
             {
                 Title = "Mr",
                 FullName = "SampleName",
@@ -762,7 +802,7 @@ namespace UnitTest_ArthurClive.Controller
             var responseData = TH.DeserializedResponceData(result.Result.ToJson());
 
             //Check inserted data
-            var insertedData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName",username), "OrderDB", "OrderInfo").Result);
+            var insertedData = BsonSerializer.Deserialize<Arthur_Clive.Data.OrderInfo>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName",username), "OrderDB", "OrderInfo").Result);
 
             //Assert
             Assert.IsNotNull(insertAddress);
@@ -853,7 +893,21 @@ namespace UnitTest_ArthurClive.Controller
         //[TestMethod]
         public void OrderController_GetOrdersOfUser_IntegrationTest_ArthurClive()
         {
+            //Arrange
+            var expectedCode = "200";
+            var expectedMessage = "Success";
+            var expectedDataCount = 6;
 
+            //Act
+            var result = controller.GetOrdersOfUser("") as ActionResult;
+            var responseData = TH.DeserializedResponceData_CategoryController_Get(result.ToJson());
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(responseData.Code, expectedCode);
+            Assert.AreEqual(responseData.Message, expectedMessage);
+            Assert.IsNotNull(responseData.Data);
+            Assert.AreEqual(responseData.Data._v.Count, expectedDataCount);
         }
 
     }

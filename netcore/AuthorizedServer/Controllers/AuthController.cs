@@ -459,8 +459,7 @@ namespace AuthorizedServer.Controllers
                     if (verifyUser.Status == "Verified")
                     {
                         RegisterModel registerModel = new RegisterModel { UserName = data.UserName, Password = data.Password };
-                        var update = Builders<BsonDocument>.Update.Set("Password", passwordHasher.HashPassword(registerModel, data.Password));
-                        var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
+                        var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("Password", passwordHasher.HashPassword(registerModel, data.Password))).Result;
                         return Ok(new ResponseData
                         {
                             Code = "200",
@@ -920,8 +919,7 @@ namespace AuthorizedServer.Controllers
                 var checkUser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
                 if (checkUser != null)
                 {
-                    var result = MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication").Result;
-                    var userModel = BsonSerializer.Deserialize<RegisterModel>(result);
+                    var userModel = BsonSerializer.Deserialize<RegisterModel>(checkUser);
                     return Ok(new ResponseData
                     {
                         Code = "200",

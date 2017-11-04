@@ -13,6 +13,7 @@ using Swashbuckle.AspNetCore.Examples;
 using Arthur_Clive.Swagger;
 using MongoDB.Bson.Serialization;
 using Microsoft.AspNetCore.Authorization;
+using System.Collections.Generic;
 
 namespace Arthur_Clive.Controllers
 {
@@ -138,7 +139,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Product inserted successfully</response>
         /// <response code="400">Process ran into an exception</response> 
         [HttpPost]
-        [SwaggerRequestExample(typeof(Product), typeof(InsertProduct))]
+        [SwaggerRequestExample(typeof(Product), typeof(InsertProductDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> Post([FromBody]Product product)
         {
@@ -222,13 +223,13 @@ namespace Arthur_Clive.Controllers
         /// <response code="404">No product found</response>   
         /// <response code="400">Process ran into an exception</response>   
         [HttpPut("{productSKU}")]
-        [SwaggerRequestExample(typeof(Product), typeof(UpdateProduct))]
+        [SwaggerRequestExample(typeof(UpdateProduct), typeof(UpdateProductDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> Update([FromBody]Product data,string productSKU)
+        public async Task<ActionResult> Update([FromBody]UpdateProduct data, string productSKU)
         {
             try
             {
-                var checkData = MH.CheckForDatas("ProductSKU",productSKU,null,null,"ProductDB","Product");
+                var checkData = MH.CheckForDatas("ProductSKU", productSKU, null, null, "ProductDB", "Product");
                 if (checkData != null)
                 {
                     var objectId = BsonSerializer.Deserialize<Product>(checkData).Id;
@@ -237,19 +238,19 @@ namespace Arthur_Clive.Controllers
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
                         var objectName = data.ProductFor + "-" + productSKU.Split('-')[1] + "-" + productSKU.Split('-')[2] + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4];
-                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id,data.ProductFor, "ProductFor",objectName);
+                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductFor, "ProductFor", objectName);
                     }
                     if (data.ProductType != null)
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
-                        var objectName = productSKU.Split('-')[0] + "-" + data.ProductType + "-" + productSKU.Split('-')[2] + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4] ;
-                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductType, "ProductType",objectName);
+                        var objectName = productSKU.Split('-')[0] + "-" + data.ProductType + "-" + productSKU.Split('-')[2] + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4];
+                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductType, "ProductType", objectName);
                     }
                     if (data.ProductDesign != null)
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
-                        var objectName = productSKU.Split('-')[0] + "-" + productSKU.Split('-')[1] + "-" + data.ProductDesign + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4] ;
-                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductDesign, "ProductDesign",objectName);
+                        var objectName = productSKU.Split('-')[0] + "-" + productSKU.Split('-')[1] + "-" + data.ProductDesign + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4];
+                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductDesign, "ProductDesign", objectName);
                     }
                     if (data.ProductBrand != null)
                     {
@@ -259,7 +260,7 @@ namespace Arthur_Clive.Controllers
                     {
                         var update = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductPrice", data.ProductPrice));
                         double discountPercentage;
-                        if(data.ProductDiscount > 0)
+                        if (data.ProductDiscount > 0)
                         {
                             discountPercentage = data.ProductDiscount;
                         }
@@ -296,37 +297,17 @@ namespace Arthur_Clive.Controllers
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
                         var objectName = productSKU.Split('-')[0] + "-" + productSKU.Split('-')[1] + "-" + productSKU.Split('-')[2] + "-" + productSKU.Split('-')[3] + "-" + data.ProductSize;
-                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductSize, "ProductSize",objectName);
+                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductSize, "ProductSize", objectName);
                     }
                     if (data.ProductMaterial != null)
                     {
                         var update = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductMaterial", data.ProductMaterial));
                     }
-                    if (data.ProductRating > 0)
-                    {
-                        var update = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductRating", data.ProductRating));
-                    }
-                    if (data.ProductReviews != null)
-                    {
-                        var reviews = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id",objectId,null,null,"ProductDB","Product")).ProductReviews;
-                        Review[] reviewArray = new Review[reviews.Length + 1];
-                        reviewArray[0] = data.ProductReviews[0];
-                        if (reviews.Length != 0)
-                        {
-                            int i = 1;
-                            foreach (var review in reviews)
-                            {
-                                reviewArray[i] = review;
-                                i++;
-                            }
-                        }
-                        var update = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductReviews", reviewArray));
-                    }
                     if (data.ProductColour != null)
                     {
                         productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
                         var objectName = productSKU.Split('-')[0] + "-" + productSKU.Split('-')[1] + "-" + productSKU.Split('-')[2] + "-" + data.ProductColour + "-" + productSKU.Split('-')[4];
-                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductColour, "ProductColour",objectName);
+                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductColour, "ProductColour", objectName);
                     }
                     if (data.RefundApplicable != null)
                     {
@@ -370,5 +351,253 @@ namespace Arthur_Clive.Controllers
                 });
             }
         }
+        
+        /// <summary>Get all the reviews added for each products</summary>
+        /// <response code="200">Returns reviews added for each product</response>  
+        /// <response code="404">No product found</response>   
+        /// <response code="400">Process ran into an exception</response>  
+        [HttpGet("getallreviews")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public ActionResult GetAllReviews()
+        {
+            try
+            {
+                var productList = MH.GetListOfObjects(null, null, null, null, null, null, "ProductDB", "Product").Result;
+                if (productList != null)
+                {
+                    List<ReviewsForEachProduct> reviewsList = new List<ReviewsForEachProduct>();
+                    foreach (var product in productList)
+                    {
+                        var productData = BsonSerializer.Deserialize<Product>(product);
+                        reviewsList.Add(new ReviewsForEachProduct { ProductSKU = productData.ProductSKU, ProductReviews = productData.ProductReviews });
+                    }
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Success",
+                        Data = reviewsList
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "No products found"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("ProductController", "GetAllReviews", "GetAllReviews", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        /// <summary>Insert review for an product</summary>
+        /// <param name="data">Details of review</param>
+        /// <param name="productSKU">SKU of product for which the review is added</param>
+        /// <response code="200">Review inserted successfully</response>
+        /// <response code="401">Review data from body is empty</response>   
+        /// <response code="402">No orders found with given id</response>     
+        /// <response code="404">No product found</response>   
+        /// <response code="400">Process ran into an exception</response>  
+        [HttpPost("insertreview/{productSKU}")]
+        [SwaggerRequestExample(typeof(Review), typeof(InsertReviewDetails))]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public async Task<ActionResult> InsertReview([FromBody]Review data, string productSKU)
+        {
+            try
+            {
+                var checkData = MH.CheckForDatas("ProductSKU", productSKU, null, null, "ProductDB", "Product");
+                if (checkData != null)
+                {
+                    var objectId = BsonSerializer.Deserialize<Product>(checkData).Id;
+                    if (data != null)
+                    {
+                        var reviews = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductReviews;
+                        Review[] reviewArray = new Review[reviews.Length + 1];
+                        data.Id = reviews.Length + 1;
+                        data.Approved = false;
+                        int i = 0;
+                        if (reviews.Length != 0)
+                        {
+                            foreach (var review in reviews)
+                            {
+                                reviewArray[i] = review;
+                                i++;
+                            }
+                        }
+                        reviewArray[i] = data;
+                        var updateReview = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductReviews", reviewArray));
+                        var checkOrder = MH.CheckForDatas("OrderId", data.OrderId, null, null, "OrderDB", "OrderInfo");
+                        if (checkOrder == null)
+                        {
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "402",
+                                Message = "No orders with id '" + data.OrderId + "' is found",
+                                Data = null
+                            });
+                        }
+                        var orderInfo = BsonSerializer.Deserialize<OrderInfo>(checkOrder);
+                        List<ProductDetails> productDetails = new List<ProductDetails>();
+                        foreach (var product in orderInfo.ProductDetails)
+                        {
+                            if (product.ProductSKU == productSKU)
+                            {
+                                product.Reviewed = true;
+                            }
+                            productDetails.Add(product);
+                        }
+                        var updateOrderInfo = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("ProductDetails", productDetails));
+
+                        return Ok(new ResponseData
+                        {
+                            Code = "200",
+                            Message = "Inserted",
+                            Data = null
+                        });
+                    }
+                    else
+                    {
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "401",
+                            Message = "Review data from body is empty",
+                            Data = null
+                        });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "Product not found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("ProductController", "InsertReview", "InsertReview", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        /// <summary>Update review for an product</summary>
+        /// <param name="data">Details of review need to update</param>
+        /// <param name="productSKU">SKU of product for which the review is added</param>
+        /// <response code="200">Review inserted successfully</response>  
+        /// <response code="401">No reviews found</response>    
+        /// <response code="402">No reviews found with given id</response>  
+        /// <response code="404">No product found</response>   
+        /// <response code="400">Process ran into an exception</response>  
+        [HttpPut("updatereview/{productSKU}")]
+        [SwaggerRequestExample(typeof(UpdateReview), typeof(UpdateReviewDetails))]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public async Task<ActionResult> UpdateReview([FromBody]UpdateReview data, string productSKU)
+        {
+            try
+            {
+                var checkData = MH.CheckForDatas("ProductSKU", productSKU, null, null, "ProductDB", "Product");
+                if (checkData != null)
+                {
+                    var objectId = BsonSerializer.Deserialize<Product>(checkData).Id;
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", objectId);
+                    var reviews = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductReviews;
+                    List<Review> reviewList = new List<Review>();
+                    Review[] reviewArray = new Review[reviews.Length];
+                    int i = 0;
+                    if (reviews.Length == 0)
+                    {
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "401",
+                            Message = "No reviews found"
+                        });
+                    }
+                    else
+                    {
+                        foreach (var review in reviews)
+                        {
+                            if (review.Id == data.Id)
+                            {
+                                review.Approved = data.Approved;
+                            }
+                            reviewArray[i] = review;
+                            i++;
+                            reviewList.Add(review);
+                        }
+                    }
+                    var result = reviewList.FindAll(x => x.Id == data.Id);
+                    if (result.Count == 0)
+                    {
+                        return BadRequest(new ResponseData
+                        {
+                            Code = "402",
+                            Message = "No reviews with id '" + data.Id + "' is found"
+                        });
+                    }
+                    var updateReview = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductReviews", reviewArray));
+                    var updatedReviews = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductReviews;
+                    double numberOfReviews = 0;
+                    double totalRating = 0;
+                    foreach (var review in updatedReviews)
+                    {
+                        if (review.Approved == true)
+                        {
+                            numberOfReviews += 1;
+                            totalRating += review.Rating;
+                        }
+                    }
+                    double overallRating;
+                    if (totalRating > 0)
+                    {
+                        overallRating = totalRating / numberOfReviews;
+                    }
+                    else
+                    {
+                        overallRating = 0;
+                    }
+                    var updateRating = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductRating", overallRating));
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Updated"
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "Product not found"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("ProductController", "InsertReview", "InsertReview", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
+
     }
 }

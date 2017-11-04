@@ -80,7 +80,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Category inserted successfully</response>
         /// <response code="400">Process ran into an exception</response>  
         [HttpPost]
-        [SwaggerRequestExample(typeof(Category), typeof(InsertCategory))]
+        [SwaggerRequestExample(typeof(Category), typeof(InsertCategoryDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> Post([FromBody]Category category)
         {
@@ -165,9 +165,9 @@ namespace Arthur_Clive.Controllers
         /// <response code="404">No category found</response>   
         /// <response code="400">Process ran into an exception</response>   
         [HttpPut("{productFor}/{productType}")]
-        [SwaggerRequestExample(typeof(Category), typeof(UpdateCategory))]
+        [SwaggerRequestExample(typeof(UpdateCategory), typeof(UpdateCategoryDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> Update([FromBody]Category data, string productFor, string productType)
+        public async Task<ActionResult> Update([FromBody]UpdateCategory data, string productFor, string productType)
         {
             try
             {

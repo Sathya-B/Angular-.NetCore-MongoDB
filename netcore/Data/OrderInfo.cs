@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
 
@@ -43,6 +42,8 @@ namespace Arthur_Clive.Data
         public string ProductSKU { get; set; }
         /// <summary>Delivery status of the product</summary>
         public string Status { get; set; }
+        /// <summary>Flag to define if the user has reviewed the product or not</summary>
+        public bool? Reviewed { get; set; }
         /// <summary>Code given to the delivery status</summary>
         public List<StatusCode> StatusCode { get; set; }
         /// <summary>Product details</summary>
@@ -66,4 +67,5 @@ namespace Arthur_Clive.Data
         /// <summary>Status of the payment</summary>
         public List<StatusCode> Status { get; set; }
     }
+    
 }

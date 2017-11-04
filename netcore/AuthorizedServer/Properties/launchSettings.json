@@ -18,7 +18,7 @@
     },
     "AuthorizedServer": {
       "commandName": "Project",
-      "launchBrowser": true,
+      //"launchBrowser": true,
       "launchUrl": "api/values",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

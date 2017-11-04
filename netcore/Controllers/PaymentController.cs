@@ -15,6 +15,7 @@ using MongoDB.Bson.Serialization;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using System.Text;
 
 namespace Arthur_Clive.Controllers
 {
@@ -71,12 +72,24 @@ namespace Arthur_Clive.Controllers
                                 if (product.ProductStock - cart.ProductQuantity < 0)
                                 {
                                     updateQuantity = 0;
-                                    var emailResponce = EmailHelper.SendEmailToAdmin(paymentModel.UserName.ToString(),paymentModel.Email.ToString(), cart.ProductSKU, cart.ProductQuantity, product.ProductStock, paymentModel.OrderId).Result;
+                                    var emailResponce = EmailHelper.SendEmailToAdmin(paymentModel.UserName.ToString(), paymentModel.Email.ToString(), cart.ProductSKU, cart.ProductQuantity, product.ProductStock, paymentModel.OrderId).Result;
                                 }
                                 var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", cart.ProductSKU), "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductStock", updateQuantity)).Result;
                             }
                         }
                         var removeCartItems = _db.GetCollection<Cart>("Cart").DeleteMany(Builders<Cart>.Filter.Eq("UserName", paymentModel.UserName));
+                        var checkOrder = MH.CheckForDatas("OrderId",paymentModel.OrderId,null,null,"OrderDB","OrderInfo");
+                        if (checkOrder != null)
+                        {
+                            var orderInfo = BsonSerializer.Deserialize<OrderInfo>(checkOrder);
+                            List<string> productInfoList = new List<string>();
+                            foreach(var product in orderInfo.ProductDetails)
+                            {
+                                productInfoList.Add(product.ProductSKU);
+                            }
+                            var productInfoString = String.Join(":", productInfoList);
+                            var sendGift = EmailHelper.SendGift(paymentModel.OrderId, productInfoString);
+                        }
                         return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectsuccess").First().Value);
                     }
                     else
@@ -191,6 +204,6 @@ namespace Arthur_Clive.Controllers
                 return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectcancelled").First().Value);
             }
         }
-
+                
     }
 }

@@ -95,7 +95,7 @@ namespace Arthur_Clive.Controllers
                                 {
                                     Code = "200",
                                     Message = "Coupon is valid",
-                                    Data = null
+                                    Data = new CouponContent { Value = data.Value, Percentage = data.Percentage }
                                 });
                             }
                             else
@@ -158,9 +158,9 @@ namespace Arthur_Clive.Controllers
         /// <response code="404">Coupon not found</response>  
         /// <response code="400">Process ran into an exception</response> 
         [HttpPut("{code}")]
-        [SwaggerRequestExample(typeof(Coupon), typeof(CouponUpdateData))]
+        [SwaggerRequestExample(typeof(UpdateCoupon), typeof(CouponUpdateData))]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public ActionResult UpdateCoupon([FromBody]Coupon data, string code)
+        public ActionResult UpdateCoupon([FromBody]UpdateCoupon data, string code)
         {
             try
             {
@@ -171,15 +171,11 @@ namespace Arthur_Clive.Controllers
                     var filter = Builders<BsonDocument>.Filter.Eq("Code", code);
                     if (data.ApplicableFor != null)
                     {
-                        var update = MH.UpdateSingleObject(filter,"CouponDB","Coupon", Builders<BsonDocument>.Update.Set("ApplicableFor", data.ApplicableFor));
+                        var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("ApplicableFor", data.ApplicableFor));
                     }
-                    if (data.ExpiryTime != null)
+                    if (data.ExpiryTime != null )
                     {
                         var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("ExpiryTime", data.ExpiryTime));
-                    }
-                    if (data.UsageCount > 0)
-                    {
-                        var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("UsageCount", result.UsageCount - data.UsageCount));
                     }
                     if (data.Value > 0)
                     {
@@ -188,6 +184,35 @@ namespace Arthur_Clive.Controllers
                     if (data.Percentage != null)
                     {
                         var updateResult = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("Percentage", data.Percentage));
+                    }
+                    if (data.UsageCount > 0)
+                    {
+                        var coupon = BsonSerializer.Deserialize<Coupon>(MH.CheckForDatas("Code", code, null, null, "CouponDB", "Coupon"));
+                        if (result.Percentage == true)
+                        {
+                            var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("UsageCount", result.UsageCount - data.UsageCount));
+                        }
+                        else
+                        {
+                            if(data.Amount > coupon.Value)
+                            {
+                                return Ok(new ResponseData
+                                {
+                                    Code = "401",
+                                    Message = "Amount is higher than the coupon value",
+                                    Data = null
+                                });
+                            }
+                            else
+                            {
+                                var balance = coupon.Value - data.Amount;
+                                var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("Value", balance));
+                                if(balance == 0)
+                                {
+                                    var updateUsageCount = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("UsageCount", 0));
+                                }
+                            }
+                        }
                     }
                     return Ok(new ResponseData
                     {

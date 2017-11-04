@@ -10,6 +10,7 @@ using AuthorizedServer.Repositories;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Moq;
+using Newtonsoft.Json.Linq;
 
 namespace UnitTest_AuthorizedServer.Controller
 {
@@ -54,6 +55,16 @@ namespace UnitTest_AuthorizedServer.Controller
         {
             await db.GetCollection<RegisterModel>("Authentication").InsertOneAsync(registerModel);
             return "Success";
+        }
+
+        public static ResponceData_AuthController_GetUserInfo DeserializedResponceData_AuthController_GetUserInfo(dynamic jsonData)
+        {
+            ActionResultModel_AuthController_GetUserInfo deserializedResponce = new ActionResultModel_AuthController_GetUserInfo();
+            MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(jsonData));
+            DataContractJsonSerializer ser = new DataContractJsonSerializer(deserializedResponce.GetType());
+            deserializedResponce = ser.ReadObject(ms) as ActionResultModel_AuthController_GetUserInfo;
+            ms.Close();
+            return deserializedResponce.Value;
         }
     }
 }

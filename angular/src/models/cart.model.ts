@@ -2,6 +2,7 @@ export class CartItem {
 public productSKU: string;
 public minioObject_URL: string;
 public productFor: string;
+public productType: string;
 public productDesign: string;
 public productBrand: string;
 public productPrice: string;
@@ -17,10 +18,11 @@ constructor(productSKU: string, minioObject_URL: string, productFor: string,
             productDesign: string, productBrand: string, productPrice: string,
             productDiscount: string, productDiscountPrice: string,
             productQuantity: number, productSize: string, productColour: string,
-            productDescription: string, userName: string) {
+            productDescription: string, userName: string, productType: string) {
 this.productSKU = productSKU;
 this.minioObject_URL = minioObject_URL;
 this.productFor = productFor;
+this.productType = productType;
 this.productDesign = productDesign;
 this.productBrand = productBrand;
 this.productPrice = productPrice;

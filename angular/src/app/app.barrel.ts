@@ -12,6 +12,7 @@ import { SwiperConfigInterface } from 'ngx-swiper-wrapper';
 import { ScrollToModule } from 'ng2-scroll-to';
 import { RouterModule, PreloadAllModules } from '@angular/router';
 import { ROUTES } from './app.routes';
+import { StarRatingModule } from 'angular-star-rating';
 
 const SWIPER_CONFIG: SwiperConfigInterface = {
   direction: 'horizontal'
@@ -21,6 +22,7 @@ export const AngularModules = [
     BrowserModule, FormsModule, HttpModule, HttpClientModule,
     BrowserAnimationsModule, ToasterModule, LazyLoadImageModule, CarouselModule,
     SpinnerModule, ScrollToModule.forRoot(), SwiperModule.forRoot(SWIPER_CONFIG),
+    StarRatingModule.forRoot(),
     RouterModule.forRoot(ROUTES, { useHash: true, preloadingStrategy: PreloadAllModules })];
 
 import { HeaderComponent } from '@app/header';

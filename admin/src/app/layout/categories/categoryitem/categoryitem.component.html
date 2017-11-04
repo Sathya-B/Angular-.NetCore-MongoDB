@@ -1,19 +1,19 @@
 <td class="customtd">
 <table>
-<td >{{category?.itemIndex + 1 }}</td>
-<td class="tdwidth">{{category.categoryItem?.productFor}}</td>
-<td class="tdwidth">{{category.categoryItem?.productType}}</td>
-<td class="tdwidth">{{category.categoryItem?.description}}</td>
+<td >{{category.itemIndex + 1 }}</td>
+<td class="tdwidth">{{category.categoryItem.productFor}}</td>
+<td class="tdwidth">{{category.categoryItem.productType}}</td>
+<td class="tdwidth">{{category.categoryItem.description}}</td>
 <td>
   <button _ngcontent-c9="" class="btn btn-primary" type="button" (click)="updateClicked()">Update</button>
 </td>
 <td>
-  <button _ngcontent-c9="" class="btn btn-danger" type="button">Delete</button>
+  <button _ngcontent-c9="" class="btn btn-danger" type="button" (click)="deleteClicked()">Delete</button>
 </td>
 </table>
 </td>
 <td class="customtd">
 <div *ngIf="showUpdate">
-<app-category-insert-update [category]="category" (cancelButtonClicked)="cancelClicked($event)"></app-category-insert-update>
+<app-category-insert-update [category]="category.categoryItem" (saveButtonClicked)="saveClicked($event)" (cancelButtonClicked)="cancelClicked($event)"></app-category-insert-update>
 </div>
 <td>

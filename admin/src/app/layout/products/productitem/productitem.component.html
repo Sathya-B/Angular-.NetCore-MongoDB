@@ -9,12 +9,12 @@
   <button _ngcontent-c9="" class="btn btn-primary" type="button" (click)="updateClicked()">Update</button>
 </td>
 <td>
-  <button _ngcontent-c9="" class="btn btn-danger" type="button">Delete</button>
+  <button _ngcontent-c9="" class="btn btn-danger" type="button" (click)="deleteClicked()">Delete</button>
 </td>
 </table>
 </td>
 <td class="customtd">
 <div *ngIf="showUpdate">
-<app-product-insert-update [product]="product" (cancelButtonClicked)="cancelClicked($event)"></app-product-insert-update>
+<app-product-insert-update [product]="product" (saveButtonClicked)="saveClicked($event)" (cancelButtonClicked)="cancelClicked($event)"></app-product-insert-update>
 </div>
 <td>

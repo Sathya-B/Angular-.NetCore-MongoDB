@@ -221,6 +221,7 @@ module.exports = function (options) {
      */
     devServer: {
       port: METADATA.port,
+      disableHostCheck: true,
       host: METADATA.host,
       public: METADATA.public,
       historyApiFallback: true,

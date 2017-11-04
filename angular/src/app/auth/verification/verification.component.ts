@@ -40,10 +40,12 @@ public onSubmit(form: NgForm) {
           throw response.error;
         }
         if (response.value.code === '999') {
-        let loginModel = { accessToken: response.value.data,
-                           firstName: response.value.content.FirstName,
-                           userName: verificationCode.PhoneNumber};
-        this.loginLogout.Login(loginModel);
+          this.JWT = response.value.data;
+          localStorage.setItem('JWT', this.JWT);
+          localStorage.setItem('FirstName', response.value.content.FirstName);
+          localStorage.setItem('UserName', verificationCode.PhoneNumber);
+          this.toastmsg.popToast('success', 'Success', 'Verified!');
+          this.router.navigate(['/welcome']);
         } else if (response.value.code === '201') {
           this.JWT = response.value.data;
           localStorage.setItem('JWT', this.JWT);

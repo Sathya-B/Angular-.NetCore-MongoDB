@@ -11,7 +11,7 @@ import { AppComponent } from '@app/app.component';
 import { NoContentComponent } from '@app/no-content';
 import { AuthInterceptor } from '@shared/auth.interceptor';
 import { FilterPipe } from '../pipes/filterpipe.component';
-
+import { ReplaceUnderscore } from '../pipes/replaceunderscore.component';
 import { APP_RESOLVER_PROVIDERS } from '@app/app.resolver';
 import { AppState, InternalStateType } from './app.service';
 
@@ -40,7 +40,8 @@ type StoreType = {
     AppComponent,
     ComponentsBarrel,
     NoContentComponent,
-    FilterPipe
+    FilterPipe,
+    ReplaceUnderscore
   ],
   imports: [
     AngularModules,

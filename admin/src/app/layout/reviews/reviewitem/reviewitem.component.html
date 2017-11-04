@@ -1,0 +1,13 @@
+<td class="customtd">
+<table>
+<td >{{rowNumber}}</td>
+<td class="tdwidth">{{productSKU}}</td>
+<td class="tdwidth">{{reviewItem.name}}</td>
+<td class="tdwidth">{{reviewItem.rating}}</td>
+<td class="tdwidth">{{reviewItem.comment}}</td>
+<td>
+  <button *ngIf="!reviewItem.approved" class="btn btn-primary" type="button" (click)="approveClicked()">Approve</button>
+  <button *ngIf="reviewItem.approved" class="btn btn-primary" type="button" (click)="revokeClicked()">Revoke</button>
+</td>
+</table>
+</td>

@@ -9,6 +9,7 @@ import 'rxjs/add/operator/map';
 export class CartService {
 
     public cartItems: CartModel.Cart = { listOfProducts: [] };
+    
     constructor(private apiService: ApiService, private appState: AppState) {
     }
     public getCount() {
@@ -31,7 +32,7 @@ export class CartService {
     public refreshCart() {
         let userName = localStorage.getItem('UserName');
         if (userName !== undefined) {
-         return   this.apiService.put('user/cart/' + userName,
+         return   this.apiService.post('user/cart/' + userName,
                                       this.cartItems , { useAuth: true }).then(
                 (response: any) => {
                     return true;

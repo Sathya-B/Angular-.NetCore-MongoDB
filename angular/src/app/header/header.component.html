@@ -30,7 +30,7 @@
 <div id="fixedHeader" class="headertop"  *ngIf="scrolled || mobile" [ngClass]="{fixedHeaderActive: scrolled, fixedHeader: scrolled || mobile}">
 	<div class="wrapper">
 		<div class="navBtn" [ngClass]="{activeNav: menuOpened == true}" (click)="openMenu()"><span></span></div>
-		<div class="logoMobile"><a [routerLink]="['/']" (click)="menuOpened = false"><img src="../assets/img/logo-arthur-clive-mobile.png" alt="Artur Clive"></a></div>
+			<div class="logoMobile"><a [routerLink]="['/']" (click)="menuOpened = false"><img src="../assets/img/logo-arthur-clive-mobile.png" alt="Artur Clive"></a></div>
 		<div class="headerBtnWrap">
 			<div class="commonIconBtnHeader userIcon tooltipsParent userLoggedIn popupHoverElement" (click)="LoginRegister()">
 				<div class="popupAfterLoginOuter">

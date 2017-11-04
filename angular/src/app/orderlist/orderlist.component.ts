@@ -14,7 +14,6 @@ constructor(private route: ActivatedRoute) {
 }
 public ngOnInit(){
 this.orders = this.route.snapshot.data['orders'];
-console.log(this.orders);
 }
 
 }

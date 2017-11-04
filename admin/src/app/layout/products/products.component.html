@@ -9,7 +9,7 @@
                 <div class="card-block table-responsive">
                 <button _ngcontent-c9="" class="btn btn-success" type="button" (click)="addClicked()">Add</button>
                 <div *ngIf="showAdd">
-                <app-product-insert-update (cancelButtonClicked)="cancelClicked($event)"></app-product-insert-update>
+                <app-product-insert-update (saveButtonClicked)="saveClicked($event)" (cancelButtonClicked)="cancelClicked($event)"></app-product-insert-update>
                 </div>
                 </div>
                 <div class="card-header">
@@ -33,7 +33,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let product of products; let i=index" [app-productitem]="{'productItem': product, 'itemIndex': i}">
+                            <tr *ngFor="let product of products; let i=index" [app-productitem]="{'productItem': product, 'itemIndex': i}" (deletedItem)="itemDeleted($event)">
                             </tr>
                         </tbody>
                     </table>

@@ -9,12 +9,12 @@ import { GetEmailComponent } from './loginregister/facebook/getemail/getemail.co
 import { GoogleSigninComponent } from './loginregister/google/googlesignin.component';
 import { UpdatePasswordComponent } from './updatepassword/updatepassword.component';
 import { VerificationComponent } from './verification/verification.component';
-
+import { WelcomeComponent } from './verification/welcome/welcome.component';
 export const AuthComponentBarrel = [
     ChangePasswordComponent, CheckEmailComponent, CreateAccountComponent,
     CreateAccountComponent, CreateAccountComponent, FaceBookSigninComponent,
     ForgotPasswordComponent, GetEmailComponent, GoogleSigninComponent,
     LoginRegisterComponent, UpdatePasswordComponent, VerificationComponent,
-    VerifyEmailComponent];
+    VerifyEmailComponent, WelcomeComponent];
 
 export { AuthGuard } from './authguard/authguard';

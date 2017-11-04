@@ -16,12 +16,14 @@ constructor(public cartService: CartService, private route: Router) {
 
 public ngOnInit() { 
  this.cartItems = this.cartService.cartItems;
- console.log(this.cartItems);
 }
 public ngOnDestroy() {
     this.cartService.refreshCart();
 }
 public checkOut() {
 this.route.navigate(['/checkout']);
+}
+public continueShopping() {
+this.route.navigate(['/']);
 }
 }

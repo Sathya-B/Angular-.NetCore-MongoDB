@@ -12,6 +12,9 @@ export const relatedLogic = {
     productDesign: false
 };
 
+export const tax = {
+    estimatedTax: .05
+}
 // ***dev */
 if (ENV !== 'production') {
 apiUrl.serverUrl = 'http://192.168.0.113:5000/api/';

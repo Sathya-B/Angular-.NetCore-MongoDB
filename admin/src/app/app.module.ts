@@ -12,7 +12,10 @@ import { AuthGuard } from './shared';
 import { ApiService } from './shared/services/api.service';
 import { AppState } from './shared/services/app.service';
 import { TokenService } from './shared/services/token.service';
+import { ToastMsgService } from './shared/services/toastmsg.service';
 import { HttpClientModule } from '@angular/common/http';
+import { ToasterModule, ToasterService, ToasterConfig } from 'angular2-toaster';
+
 export function HttpLoaderFactory(http: Http) {
     // for development
     // return new TranslateHttpLoader(http, '/start-angular/SB-Admin-BS4-Angular-4/master/dist/assets/i18n/', '.json');
@@ -28,6 +31,7 @@ export function HttpLoaderFactory(http: Http) {
         FormsModule,
         HttpModule,
         HttpClientModule,
+        ToasterModule,
         AppRoutingModule,
         TranslateModule.forRoot({
             loader: {
@@ -40,6 +44,7 @@ export function HttpLoaderFactory(http: Http) {
     providers: [AuthGuard,
                 AppState,
                 ApiService,
+                ToastMsgService,
                 TokenService],
     bootstrap: [AppComponent]
 })

@@ -17,10 +17,7 @@ export class GoogleSigninComponent implements AfterViewInit {
 
   private scope = [
     'profile',
-    'email',
-    'https://www.googleapis.com/auth/plus.me',
-    'https://www.googleapis.com/auth/contacts.readonly',
-    'https://www.googleapis.com/auth/admin.directory.user.readonly'
+    'email'
   ].join(' ');
 
   constructor(private element: ElementRef, private apiService: ApiService,
@@ -37,7 +34,7 @@ export class GoogleSigninComponent implements AfterViewInit {
       });
       that.attachSignin(that.element.nativeElement.firstChild);
     });
-  }
+    }
   public attachSignin(element) {
     let that = this;
     this.auth2.attachClickHandler(element, {},

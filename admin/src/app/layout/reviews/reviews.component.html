@@ -1,0 +1,34 @@
+<div [@routerTransition]>
+    <app-page-header [heading]="'Reviews'" [icon]="'fa-table'"></app-page-header>
+    <div class="row">
+        <div class="col col-xl-10">
+            <div class="card mb-3">
+                <div class="card-header">
+                    All Comments
+                </div>
+                <div class="card-block table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="customtd">
+                                <table>
+                                <th>#</th>
+                                <th class="tdwidth">SKU</th>
+                                <th class="tdwidth">User Name</th>
+                                <th class="tdwidth">Rating</th>
+                                <th class="tdwidth">Comment</th>
+                                <th class="tdwidth">Approve/Reject</th>
+                                </table>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let review of reviews; let i = index">                               
+                                <app-reviewitem *ngFor="let reviewItem of review.productReviews; let j = index;" [reviewItem]="reviewItem" [productSKU]="review.productSKU" [(index)]="rowIndex"></app-reviewitem>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>

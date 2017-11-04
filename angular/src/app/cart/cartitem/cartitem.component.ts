@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CartService } from '@services/cart.service';
 import { WishListService } from '@services/wishlist.service';
 import { Router } from '@angular/router';
@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
   templateUrl: './cartitem.component.html',
   styleUrls: ['./cartitem.component.scss']
 })
-export class CartItemComponent {
+export class CartItemComponent implements OnInit {
 
 @Input() public item: any;
 
@@ -16,6 +16,9 @@ export class CartItemComponent {
 
 constructor(public cartService: CartService, public wishListService: WishListService,
             private router: Router) {
+}
+
+public ngOnInit() {
 }
 public totalAmount() {
   return this.item.productQuantity * this.item.productPrice;

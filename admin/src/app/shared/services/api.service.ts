@@ -54,7 +54,7 @@ public put(url: string, data: any, options?: any, serverUrl?: string) {
         return this.tokenService.getAuthToken(useAuth).then(
         (token) => {
         const authHeader = this.header(token);
-        return this.http.post(serverUrl + url, body, { headers: authHeader }).timeout(30000)
+        return this.http.put(serverUrl + url, body, { headers: authHeader }).timeout(30000)
             .toPromise()
             .then((res) => {
                return this.handleSuccess(res, options);
@@ -111,7 +111,7 @@ public delete(url: string, data: any, options?: any, serverUrl?: string) {
         return this.tokenService.getAuthToken(useAuth).then(
         (token) => {
         const authHeader = this.header(token);
-        return this.http.post(serverUrl + url, body, { headers: authHeader }).timeout(30000)
+        return this.http.delete(serverUrl + url, { headers: authHeader }).timeout(30000)
             .toPromise()
             .then((res) => {
                return this.handleSuccess(res, options);

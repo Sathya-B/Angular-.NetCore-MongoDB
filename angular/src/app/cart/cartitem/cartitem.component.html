@@ -3,12 +3,17 @@
     <div class="bagLeft">
       <div class="itemImageWrap"><a href=""><img [lazyLoad]="item.minioObject_URL" alt=""></a></div>
       <div class="itemDescColourWrap">
-        <div class="itemDescColourWrapInner">
+        <div class="itemDescColourWrapInner" *ngIf="item.productType !='Gifts'" >
           <a (click)="viewItem()" style="cursor: pointer"><span class="itemOderTabHeading">{{item.productFor + ' ' + item.productType}}</span></a>
           <div class="itemColour">Colour : <span>{{item.productColour}}</span></div>
           <div class="itemSize" title="Selected Size" *ngIf="item.productSize !=''">
-            <span>{{item.productSize}}</span>
+            <span>{{item.productSize | replaceUnderscore}}</span>
           </div>
+        </div>
+        <div class="itemDescColourWrapInner" *ngIf="item.productType == 'Gifts'" >
+          <a (click)="viewItem()" style="cursor: pointer"><span class="itemOderTabHeading">{{item.productType}}</span></a>
+          <br>
+          <span class="itemOderTabHeading">For:{{item.productFor}}</span>
         </div>
       </div>
     </div>

@@ -15,10 +15,9 @@ export class OrderListResolver implements Resolve<any> {
 
       let userName = localStorage.getItem('UserName');
       return  this.apiService.get('Order/vieworder/' + userName).then(
-      (response: any) => {
+      (response: any) => {      
       orders = response.data;
-      console.log(orders.result);
-      return orders.result;
+      return orders;
       },
       (error: any) => {
       console.log(error);

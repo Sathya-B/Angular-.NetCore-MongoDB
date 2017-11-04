@@ -26,6 +26,7 @@
 			padding: 20px;
 			display: flex;
 			margin-bottom: 50px;
+			min-height: 235px;
 
 			.removeProduct{
 				position: absolute;
@@ -81,7 +82,6 @@
 						}
 						@include MQ(599) {
 							padding: 10px 5px 0 0;
-							position: relative;
 						}
 
 						a{
@@ -171,6 +171,7 @@
 									height: 30px;
 									@include font-size(14px);
 									outline: none;
+									padding: 2px 12px 0 18px;
 								}
 							}
 						}

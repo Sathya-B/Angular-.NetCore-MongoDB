@@ -10,6 +10,7 @@ import { EventEmitter } from '@angular/core';
 import { RelatedComponent } from './related/related.component';
 import { ColorSizeStockComponent } from './colorsizestock/colorsizestock.component';
 import { ToastMsgService } from '@services/toastmsg.service';
+import { NgForm } from '@angular/forms';
 import * as CartModel from '@models/cart.model';
 import * as WishListModel from '@models/wishlist.model';
 
@@ -17,7 +18,7 @@ import * as WishListModel from '@models/wishlist.model';
   selector: 'variants',
   providers: [
   ],
-  styleUrls: ['./variants.component.css'],
+  styleUrls: ['./variants.component.scss'],
   templateUrl: './variants.component.html'
 
 })
@@ -43,9 +44,9 @@ export class VariantsComponent implements OnInit {
   @ViewChild(ColorSizeStockComponent) public css: ColorSizeStockComponent;
 
   constructor(private cartService: CartService, private route: ActivatedRoute,
-              private toastMsg: ToastMsgService, private wishListService: WishListService,
-              private router: Router, private apiService: ApiService,
-              private cd: ChangeDetectorRef) {
+    private toastMsg: ToastMsgService, private wishListService: WishListService,
+    private router: Router, private apiService: ApiService,
+    private cd: ChangeDetectorRef) {
     this.for = route.snapshot.paramMap.get('productFor');
     this.type = route.snapshot.paramMap.get('productType');
     this.design = route.snapshot.paramMap.get('productDesign');
@@ -75,7 +76,7 @@ export class VariantsComponent implements OnInit {
     }
   }
 
-  public variantItemClicked(variantItem: any) {   
+  public variantItemClicked(variantItem: any) {
     let newKey = this.for + '-' + this.type + '-' + variantItem.productDesign;
     let oldKey = this.variants.topItem.productFor + '-' + this.variants.topItem.productType + '-' + this.variants.productDesign;
     refreshLocalItems(oldKey, this.variants, variantItem.productDesign, newKey, variantItem);
@@ -88,17 +89,15 @@ export class VariantsComponent implements OnInit {
   }
 
   public addToCart() {
-    console.log('clicked');
-    console.log(this.css.remainingQty);
-   if ((Number(this.css.remainingQty) >= 1)) {
-    let cartItem: CartModel.CartItem;
-    cartItem = this.css.itemToCart;
-    cartItem.productQuantity = this.css.quantity;
-    this.cartService.cartItems.listOfProducts.push(cartItem);
-    this.router.navigate(['/addedtocart']);
-    if (localStorage.getItem('UserName') !== undefined) {
-      this.cartService.refreshCart();
-    }
+    if ((Number(this.css.remainingQty) >= 1)) {
+      let cartItem: CartModel.CartItem;
+      cartItem = this.css.itemToCart;
+      cartItem.productQuantity = this.css.quantity;
+      this.cartService.cartItems.listOfProducts.push(cartItem);
+      this.router.navigate(['/addedtocart']);
+      if (localStorage.getItem('UserName') !== undefined) {
+        this.cartService.refreshCart();
+      }
     } else {
       this.toastMsg.popToast('info', 'Info', 'Please Select a Colour and Size.');
     }
@@ -123,23 +122,41 @@ export class VariantsComponent implements OnInit {
     localStorage.removeItem(removeCache);
     localStorage.removeItem(removeCache + '-related');
   }
+  onSubmit(form: NgForm) {
+    console.log(form.value);
+    if (form.value.amount < 500 || form.value.amount > 10000) {
+      this.toastMsg.popToast('info', 'Info', 'Please Enter Gift Amount between Rs 500 and Rs 10,000.');
+    } else {
+      let cartItem: CartModel.CartItem;
+      cartItem = this.variants.topItem;
+      cartItem.productQuantity = 1;
+      cartItem.productFor = form.value.Email;
+      cartItem.productPrice = form.value.amount;
+      cartItem.productDescription = form.value.message;
+      this.cartService.cartItems.listOfProducts.push(cartItem);
+      this.router.navigate(['/addedtocart']);
+      if (localStorage.getItem('UserName') !== undefined) {
+        this.cartService.refreshCart();
+      }
+    }
+  }
 }
 function findLocalItems(query) {
   let results = [];
-  results = JSON.parse(localStorage.getItem(query));  
+  results = JSON.parse(localStorage.getItem(query));
   return results;
 }
-function refreshLocalItems(oldKey: string, variantItem: any, removeDesign: string, newKey: string, newVariant: any){
+function refreshLocalItems(oldKey: string, variantItem: any, removeDesign: string, newKey: string, newVariant: any) {
   let results = [];
-  results = JSON.parse(localStorage.getItem(oldKey+'-related'));
+  results = JSON.parse(localStorage.getItem(oldKey + '-related'));
   let newresults = results.filter((item) => {
     return item.productDesign !== removeDesign;
   });
   variantItem.variants.forEach(element => {
     newresults.push(element);
   });
-  localStorage.removeItem(oldKey+'-related');
+  localStorage.removeItem(oldKey + '-related');
   localStorage.removeItem(oldKey);
   localStorage.setItem(newKey, JSON.stringify(newVariant));
-  localStorage.setItem(newKey + '-related', JSON.stringify(newresults));     
+  localStorage.setItem(newKey + '-related', JSON.stringify(newresults));
 }

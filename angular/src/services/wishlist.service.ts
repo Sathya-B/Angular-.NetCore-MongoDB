@@ -32,7 +32,7 @@ export class WishListService {
     public refreshList() {
         let userName = localStorage.getItem('UserName');
         if (userName !== undefined) {
-        return  this.apiService.put('user/wishlist/' + userName, this.wishListItems ,
+        return  this.apiService.post('user/wishlist/' + userName, this.wishListItems ,
                                     { useAuth: true }).then(
                 (response: any) => {
                     return true;

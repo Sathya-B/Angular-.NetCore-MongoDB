@@ -7,12 +7,14 @@ import { ProductitemComponent } from './productitem/productitem.component';
 import { PageHeaderModule } from './../../shared';
 import { FormsModule } from '@angular/forms';
 import { ProductInsertUpdateComponent } from './product-insert-update/product-insert-update.component';
+import { ImageUploadModule } from 'angular2-image-upload';
 
 @NgModule({
   imports: [
     CommonModule,
     ProductsRoutingModule,
     PageHeaderModule,
+    ImageUploadModule.forRoot(),
     FormsModule
   ],
   declarations: [ProductsComponent, ProductitemComponent, ProductInsertUpdateComponent]

@@ -21,3 +21,28 @@ export function checkOptions(options?: any) {
     return false;
   }
 }
+
+
+export function xwwwfurlenc(srcjson){
+	if(typeof srcjson !== "object") if(typeof console !== "undefined"){ console.log("\"srcjson\" is not a JSON object"); return null; }
+	let u = encodeURIComponent;
+	var urljson = "";
+	var keys = Object.keys(srcjson);
+	for(var i=0; i <keys.length; i++){
+		urljson += u(keys[i]) + "=" + u(srcjson[keys[i]]);
+		if(i < (keys.length-1))urljson+="&";
+	}
+	return urljson;
+}
+
+//Will only decode as strings
+//Without embedding extra information, there is no clean way to know what type of variable it was.
+export function dexwwwfurlenc(urljson){
+	var dstjson = {};
+	var ret;
+	var reg = /(?:^|&)(\w+)=(\w+)/g;
+	while((ret = reg.exec(urljson)) !== null){
+		dstjson[ret[1]] = ret[2];
+	}
+	return dstjson;
+}

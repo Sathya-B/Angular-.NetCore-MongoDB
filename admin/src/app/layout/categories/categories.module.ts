@@ -7,12 +7,15 @@ import { PageHeaderModule } from './../../shared';
 import { CategoryItemComponent } from './categoryitem/categoryitem.component';
 import { FormsModule } from '@angular/forms';
 import { CategoryInsertUpdateComponent } from './category-insert-update/category-insert-update.component';
+import { ImageUploadModule } from 'angular2-image-upload';
+
 @NgModule({
     imports: [
         CommonModule,
         CategoriesRoutingModule,      
         PageHeaderModule,
-        FormsModule
+        FormsModule,
+        ImageUploadModule.forRoot(),
     ],
     declarations: [CategoriesComponent,CategoryItemComponent, CategoryInsertUpdateComponent]
 })

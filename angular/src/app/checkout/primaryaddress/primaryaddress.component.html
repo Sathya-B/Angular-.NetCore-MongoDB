@@ -10,7 +10,7 @@
                     <br>{{billingAddress.addressLines}}
                     <br>{{billingAddress.city}}
                     <br> {{billingAddress.pinCode}}
-                    <br> {{billingAddress.state}}
+                    <br> {{billingAddress.state != undefined ? billingAddress.state + ', ' : billingAddress.state}}{{billingAddress?.country}}
                     <br> {{billingAddress.phoneNumber}}
                 </div>                
             </div>
@@ -21,7 +21,7 @@
                     <br>{{shippingAddress.addressLines}}
                     <br>{{shippingAddress.city}}
                     <br> {{shippingAddress.pinCode}}
-                    <br> {{shippingAddress.state}}
+                    <br> {{shippingAddress.state != undefined ? shippingAddress.state + ', ' : shippingAddress.state}}{{shippingAddress?.country}}
                     <br> {{shippingAddress.phoneNumber}}
                 </div>
             </div>

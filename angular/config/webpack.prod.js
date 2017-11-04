@@ -228,10 +228,10 @@ module.exports = function (env) {
         helpers.root('config/empty.js')
       ),
 
-      // new NormalModuleReplacementPlugin(
-      //   /zone\.js(\\|\/)dist(\\|\/)long-stack-trace-zone/,
-      //   helpers.root('config/empty.js')
-      // ),
+      new NormalModuleReplacementPlugin(
+        /zone\.js(\\|\/)dist(\\|\/)long-stack-trace-zone/,
+        helpers.root('config/empty.js')
+      ),
 
       new HashedModuleIdsPlugin(),
 

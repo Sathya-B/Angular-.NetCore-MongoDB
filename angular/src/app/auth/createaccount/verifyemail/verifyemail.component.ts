@@ -7,6 +7,7 @@ import { ToastMsgService } from '@services/toastmsg.service';
 
 @Component({
   selector: 'verifyemail',
+  styleUrls: ['verifyemail.component.scss'],
   templateUrl: './verifyemail.component.html'
 })
 export class VerifyEmailComponent implements OnInit {

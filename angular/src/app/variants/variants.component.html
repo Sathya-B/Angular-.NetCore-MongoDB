@@ -3,7 +3,8 @@
         <div class="wrapInner">
             <div class="pageBgWhite">
                 <div class="productMainWrap clearfix">
-                    <div class="productImgwrap"><img [src]="variants?.topItem.minioObject_URL" alt=""></div>
+                    <div *ngIf="variants?.topItem.productType != 'Gifts'" class="productImgwrap"><img [src]="variants?.topItem.minioObject_URL" alt=""></div>
+                    <div *ngIf="variants?.topItem.productType == 'Gifts'" class="productImgwrap giftProductBorder"><img [src]="variants?.topItem.minioObject_URL" alt=""></div>
                     <div class="productBasicInfoWrap">
                         <h1>{{variants?.topItem.productDesign}}</h1>
 
@@ -27,20 +28,21 @@
                         </div>
 
                         <div *ngIf="variants?.topItem.productType == 'Gifts'">
+                            <div class="voucherFormWrap">
                             <form (ngSubmit)="onSubmit(f)" #f="ngForm">
-                                <div class="formRow rowSpacing">
+                                <div class="fieldsWrap">
                                     <input type="email" name="Email" placeholder="Recipient Email*" ngModel email required>
                                     <div *ngIf="f.controls.Email?.errors && f.controls.Email?.touched"><span class="error">Please enter a valid Email.</span></div>
                                 </div>
-                                <div class="formRow rowSpacing">
+                                <div class="fieldsWrap">
                                     <input type="email" name="confirmEmail" placeholder="Confirm Email*" ngModel email required>
                                     <div *ngIf="(f.controls.confirmEmail?.value != f.controls.Email?.value) && f.controls.confirmEmail?.touched"><span class="error">Email Doesn't match.</span></div>
                                 </div>
-                                <div class="formRow rowSpacing">
+                                <div class="fieldsWrap">
                                     <input type="text" name="amount" placeholder="Enter Amount* (Min:500, Max:10,000)" ngModel required pattern="^[0-9]*$">
                                     <div *ngIf="f.controls.amount?.errors && f.controls.amount?.touched"><span class="error">Please enter valid Gift Amount.</span></div>
                                 </div>
-                                <div class="formRow rowSpacing">
+                                <div class="fieldsWrap">
                                     <textarea type="text" name="message" placeholder="Enter Message(Optional)" ngModel></textarea>
                                 </div>
                                 <div class="singlePageBtnsWrap">
@@ -48,6 +50,7 @@
                                     <a href="#prdDetails" class="viewProductDetailsCustom" scrollTo href="#prdDetails">Product Details</a>
                                 </div>
                             </form>
+                            </div>
                         </div>
                         <div class="productMetaWrap">
                             <div *ngIf="variants?.topItem.productType == 'Tshirt'"><span class="posted_in">Categories: <a [routerLink]="['/']" rel="tag">Clothing</a></span></div>
@@ -61,7 +64,7 @@
                     <h2>Description</h2>
                     <p>{{variants?.topItem.productDescription}}</p>
                 </div>
-                <div class="productAdditionalInfo">
+                <div *ngIf="variants?.topItem.productType != 'Gifts'" class="productAdditionalInfo">
                     <h2>Additional information</h2>
                     <h3>DELIVERY TIMES:</h3>
                     <p>Within India : 4 To 10 Days Depending On Pin Code</p>
@@ -73,10 +76,16 @@
                             Design<br> Do Not Bleach<br> Do Not Tumble Dry<br> Do Not Chemical Dry Clean
                         </p>
                     </div>
-
                 </div>
+                <div *ngIf="variants?.topItem.productType == 'Gifts'" class="productAdditionalInfo">
+                    <h2>Additional information</h2>
+                    <h3>DELIVERY TIMES:</h3>
+                    <p>Coupon emailed to the recipient once Payment is processed.</p>
+                </div>
+
                 <div class="productAdditionalInfo">
                     <h2>Product Review </h2>
+                    <p>No reviews yet.</p>
                 </div>
                 <!-- <div class="reviewCommentsWrap">
 						<h2>Product Review </h2>

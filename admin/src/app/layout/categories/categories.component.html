@@ -1,7 +1,7 @@
 <div [@routerTransition]>
     <app-page-header [heading]="'Categories'" [icon]="'fa-table'"></app-page-header>
     <div class="row">
-        <div class="col col-xl-10">
+        <div class="col col-xl-12">
             <div class="card mb-3">
                 <div class="card-header">
                     Add New Category
@@ -16,26 +16,20 @@
                     Available Categories
                 </div>
                 <div class="card-block table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th class="customtd">
-                                <table>
-                                <th>#</th>
-                                <th class="tdwidth">Product For</th>
-                                <th class="tdwidth">Product Type</th>
-                                <th class="tdwidth">Description</th>
-                                <th class="tdwidth">Update</th>
-                                <th class="tdwidth">Delete</th>
-                                </table>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let category of categories; let i=index" [app-categoryitem]="{'categoryItem': category, 'itemIndex': i}" (deletedItem)="itemDeleted($event)">
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table">
+                        <div class="table-caption row">
+                                <span class="col-sm-1">#</span>
+                                <span class="col-sm-2">Product For</span>
+                                <span class="col-sm-2">Product Type</span>
+                                <span class="col-sm-3">Description</span>
+                                <span class="col-sm-2">Update</span>
+                                <span class="col-sm-2">Delete</span>
+                            </div> 
+                        
+                            <div *ngFor="let category of categories; let i=index" [app-categoryitem]="{'categoryItem': category, 'itemIndex': i}" (deletedItem)="itemDeleted($event)">
+                            </div>
+                        
+                    </div>
                 </div>
             </div>
         </div>

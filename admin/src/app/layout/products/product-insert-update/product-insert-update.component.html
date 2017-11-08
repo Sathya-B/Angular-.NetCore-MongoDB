@@ -1,3 +1,4 @@
+<br/>
 <div>
   <form (ngSubmit)="onSubmit(f)" #f="ngForm">
     <div class="form-group">
@@ -97,7 +98,7 @@
     </div>
     <div class="form-group">
       <label for="minioObject_URL">Image Url: {{product.productItem.minioObject_URL}}</label>
-      <image-upload url="http://192.168.0.113:5000/api/admin/uploadimage" [beforeUpload]="onBeforeUpload(f)" (uploadFinished)="onUploadFinished($event)">
+      <image-upload url="https://artwear.in:5003/api/admin/uploadimage" [beforeUpload]="onBeforeUpload(f)" (uploadFinished)="onUploadFinished($event)">
       </image-upload>
       <input type="text" name="minioObject_URL" class="form-control"
        [ngModel]="product.productItem.minioObject_URL" hidden required>
@@ -106,3 +107,4 @@
     <button _ngcontent-c9="" class="btn btn-danger" type="button" (click)="cancelClicked()">Cancel</button>
   </form>
 </div>
+<br/>

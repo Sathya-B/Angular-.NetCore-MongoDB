@@ -58,6 +58,11 @@
 				// padding-bottom: 5px;
 			}
 		}
+		span.callTimings{
+			display: block;
+			padding-bottom: 5px;
+			@include font-size(12px);
+		}
 		p{
 			@include MQ(1023){
 				padding-bottom: 12px;

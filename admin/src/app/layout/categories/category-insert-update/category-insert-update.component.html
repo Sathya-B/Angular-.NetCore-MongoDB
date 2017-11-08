@@ -1,3 +1,4 @@
+<br/>
 <div>
     <form (ngSubmit)="onSubmit(f)" #f="ngForm">
     <div class="form-group">
@@ -15,13 +16,13 @@
        class="form-control-label" for="inputError">Field required.</label>
     </div>
       <label for="description">Description</label>
-      <input type="text" name="description" class="form-control"
-       [ngModel]="category.description" required>
+      <textarea type="text" name="description" class="form-control"
+       [ngModel]="category.description" required></textarea>
       <label *ngIf="f.controls.description?.errors && f.controls.description.touched"
        class="form-control-label" for="inputError">Field required.</label>
     <div class="form-group">
       <label for="minioObject_URL">Image Url: {{category.minioObject_URL}}</label>
-      <image-upload url="http://192.168.0.113:5000/api/admin/uploadimage" [beforeUpload]="onBeforeUpload(f)" (uploadFinished)="onUploadFinished($event)">
+      <image-upload url="https://artwear.in:5003/api/admin/uploadimage" [beforeUpload]="onBeforeUpload(f)" (uploadFinished)="onUploadFinished($event)">
       </image-upload>
       <input type="text" name="minioObject_URL" class="form-control"
        [ngModel]="category.minioObject_URL" hidden required>
@@ -30,3 +31,4 @@
     <button _ngcontent-c9="" class="btn btn-danger" type="button" (click)="cancelClicked()">Cancel</button>
   </form>        
 </div>
+<br/>

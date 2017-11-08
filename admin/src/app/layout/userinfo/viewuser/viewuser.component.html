@@ -1,13 +1,14 @@
 <div class="orderDetailsWrapOuter">
   <div class="orderDetailsWrap">
     <div class="orderDetailsAddressWrap clearfix">
-      <div class="InvoiceTab">
+     <div class="row">
+      <div class="InvoiceTab col-sm-4 text-left">
         <h2>User Details</h2>
         <p> Full Name: <strong>{{user.userInfo.fullName}}</strong></p>
         <p>Phone Number : <strong>{{user.userInfo.phoneNumber}}</strong></p>
         <p>Email : <strong>{{user.userInfo.email}}</strong></p>
       </div>
-      <div class="odrDtlsBillingAddress">
+      <div class="odrDtlsBillingAddress col-sm-4">
         <h2>Billing Address</h2>
         <div>
           {{billingAddress?.addressLines}}<br> {{billingAddress?.city}}
@@ -16,7 +17,7 @@
           <br> {{billingAddress?.country}}
         </div>
       </div>
-      <div class="odrDtlsDeliveryAddress">
+      <div class="odrDtlsDeliveryAddress col-sm-4">
         <h2>Delivery Address</h2>
         <div>
           {{shippingAddress?.addressLines}}<br> {{shippingAddress?.city}}
@@ -25,6 +26,7 @@
           <br> {{shippingAddress?.country}}
         </div>
       </div>
+    </div>
      <button class="btn btn-danger" type="button" (click)="cancelClicked()">Close</button>
     </div>
   </div>

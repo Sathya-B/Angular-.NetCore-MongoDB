@@ -12,16 +12,17 @@
                         <div class="couponTab">
                             <h2 class="couponHeading">Have a Coupon?</h2>
                             <div>
-                                <!-- <p>Sign in to use account linked coupons</p> -->
+                                <form (ngSubmit)="onSubmit(f)" #f="ngForm">
                                 <p>Enter your coupon code</p>
-                                <p><input type="text"></p>
-                                <button>Apply Coupon</button>
+                                <p><input type="text" name="coupon" ngModel required></p>
+                                <button type="submit" [disabled]="!f.valid">Apply Coupon</button>
+                                </form>
                             </div>
                         </div>
                         <!-- End Coupon Tab -->
 
                         <!-- Start Order Tab -->
-                        <order></order>
+                        <order [couponDiscount]="couponDiscount"></order>
                         <!-- End Order Tab -->
 
                         <!-- Start Checkout Button -->

@@ -47,11 +47,17 @@
                 <div class="itemImageWrap">
                   <img [lazyLoad]="product.productInCart.minioObject_URL" alt="">
                 </div>
-                <div class="itemDescriptionWrap clearfix">
+                <div class="itemDescriptionWrap clearfix" *ngIf="product.productInCart.productType != 'Gifts'">
                   <h3>Product Description</h3>
                   <p>{{product.productInCart.productFor +' '+ product.productInCart.productType + ' ' + product.productInCart.productDesign}}</p>
                   <p>Colour : {{product?.productInCart.productColour}}</p>
                   <p>Size : {{product?.productInCart.productSize | replaceUnderscore}}</p>
+                </div>
+                <div class="itemDescriptionWrap clearfix" *ngIf="product.productInCart.productType == 'Gifts'">
+                  <h3>Product Description</h3>
+                  <p>Arthur Clive{{' '+ product.productInCart.productDesign + ' ' + product.productInCart.productType}}</p>
+                  <br>
+                  <p>For: {{product.productInCart.productFor}}</p>
                 </div>
               </div>
               <div class="itemPriceDetailsRight">
@@ -209,12 +215,17 @@
                       <th width="200" align="right" valign="top">Item Total</th>
                     </tr>
                     <tr>
-                      <td align="left" valign="top">
+                      <td align="left" valign="top" *ngIf="product.productInCart.productType != 'Gifts'">
                         {{product.productInCart.productFor +' '+ product.productInCart.productType + ' ' + product.productInCart.productDesign}}
                         <br>
                         Colour : {{product?.productInCart.productColour}}
                         <br>
                         Size : {{product?.productInCart.productSize | replaceUnderscore}}
+                      </td>
+                      <td align="left" valign="top" *ngIf="product.productInCart.productType == 'Gifts'">
+                        <p>Arthur Clive {{' ' + product.productInCart.productDesign +' '+ product.productInCart.productType}}</p>
+                        <br>
+                        <p>For: {{product.productInCart.productFor}}</p>
                       </td>
                       <td align="center" valign="middle">{{product?.productInCart.productQuantity}}</td>
                       <td align="center" valign="middle"><i class="fa fa-inr"></i><span class="unitPrice">{{product?.productInCart.productPrice}}</span></td>

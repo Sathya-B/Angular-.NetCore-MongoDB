@@ -3,7 +3,7 @@
     <table class="orderTable">
         <tr>
             <td>Bag Total</td>
-            <td><i class="fa fa-inr"></i>{{getCartTotal()}}</td>
+            <td><i class="fa fa-inr"></i>{{cartTotal}}</td>
         </tr>
         <tr>
             <td>Bag Discount</td>
@@ -11,11 +11,13 @@
         </tr>
         <tr>
             <td>Estimated Tax</td>
-            <td><i class="fa fa-inr"></i>{{getEstimatedTax()}}</td>
+            <td><i class="fa fa-inr"></i>{{estimatedTax}}</td>
         </tr>
         <tr>
             <td>Coupon Discount</td>
-            <td class="discountAmount"><i class="fa fa-inr"></i> 0
+            <td class="discountAmount"><i class="fa fa-inr" *ngIf="!couponDiscount.percentage"></i>
+            <i class="fa fa-percent" *ngIf="couponDiscount.percentage"></i>
+            <span>{{couponDiscount.value}}</span>
                 <!-- <a href="" class="applyCoupon">Apply Coupon</a> --></td>
         </tr>
         <tr>
@@ -24,7 +26,7 @@
         </tr>
         <tr>
             <td>Order Total</td>
-            <td><i class="fa fa-inr"></i>{{(getCartTotal() * 1.15).toFixed(2) }}</td>
+            <td><i class="fa fa-inr"></i>{{finalAmount}}</td>
         </tr>
     </table>
 </div>

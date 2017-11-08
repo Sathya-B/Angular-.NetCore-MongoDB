@@ -1,19 +1,18 @@
-<td class="customtd">
-<table>
-<td >{{category.itemIndex + 1 }}</td>
-<td class="tdwidth">{{category.categoryItem.productFor}}</td>
-<td class="tdwidth">{{category.categoryItem.productType}}</td>
-<td class="tdwidth">{{category.categoryItem.description}}</td>
-<td>
-  <button _ngcontent-c9="" class="btn btn-primary" type="button" (click)="updateClicked()">Update</button>
-</td>
-<td>
-  <button _ngcontent-c9="" class="btn btn-danger" type="button" (click)="deleteClicked()">Delete</button>
-</td>
-</table>
-</td>
-<td class="customtd">
-<div *ngIf="showUpdate">
-<app-category-insert-update [category]="category.categoryItem" (saveButtonClicked)="saveClicked($event)" (cancelButtonClicked)="cancelClicked($event)"></app-category-insert-update>
-</div>
-<td>
+  <div class="table-row row">
+    <span class="col-sm-1">{{category.itemIndex + 1 }}</span>
+    <span class="col-sm-2">{{category.categoryItem.productFor}}</span>
+    <span class="col-sm-2">{{category.categoryItem.productType}}</span>
+    <span class="col-sm-3">{{category.categoryItem.description}}</span>
+    <span class="col-sm-2">
+      <button class="btn btn-primary" type="button" (click)="updateClicked()">Update</button>
+    </span>
+    <span class="col-sm-2">
+      <button class="btn btn-danger" type="button" (click)="deleteClicked()">Delete</button>
+    </span>
+  </div>
+
+
+  <div *ngIf="showUpdate" class="row">
+    <app-category-insert-update class="col-sm-6" [category]="category.categoryItem" (saveButtonClicked)="saveClicked($event)" (cancelButtonClicked)="cancelClicked($event)"></app-category-insert-update>
+  </div>
+  

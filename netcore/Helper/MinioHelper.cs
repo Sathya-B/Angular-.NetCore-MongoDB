@@ -12,9 +12,17 @@ namespace Arthur_Clive.Helper
         /// <summary>Get Minio client</summary>
         public static MinioClient GetMinioClient()
         {
-            return new MinioClient(GlobalHelper.ReadXML().Elements("minioclient").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("host").First().Value,
-                                    GlobalHelper.ReadXML().Elements("minioclient").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("accesskey").First().Value,
-                                    GlobalHelper.ReadXML().Elements("minioclient").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("secretkey").First().Value);
+            try
+            {
+                return new MinioClient(GlobalHelper.ReadXML().Elements("minioclient").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("host").First().Value,
+                                        GlobalHelper.ReadXML().Elements("minioclient").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("accesskey").First().Value,
+                                        GlobalHelper.ReadXML().Elements("minioclient").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("secretkey").First().Value);
+            }
+            catch(Exception ex)
+            {
+                Logger.LoggerDataAccess.CreateLog("MinioHelper", "GetMinioClient", ex.Message);
+                return null;
+            }
         }
 
         /// <summary>Get Minio object presigned url</summary>
@@ -29,7 +37,7 @@ namespace Arthur_Clive.Helper
             }
             catch(Exception ex)
             {
-                Logger.LoggerDataAccess.CreateLog("AmazonHelper", "GetMinioObject", "GetMinioObject", ex.Message);
+                Logger.LoggerDataAccess.CreateLog("MinioHelper", "GetMinioObject", ex.Message);
                 return null;
             }
         }

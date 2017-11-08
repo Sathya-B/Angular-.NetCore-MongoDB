@@ -56,7 +56,7 @@ namespace AuthorizedServer.Helper
             }
             catch(Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthHelper", "DoPassword", "DoPassword", ex.Message);
+                LoggerDataAccess.CreateLog("AuthHelper", "DoPassword", ex.Message);
                 return new ResponseData
                 {
                     Code = "400",
@@ -124,7 +124,7 @@ namespace AuthorizedServer.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthHelper", "DoRefreshToken", "DoRefreshToken", ex.Message);
+                LoggerDataAccess.CreateLog("AuthHelper", "DoRefreshToken", ex.Message);
                 return new ResponseData
                 {
                     Code = "400",
@@ -172,7 +172,7 @@ namespace AuthorizedServer.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthHelper", "GetJwt", "GetJwt", ex.Message);
+                LoggerDataAccess.CreateLog("AuthHelper", "GetJwt", ex.Message);
                 return null;
             }
         }

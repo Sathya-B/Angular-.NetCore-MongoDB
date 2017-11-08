@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Arthur_Clive.Data;
 using Arthur_Clive.Logger;
@@ -55,7 +54,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CouponController", "InsertCoupon", "InsertCoupon", ex.Message);
+                LoggerDataAccess.CreateLog("CouponController", "InsertCoupon", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -87,7 +86,7 @@ namespace Arthur_Clive.Controllers
                     var data = BsonSerializer.Deserialize<Coupon>(checkData);
                     if (data.ExpiryTime > DateTime.UtcNow)
                     {
-                        if (data.ApplicableFor == "All" || data.ApplicableFor == username )
+                        if (data.ApplicableFor == "All" || data.ApplicableFor == username)
                         {
                             if (data.UsageCount != 0)
                             {
@@ -140,7 +139,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CouponController", "CheckCoupon", "CheckCoupon", ex.Message);
+                LoggerDataAccess.CreateLog("CouponController", "CheckCoupon", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -173,7 +172,7 @@ namespace Arthur_Clive.Controllers
                     {
                         var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("ApplicableFor", data.ApplicableFor));
                     }
-                    if (data.ExpiryTime != null )
+                    if (data.ExpiryTime != null)
                     {
                         var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("ExpiryTime", data.ExpiryTime));
                     }
@@ -194,7 +193,7 @@ namespace Arthur_Clive.Controllers
                         }
                         else
                         {
-                            if(data.Amount > coupon.Value)
+                            if (data.Amount > coupon.Value)
                             {
                                 return Ok(new ResponseData
                                 {
@@ -207,7 +206,7 @@ namespace Arthur_Clive.Controllers
                             {
                                 var balance = coupon.Value - data.Amount;
                                 var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("Value", balance));
-                                if(balance == 0)
+                                if (balance == 0)
                                 {
                                     var updateUsageCount = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("UsageCount", 0));
                                 }
@@ -233,7 +232,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CouponController", "UpdateCoupon", "UpdateCoupon", ex.Message);
+                LoggerDataAccess.CreateLog("CouponController", "UpdateCoupon", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

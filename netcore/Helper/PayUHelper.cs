@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -18,67 +16,98 @@ namespace Arthur_Clive.Helper
         /// <param name="text"></param>
         public static string Generatehash512(string text)
         {
-            byte[] message = Encoding.UTF8.GetBytes(text);
-            UnicodeEncoding UE = new UnicodeEncoding();
-            byte[] hashValue;
-            SHA512Managed hashString = new SHA512Managed();
-            string hex = "";
-            hashValue = hashString.ComputeHash(message);
-            foreach (byte x in hashValue)
+            try
             {
-                hex += String.Format("{0:x2}", x);
+                byte[] message = Encoding.UTF8.GetBytes(text);
+                UnicodeEncoding UE = new UnicodeEncoding();
+                byte[] hashValue;
+                SHA512Managed hashString = new SHA512Managed();
+                string hex = "";
+                hashValue = hashString.ComputeHash(message);
+                foreach (byte x in hashValue)
+                {
+                    hex += String.Format("{0:x2}", x);
+                }
+                return hex;
             }
-            return hex;
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("PayUHelper", "Generatehash512", ex.Message);
+                return null;
+            }
         }
 
-        /// <summary>/// Prepare post form for paymet through PayUMoney</summary>
+        /// <summary>Prepare post form for paymet through PayUMoney</summary>
         /// <param name="url"></param>
         /// <param name="data"></param>
         public static string PreparePOSTForm(string url, Hashtable data)
         {
-            string formID = "PostForm";
-            StringBuilder strForm = new StringBuilder();
-            strForm.Append("<form id=\"" + formID + "\" name=\"" + formID + "\" action=\"" + url + "\" method=\"POST\">");
-            foreach (DictionaryEntry key in data)
+            try
             {
-                strForm.Append("<input type=\"hidden\" name=\"" + key.Key + "\" value=\"" + key.Value + "\">");
+                string formID = "PostForm";
+                StringBuilder strForm = new StringBuilder();
+                strForm.Append("<form id=\"" + formID + "\" name=\"" + formID + "\" action=\"" + url + "\" method=\"POST\">");
+                foreach (DictionaryEntry key in data)
+                {
+                    strForm.Append("<input type=\"hidden\" name=\"" + key.Key + "\" value=\"" + key.Value + "\">");
+                }
+                strForm.Append("</form>");
+                StringBuilder strScript = new StringBuilder();
+                strScript.Append("<script language='javascript'>");
+                strScript.Append("var v" + formID + " = document." + formID + ";");
+                strScript.Append("v" + formID + ".submit();");
+                strScript.Append("</script>");
+                strForm.Append(strScript);
+                return strForm.ToString();
             }
-            strForm.Append("</form>");
-            StringBuilder strScript = new StringBuilder();
-            strScript.Append("<script language='javascript'>");
-            strScript.Append("var v" + formID + " = document." + formID + ";");
-            strScript.Append("v" + formID + ".submit();");
-            strScript.Append("</script>");
-            strForm.Append(strScript);
-            return strForm.ToString();
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("PayUHelper", "PreparePOSTForm", ex.Message);
+                return null;
+            }
         }
 
         /// <summary>Get TxnId</summary>
         public static string GetTxnId()
         {
-            Random random = new Random();
-            string strHash = Generatehash512(random.ToString() + DateTime.Now);
-            string txnId = strHash.ToString().Substring(0, 20);
-            return txnId;
+            try
+            {
+                Random random = new Random();
+                string strHash = Generatehash512(random.ToString() + DateTime.Now);
+                string txnId = strHash.ToString().Substring(0, 20);
+                return txnId;
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("PayUHelper", "GetTxnId", ex.Message);
+                return null;
+            }
         }
-        
+
         /// <summary>Get hash string</summary>
         /// <param name="txnId"></param>
         /// <param name="model"></param>
-        public static string GetHashString(string txnId,PaymentModel model)
+        public static string GetHashString(string txnId, PaymentModel model)
         {
-            string hashSequence = "key|txnid|amount|productinfo|firstname|email|udf1|udf2|||||||||salt";
-            hashSequence = hashSequence.Replace("key", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("key").First().Value);
-            hashSequence = hashSequence.Replace("txnid", txnId);
-            hashSequence = hashSequence.Replace("amount", Convert.ToDecimal(model.Amount).ToString("F2"));
-            hashSequence = hashSequence.Replace("productinfo", model.ProductInfo);
-            hashSequence = hashSequence.Replace("firstname", model.FirstName);
-            hashSequence = hashSequence.Replace("email", model.Email);
-            hashSequence = hashSequence.Replace("udf1", model.OrderId.ToString());
-            hashSequence = hashSequence.Replace("udf2", model.UserName);
-            hashSequence = hashSequence.Replace("salt", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("saltkey").First().Value);
-
-            return hashSequence;
+            try
+            {
+                string hashSequence = "key|txnid|amount|productinfo|firstname|email|udf1|udf2|||||||||salt";
+                hashSequence = hashSequence.Replace("key", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("key").First().Value);
+                hashSequence = hashSequence.Replace("txnid", txnId);
+                hashSequence = hashSequence.Replace("amount", Convert.ToDecimal(model.Amount).ToString("F2"));
+                hashSequence = hashSequence.Replace("productinfo", model.ProductInfo);
+                hashSequence = hashSequence.Replace("firstname", model.FirstName);
+                hashSequence = hashSequence.Replace("email", model.Email);
+                hashSequence = hashSequence.Replace("udf1", model.OrderId.ToString());
+                hashSequence = hashSequence.Replace("udf2", model.UserName);
+                hashSequence = hashSequence.Replace("salt", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("saltkey").First().Value);
+                return hashSequence;
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("PayUHelper", "GetHashString", ex.Message);
+                return null;
+            }
         }
 
         /// <summary>Get reverse hash string</summary>
@@ -86,20 +115,28 @@ namespace Arthur_Clive.Helper
         /// <param name="model"></param>
         public static string GetReverseHashString(string txnId, PaymentModel model)
         {
-            string hashSequence = "salt|status|||||||||udf2|udf1|email|firstname|productinfo|amount|txnid|key";
-            hashSequence = hashSequence.Replace("key", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("key").First().Value);
-            hashSequence = hashSequence.Replace("txnid", txnId);
-            hashSequence = hashSequence.Replace("amount", Convert.ToDecimal(model.Amount).ToString("F2"));
-            hashSequence = hashSequence.Replace("productinfo", model.ProductInfo);
-            hashSequence = hashSequence.Replace("firstname", model.FirstName);
-            hashSequence = hashSequence.Replace("email",model.Email);
-            hashSequence = hashSequence.Replace("status", "success");
-            hashSequence = hashSequence.Replace("udf1", model.OrderId.ToString());
-            hashSequence = hashSequence.Replace("udf2", model.UserName);
-            hashSequence = hashSequence.Replace("salt", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("saltkey").First().Value);
-            return hashSequence;
+            try
+            {
+                string hashSequence = "salt|status|||||||||udf2|udf1|email|firstname|productinfo|amount|txnid|key";
+                hashSequence = hashSequence.Replace("key", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("key").First().Value);
+                hashSequence = hashSequence.Replace("txnid", txnId);
+                hashSequence = hashSequence.Replace("amount", Convert.ToDecimal(model.Amount).ToString("F2"));
+                hashSequence = hashSequence.Replace("productinfo", model.ProductInfo);
+                hashSequence = hashSequence.Replace("firstname", model.FirstName);
+                hashSequence = hashSequence.Replace("email", model.Email);
+                hashSequence = hashSequence.Replace("status", "success");
+                hashSequence = hashSequence.Replace("udf1", model.OrderId.ToString());
+                hashSequence = hashSequence.Replace("udf2", model.UserName);
+                hashSequence = hashSequence.Replace("salt", GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("saltkey").First().Value);
+                return hashSequence;
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("PayUHelper", "GetReverseHashString", ex.Message);
+                return null;
+            }
         }
-        
+
         /// <summary>Generate hashtable data for payment gateway process</summary>
         /// <param name="model">Data to be included in the form</param>
         public static Hashtable GetHashtableData(PaymentModel model)
@@ -144,7 +181,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("PaymentController", "MakePayment", "MakePayment", ex.Message);
+                LoggerDataAccess.CreateLog("PayUHelper", "GetHashtableData", ex.Message);
                 return null;
             }
         }

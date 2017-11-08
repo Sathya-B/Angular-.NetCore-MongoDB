@@ -21,16 +21,24 @@ namespace Arthur_Clive.Helper
         /// <param name="key"></param>
         public static string GetCredentials(string key)
         {
-            var xx = GlobalHelper.ReadXML();
-            var result = GlobalHelper.ReadXML().Elements("amazonses").Where(x => x.Element("current").Value.Equals("Yes")).Descendants(key);
-            return result.First().Value;
+            try
+            {
+                var xx = GlobalHelper.ReadXML();
+                var result = GlobalHelper.ReadXML().Elements("amazonses").Where(x => x.Element("current").Value.Equals("Yes")).Descendants(key);
+                return result.First().Value;
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("EmailHelper", "GetCredentials", ex.Message);
+                return "Failed";
+            }
         }
 
         /// <summary>Send email using Amazon SES service</summary>
         /// <param name="fullname"></param>
         /// <param name="emailReceiver"></param>
         /// <param name="message"></param>
-        public static async Task<string> SendEmail_ToUsers(string fullname, string emailReceiver, string message)
+        public static async Task<string> SendEmail_ToSubscribedUsers(string fullname, string emailReceiver, string message)
         {
             string emailSender = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsender").First().Value;
             string link = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("websitelink").First().Value;
@@ -45,7 +53,7 @@ namespace Arthur_Clive.Helper
                         Subject = new Content(GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsubject1").First().Value),
                         Body = new Body
                         {
-                            Html = new Content(CreateEmailBody(fullname, "<a href ='" + link + "'>Click Here</a>", message))
+                            Html = new Content(CreateEmailBody_SendMessageToSubscribedUsers(fullname, "<a href ='" + link + "'>Click Here</a>", message))
                         }
                     }
                 };
@@ -56,29 +64,37 @@ namespace Arthur_Clive.Helper
                 }
                 catch (Exception ex)
                 {
-                    LoggerDataAccess.CreateLog("EmailHelper", "SendEmail_ToUsers", "SendEmail_ToUsers", ex.Message);
-                    return ex.Message;
+                    LoggerDataAccess.CreateLog("EmailHelper", "SendEmail_ToSubscribedUsers", ex.Message);
+                    return "Failed";
                 }
             }
         }
 
-        /// <summary>Create email body       /// </summary>
+        /// <summary>Create email body</summary>
         /// <param name="fullname"></param>
         /// <param name="link"></param>
         /// <param name="message"></param>
-        public static string CreateEmailBody(string fullname, string link, string message)
+        public static string CreateEmailBody_SendMessageToSubscribedUsers(string fullname, string link, string message)
         {
-            string emailBody;
-            var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            var path = Path.Combine(dir, "MessageFromAdmin.html");
-            using (StreamReader reader = File.OpenText(path))
+            try
             {
-                emailBody = reader.ReadToEnd();
+                string emailBody;
+                var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                var path = Path.Combine(dir, "EmailTemplate\\MessageFromAdmin.html");
+                using (StreamReader reader = File.OpenText(path))
+                {
+                    emailBody = reader.ReadToEnd();
+                }
+                emailBody = emailBody.Replace("{FullName}", fullname);
+                emailBody = emailBody.Replace("{Message}", message);
+                emailBody = emailBody.Replace("{Link}", link);
+                return emailBody;
             }
-            emailBody = emailBody.Replace("{FullName}", fullname);
-            emailBody = emailBody.Replace("{Message}", message);
-            emailBody = emailBody.Replace("{Link}", link);
-            return emailBody;
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody_SendMessageToSubscribedUsers", ex.Message);
+                return "Failed";
+            }
         }
 
         /// <summary>Send email to admin is the orders product quantity is higher than the product stock</summary>
@@ -110,8 +126,8 @@ namespace Arthur_Clive.Helper
                 }
                 catch (Exception ex)
                 {
-                    LoggerDataAccess.CreateLog("EmailHelper", "SendEmail", "SendEmail", ex.Message);
-                    return ex.Message;
+                    LoggerDataAccess.CreateLog("EmailHelper", "SendEmail", ex.Message);
+                    return "Failed";
                 }
             }
         }
@@ -124,19 +140,27 @@ namespace Arthur_Clive.Helper
         /// <param name="orderId"></param>
         public static string CreateEmailBody_ErrorReport(string userName, string productInfo, long orderQuantity, long productStock, string orderId)
         {
-            string emailBody;
-            var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            var path = Path.Combine(dir, "EmailTemplate\\ErrorReport.html");
-            using (StreamReader reader = File.OpenText(path))
+            try
             {
-                emailBody = reader.ReadToEnd();
+                string emailBody;
+                var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                var path = Path.Combine(dir, "EmailTemplate\\ErrorReport.html");
+                using (StreamReader reader = File.OpenText(path))
+                {
+                    emailBody = reader.ReadToEnd();
+                }
+                emailBody = emailBody.Replace("{OrderId}", orderId);
+                emailBody = emailBody.Replace("{UserName}", userName);
+                emailBody = emailBody.Replace("{ProductInfo}", productInfo);
+                emailBody = emailBody.Replace("{OrderQuantity}", orderQuantity.ToString());
+                emailBody = emailBody.Replace("{ProductStock}", productStock.ToString());
+                return emailBody;
             }
-            emailBody = emailBody.Replace("{OrderId}", orderId);
-            emailBody = emailBody.Replace("{UserName}", userName);
-            emailBody = emailBody.Replace("{ProductInfo}", productInfo);
-            emailBody = emailBody.Replace("{OrderQuantity}", orderQuantity.ToString());
-            emailBody = emailBody.Replace("{ProductStock}", productStock.ToString());
-            return emailBody;
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody_ErrorReport", ex.Message);
+                return "Failed";
+            }
         }
 
         /// <summary>Send gift by email</summary>
@@ -160,7 +184,7 @@ namespace Arthur_Clive.Helper
                                 if (product == info.ProductSKU)
                                 {
                                     Random generator = new Random();
-                                    var couponCode =  "CU" + generator.Next(0, 1000000).ToString("D6");
+                                    var couponCode = "CU" + generator.Next(0, 1000000).ToString("D6");
                                     Coupon coupon = new Coupon
                                     {
                                         Code = couponCode,
@@ -178,8 +202,6 @@ namespace Arthur_Clive.Helper
                                         return "User not found";
                                     }
                                     var userData = BsonSerializer.Deserialize<RegisterModel>(user);
-                                    var imageUrl = "https://s3.ap-south-1.amazonaws.com/arthurclive-products/" + product + ".jpg"; 
-                                    var imageLink = "<img src=" + imageUrl + " width=\"300px\" heigh=\"900px\" alt=" + product + ">";
                                     string emailSender = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsender").First().Value;
                                     using (var client = new AmazonSimpleEmailServiceClient(GetCredentials("accesskey"), GetCredentials("secretkey"), Amazon.RegionEndpoint.USWest2))
                                     {
@@ -192,7 +214,7 @@ namespace Arthur_Clive.Helper
                                                 Subject = new Content(GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsubject4").First().Value),
                                                 Body = new Body
                                                 {
-                                                    Html = new Content(CreateEmailBody_SendGiftCard(info.ProductInCart.ProductPrice.ToString(),couponCode, info.ProductInCart.ProductDescription, userData.FullName,imageLink))
+                                                    Html = new Content(CreateEmailBody_SendGiftCard(info.ProductInCart.ProductPrice.ToString(), couponCode, info.ProductInCart.ProductDescription, userData.FullName, info.ProductSKU))
                                                 }
                                             }
                                         };
@@ -211,7 +233,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("EmailHelper", "SendGiftCard", "SendGiftCard", ex.Message);
+                LoggerDataAccess.CreateLog("EmailHelper", "SendGiftCard", ex.Message);
                 return "Failed";
             }
         }
@@ -221,22 +243,89 @@ namespace Arthur_Clive.Helper
         /// <param name="couponCode"></param>
         /// <param name="message"></param>
         /// <param name="fullName"></param>
-        /// <param name="image"></param>
-        public static string CreateEmailBody_SendGiftCard(string value, string couponCode, string message, string fullName,string image)
+        /// <param name="objectName"></param>
+        public static string CreateEmailBody_SendGiftCard(string value, string couponCode, string message, string fullName, string objectName)
         {
-            string emailBody;
-            var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            var path = Path.Combine(dir, "EmailTemplate\\SendGift.html");
-            using (StreamReader reader = File.OpenText(path))
+            try
             {
-                emailBody = reader.ReadToEnd();
+                string emailBody;
+                var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                var path = Path.Combine(dir, "EmailTemplate\\ECard.html");
+                using (StreamReader reader = File.OpenText(path))
+                {
+                    emailBody = reader.ReadToEnd();
+                }
+                List<string> matchedString = GlobalHelper.StringBetweenTwoCharacters(objectName, "All-Gifts-", "-NA-");
+                var replaceName = "You have received an e-gift from " + fullName;
+                var imageUrl = "https://s3.ap-south-1.amazonaws.com/acemailtemplate/Gift-Banner-" + matchedString[0] + ".jpg";
+                var replaceImage = "<img src=" + imageUrl + " width='600' height='124'>";
+                var replacedValue = "Value of gift is &#8377;" + value;
+                emailBody = emailBody.Replace("{GiftValue}", replacedValue);
+                emailBody = emailBody.Replace("{CouponCode}", couponCode);
+                emailBody = emailBody.Replace("{Message}", message);
+                emailBody = emailBody.Replace("{FullName}", replaceName);
+                emailBody = emailBody.Replace("{Image}", replaceImage);
+                return emailBody;
             }
-            emailBody = emailBody.Replace("{GiftValue}", value);
-            emailBody = emailBody.Replace("{CouponCode}", couponCode);
-            emailBody = emailBody.Replace("{Message}", message);
-            emailBody = emailBody.Replace("{FullName}", fullName);
-            emailBody = emailBody.Replace("{Image}", image);
-            return emailBody;
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody_SendGiftCard", ex.Message);
+                return "Failed";
+            }
+        }
+
+        /// <summary>Send email to user who subscribes for news letter service</summary>
+        /// <param name="emailReceiver"></param>
+        public static async Task<string> SendEmail_NewsLetterService(string emailReceiver)
+        {
+            try
+            {
+                string emailSender = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsender").First().Value;
+                using (var client = new AmazonSimpleEmailServiceClient(GetCredentials("accesskey"), GetCredentials("secretkey"), Amazon.RegionEndpoint.USWest2))
+                {
+                    var sendRequest = new SendEmailRequest
+                    {
+                        Source = emailSender,
+                        Destination = new Destination { ToAddresses = new List<string> { emailReceiver } },
+                        Message = new Message
+                        {
+                            Subject = new Content(GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsubject5").First().Value),
+                            Body = new Body
+                            {
+                                Html = new Content(CreateEmailBody_NewsLetterService())
+                            }
+                        }
+                    };
+                    var responce = await client.SendEmailAsync(sendRequest);
+                }
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("EmailHelper", "SendEmail_NewsLetterService", ex.Message);
+                return "Failed";
+            }
+        }
+
+        /// <summary>Create email body to send email to user who subscribes for news letter service</summary>
+        public static string CreateEmailBody_NewsLetterService()
+        {
+            try
+            {
+                string emailBody;
+                var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                var path = Path.Combine(dir, "EmailTemplate\\Newsletter.html");
+                using (StreamReader reader = File.OpenText(path))
+                {
+                    emailBody = reader.ReadToEnd();
+                }
+                return emailBody;
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody_NewsLetterService", ex.Message);
+                return "Failed";
+            }
         }
     }
 }

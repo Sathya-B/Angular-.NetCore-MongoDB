@@ -12,7 +12,6 @@ using MH = Arthur_Clive.Helper.MongoHelper;
 using Swashbuckle.AspNetCore.Examples;
 using Arthur_Clive.Swagger;
 using MongoDB.Bson.Serialization;
-using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
 
 namespace Arthur_Clive.Controllers
@@ -68,7 +67,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "Get", "Get", ex.Message);
+                LoggerDataAccess.CreateLog("ProductController", "Get", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -123,7 +122,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "Get", "Get", ex.Message);
+                LoggerDataAccess.CreateLog("ProductController", "Get", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -161,7 +160,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "Post", "Post", ex.Message);
+                LoggerDataAccess.CreateLog("ProductController", "Post", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -206,7 +205,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "Delete", "Delete", ex.Message);
+                LoggerDataAccess.CreateLog("ProductController", "Delete", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -342,7 +341,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "Update", "Update", ex.Message);
+                LoggerDataAccess.CreateLog("ProductController", "Update", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -351,7 +350,7 @@ namespace Arthur_Clive.Controllers
                 });
             }
         }
-        
+
         /// <summary>Get all the reviews added for each products</summary>
         /// <response code="200">Returns reviews added for each product</response>  
         /// <response code="404">No product found</response>   
@@ -389,7 +388,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "GetAllReviews", "GetAllReviews", ex.Message);
+                LoggerDataAccess.CreateLog("ProductController", "GetAllReviews", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -486,7 +485,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "InsertReview", "InsertReview", ex.Message);
+                LoggerDataAccess.CreateLog("ProductController", "InsertReview", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -589,7 +588,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "InsertReview", "InsertReview", ex.Message);
+                LoggerDataAccess.CreateLog("ProductController", "InsertReview", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
 
@@ -13,6 +12,9 @@ namespace Arthur_Clive.Data
         /// <summary>UserName of user</summary>
         [Required]
         public string UserName { get; set; }
+        /// <summary>Email of user</summary>
+        [Required]
+        public string Email { get; set; }
     }
 
     /// <summary>Get address list</summary>

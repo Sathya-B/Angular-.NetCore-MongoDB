@@ -127,7 +127,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "Register", "Register", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "Register", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -201,7 +201,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "RegisterVerification", "RegisterVerification", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "RegisterVerification", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -285,7 +285,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "Login", "Login", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "Login", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -352,7 +352,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "ForgetPassword", "ForgetPassword", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "ForgetPassword", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -427,7 +427,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "ForgotPasswordVerification", "ForgotPasswordVerification", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "ForgotPasswordVerification", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -489,7 +489,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "ChangePassword", "ChangePassword", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "ChangePassword", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -566,7 +566,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "ChangePasswordWhenLoggedIn", "ChangePasswordWhenLoggedIn", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "ChangePasswordWhenLoggedIn", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -629,7 +629,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "DeactivateAccount", "DeactivateAccount", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "DeactivateAccount", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -722,7 +722,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "GoogleLogin", "GoogleLogin", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "GoogleLogin", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -815,7 +815,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "FaceBookLogin", "FaceBookLogin", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "FaceBookLogin", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -894,7 +894,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "GoogleLogin", "GoogleLogin", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "GoogleLogin", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -946,7 +946,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "GetUserInfo", "GetUserInfo", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "GetUserInfo", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -1018,7 +1018,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "UpdateFullName", "UpdateFullName", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "UpdateFullName", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -1095,7 +1095,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "UpdatePhoneNumber", "UpdatePhoneNumber", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "UpdatePhoneNumber", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -1171,7 +1171,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "UpdateEmailId", "UpdateEmailId", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "UpdateEmailId", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -1272,7 +1272,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "UpdateFullName", "UpdateFullName", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "UpdateFullName", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

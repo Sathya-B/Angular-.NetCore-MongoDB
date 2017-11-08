@@ -10,6 +10,7 @@ using MongoDB.Driver;
 using AH = Arthur_Clive.Helper.AmazonHelper;
 using WH = Arthur_Clive.Helper.MinioHelper;
 using MH = Arthur_Clive.Helper.MongoHelper;
+using MongoDB.Bson.Serialization;
 
 namespace Arthur_Clive.Helper
 {
@@ -25,13 +26,21 @@ namespace Arthur_Clive.Helper
         /// <summary>Get client for MongoDB</summary>
         public static MongoClient GetClient()
         {
-            var ip = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("ip").First().Value;
-            var user = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("user").First().Value;
-            var password = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("password").First().Value;
-            var db = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("db").First().Value;
-            var connectionString = "mongodb://"+user+":"+password+"@"+ip+":27017/"+ db;
-            var mongoClient = new MongoClient(connectionString);
-            return mongoClient;
+            try
+            {
+                var ip = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("ip").First().Value;
+                var user = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("user").First().Value;
+                var password = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("password").First().Value;
+                var db = GlobalHelper.ReadXML().Elements("mongo").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("db").First().Value;
+                var connectionString = "mongodb://" + user + ":" + password + "@" + ip + ":27017/" + db;
+                var mongoClient = new MongoClient(connectionString);
+                return mongoClient;
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("MongoHelper", "GetClient", ex.Message);
+                return null;
+            }
         }
 
         /// <summary>Get single object from MongoDB</summary>
@@ -40,10 +49,18 @@ namespace Arthur_Clive.Helper
         /// <param name="collectionName"></param>
         public static async Task<BsonDocument> GetSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName)
         {
-            _mongodb = _client.GetDatabase(dbName);
-            var collection = _mongodb.GetCollection<BsonDocument>(collectionName);
-            IAsyncCursor<BsonDocument> cursor = await collection.FindAsync(filter);
-            return cursor.FirstOrDefault();
+            try
+            {
+                _mongodb = _client.GetDatabase(dbName);
+                var collection = _mongodb.GetCollection<BsonDocument>(collectionName);
+                IAsyncCursor<BsonDocument> cursor = await collection.FindAsync(filter);
+                return cursor.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("MongoHelper", "GetSingleObject", ex.Message);
+                return null;
+            }
         }
 
         /// <summary>Get list of objects from MongoDB</summary>
@@ -80,9 +97,9 @@ namespace Arthur_Clive.Helper
                 IAsyncCursor<BsonDocument> cursor = await collection.FindAsync(filter);
                 return cursor.ToList();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("MongoHelper", "GetListOfObjects", "GetListOfObjects", ex.Message);
+                LoggerDataAccess.CreateLog("MongoHelper", "GetListOfObjects", ex.Message);
                 return null;
             }
         }
@@ -92,24 +109,40 @@ namespace Arthur_Clive.Helper
         /// <param name="dbName"></param>
         /// <param name="collectionName"></param>
         /// <param name="update"></param>
-        public static async Task<bool> UpdateSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName, UpdateDefinition<BsonDocument> update)
+        public static async Task<bool?> UpdateSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName, UpdateDefinition<BsonDocument> update)
         {
-            _mongodb = _client.GetDatabase(dbName);
-            var collection = _mongodb.GetCollection<BsonDocument>(collectionName);
-            var cursor = await collection.UpdateOneAsync(filter, update);
-            return cursor.ModifiedCount > 0;
+            try
+            {
+                _mongodb = _client.GetDatabase(dbName);
+                var collection = _mongodb.GetCollection<BsonDocument>(collectionName);
+                var cursor = await collection.UpdateOneAsync(filter, update);
+                return cursor.ModifiedCount > 0;
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("MongoHelper", "UpdateSingleObject", ex.Message);
+                return null;
+            }
         }
 
         /// <summary>Delete single object from MongoDB</summary>
         /// <param name="filter"></param>
         /// <param name="dbName"></param>
         /// <param name="collectionName"></param>
-        public static bool DeleteSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName)
+        public static bool? DeleteSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName)
         {
-            var data = GetSingleObject(filter, dbName, collectionName).Result;
-            var collection = _mongodb.GetCollection<BsonDocument>(collectionName);
-            var response = collection.DeleteOneAsync(data);
-            return response.Result.DeletedCount > 0;
+            try
+            {
+                var data = GetSingleObject(filter, dbName, collectionName).Result;
+                var collection = _mongodb.GetCollection<BsonDocument>(collectionName);
+                var response = collection.DeleteOneAsync(data);
+                return response.Result.DeletedCount > 0;
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("MongoHelper", "DeleteSingleObject", ex.Message);
+                return null;
+            }
         }
 
         /// <summary>Check if a data is present in MongoDB</summary>
@@ -121,16 +154,24 @@ namespace Arthur_Clive.Helper
         /// <param name="collectionName"></param>
         public static BsonDocument CheckForDatas(string filterField1, dynamic filterData1, string filterField2, dynamic filterData2, string dbName, string collectionName)
         {
-            FilterDefinition<BsonDocument> filter;
-            if (filterField2 == null)
+            try
             {
-                filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1);
+                FilterDefinition<BsonDocument> filter;
+                if (filterField2 == null)
+                {
+                    filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1);
+                }
+                else
+                {
+                    filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2);
+                }
+                return GetSingleObject(filter, dbName, collectionName).Result;
             }
-            else
+            catch (Exception ex)
             {
-                filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2);
+                LoggerDataAccess.CreateLog("MongoHelper", "CheckForDatas", ex.Message);
+                return null;
             }
-            return GetSingleObject(filter, dbName, collectionName).Result;
         }
 
         /// <summary>Get product list  from MongoDB</summary>
@@ -146,7 +187,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("GlobalHelper", "GetProducts", "GetProducts", ex.Message);
+                LoggerDataAccess.CreateLog("MongoHelper", "GetProducts", ex.Message);
                 return null;
             }
         }
@@ -156,7 +197,7 @@ namespace Arthur_Clive.Helper
         /// <param name="updateData"></param>
         /// <param name="updateField"></param>
         /// <param name="objectName"></param>
-        public async static Task<bool> UpdateProductDetails(dynamic objectId, dynamic updateData, string updateField, string objectName)
+        public async static Task<bool?> UpdateProductDetails(dynamic objectId, dynamic updateData, string updateField, string objectName)
         {
             try
             {
@@ -167,7 +208,7 @@ namespace Arthur_Clive.Helper
                 MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
                 var update1 = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductSKU", objectName));
                 var update2 = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Product", Builders<BsonDocument>.Update.Set("MinioObject_URL", MinioObject_URL));
-                if(update1 == true & update2 == true)
+                if (update1 == true & update2 == true)
                 {
                     return true;
                 }
@@ -178,8 +219,8 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("GlobalHelper", "UpdateProductDetails", "UpdateProductDetails", ex.Message);
-                return false;
+                LoggerDataAccess.CreateLog("MongoHelper", "UpdateProductDetails", ex.Message);
+                return null;
             }
         }
 
@@ -190,7 +231,7 @@ namespace Arthur_Clive.Helper
         /// <param name="updateData"></param>
         /// <param name="updateField"></param>
         /// <param name="objectName"></param>
-        public async static Task<bool> UpdateCategoryDetails(dynamic objectId, string productFor, string productType, dynamic updateData, string updateField, string objectName)
+        public async static Task<bool?> UpdateCategoryDetails(dynamic objectId, string productFor, string productType, dynamic updateData, string updateField, string objectName)
         {
             try
             {
@@ -204,10 +245,67 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("GlobalHelper", "UpdateCategoryDetails", "UpdateCategoryDetails", ex.Message);
-                return false;
+                LoggerDataAccess.CreateLog("MongoHelper", "UpdateCategoryDetails", ex.Message);
+                return null;
             }
         }
 
+        /// <summary>Update order details</summary>
+        /// <param name="orderId"></param>
+        public async static Task<string> UpdatePaymentDetails(long orderId)
+        {
+            try
+            {
+                PaymentMethod paymentDetails = new PaymentMethod();
+                List<StatusCode> statusCodeList = new List<StatusCode>();
+                var orderData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderId), "OrderDB", "OrderInfo").Result);
+                foreach (var detail in orderData.PaymentDetails.Status)
+                {
+                    statusCodeList.Add(detail);
+                }
+                statusCodeList.Add(new StatusCode { StatusId = 2, Description = "Payment Received", Date = DateTime.UtcNow });
+                paymentDetails.Status = statusCodeList;
+                var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("MongoHelper", "UpdatePaymentDetails", ex.Message);
+                return null;
+            }
+        }
+
+        /// <summary>Remove product in a particular cart</summary>
+        /// <param name="orderId"></param>
+        /// <param name="userName"></param>
+        /// <param name="email"></param>
+        public async static Task<string> RemoveCartItems(long orderId, string userName, string email)
+        {
+            try
+            {
+                IAsyncCursor<Cart> cartCursor = await _client.GetDatabase("UserInfo").GetCollection<Cart>("Cart").FindAsync(Builders<Cart>.Filter.Eq("UserName", userName));
+                var cartDatas = cartCursor.ToList();
+                foreach (var cart in cartDatas)
+                {
+                    foreach (var product in GetProducts(cart.ProductSKU, _client.GetDatabase("ProductDB")).Result)
+                    {
+                        long updateQuantity = product.ProductStock - cart.ProductQuantity;
+                        if (product.ProductStock - cart.ProductQuantity < 0)
+                        {
+                            updateQuantity = 0;
+                            var emailResponce = EmailHelper.SendEmailToAdmin(userName.ToString(), email.ToString(), cart.ProductSKU, cart.ProductQuantity, product.ProductStock, orderId).Result;
+                        }
+                        var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", cart.ProductSKU), "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductStock", updateQuantity)).Result;
+                    }
+                }
+                var removeCartItems = _client.GetDatabase("UserInfo").GetCollection<Cart>("Cart").DeleteMany(Builders<Cart>.Filter.Eq("UserName", userName));
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("MongoHelper", "RemoveCartItems", ex.Message);
+                return null;
+            }
+        }
     }
 }

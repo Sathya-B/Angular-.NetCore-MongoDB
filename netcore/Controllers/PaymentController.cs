@@ -7,15 +7,12 @@ using PU = Arthur_Clive.Helper.PayUHelper;
 using Arthur_Clive.Logger;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
-using Arthur_Clive.Swagger;
 using MongoDB.Driver;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Xml.Linq;
-using System.Text;
 
 namespace Arthur_Clive.Controllers
 {
@@ -52,44 +49,9 @@ namespace Arthur_Clive.Controllers
                     if (PU.Generatehash512(PU.GetReverseHashString(paymentResponse["txnid"], paymentModel)) == paymentResponse["hash"])
                     {
                         var updatePaymentMethod = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
-                        PaymentMethod paymentDetails = new PaymentMethod();
-                        List<StatusCode> statusCodeList = new List<StatusCode>();
-                        var orderData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo").Result);
-                        foreach (var detail in orderData.PaymentDetails.Status)
-                        {
-                            statusCodeList.Add(detail);
-                        }
-                        statusCodeList.Add(new StatusCode { StatusId = 2, Description = "Payment Received", Date = DateTime.UtcNow });
-                        paymentDetails.Status = statusCodeList;
-                        var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
-                        IAsyncCursor<Cart> cartCursor = await _db.GetCollection<Cart>("Cart").FindAsync(Builders<Cart>.Filter.Eq("UserName", paymentModel.UserName));
-                        var cartDatas = cartCursor.ToList();
-                        foreach (var cart in cartDatas)
-                        {
-                            foreach (var product in MH.GetProducts(cart.ProductSKU, product_db).Result)
-                            {
-                                long updateQuantity = product.ProductStock - cart.ProductQuantity;
-                                if (product.ProductStock - cart.ProductQuantity < 0)
-                                {
-                                    updateQuantity = 0;
-                                    var emailResponce = EmailHelper.SendEmailToAdmin(paymentModel.UserName.ToString(), paymentModel.Email.ToString(), cart.ProductSKU, cart.ProductQuantity, product.ProductStock, paymentModel.OrderId).Result;
-                                }
-                                var result = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", cart.ProductSKU), "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductStock", updateQuantity)).Result;
-                            }
-                        }
-                        var removeCartItems = _db.GetCollection<Cart>("Cart").DeleteMany(Builders<Cart>.Filter.Eq("UserName", paymentModel.UserName));
-                        var checkOrder = MH.CheckForDatas("OrderId",paymentModel.OrderId,null,null,"OrderDB","OrderInfo");
-                        if (checkOrder != null)
-                        {
-                            var orderInfo = BsonSerializer.Deserialize<OrderInfo>(checkOrder);
-                            List<string> productInfoList = new List<string>();
-                            foreach(var product in orderInfo.ProductDetails)
-                            {
-                                productInfoList.Add(product.ProductSKU);
-                            }
-                            var productInfoString = String.Join(":", productInfoList);
-                            var sendGift = EmailHelper.SendGift(paymentModel.OrderId, productInfoString);
-                        }
+                        var updatePaymentDetails = await MH.UpdatePaymentDetails(paymentModel.OrderId);
+                        var removeCartItems = MH.RemoveCartItems(paymentModel.OrderId, paymentModel.UserName, paymentModel.Email);
+                        var sendGift = GlobalHelper.SendGift(paymentModel.OrderId);
                         return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectsuccess").First().Value);
                     }
                     else
@@ -111,7 +73,7 @@ namespace Arthur_Clive.Controllers
                 }
                 catch (Exception ex)
                 {
-                    LoggerDataAccess.CreateLog("PaymentController", "PaymentSuccess", "PaymentSuccess", ex.Message);
+                    LoggerDataAccess.CreateLog("PaymentController", "PaymentSuccess", ex.Message);
                     var updatePaymentMethod = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
                     PaymentMethod paymentDetails = new PaymentMethod();
                     List<StatusCode> statusCodeList = new List<StatusCode>();

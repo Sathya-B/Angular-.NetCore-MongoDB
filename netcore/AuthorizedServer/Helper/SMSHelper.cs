@@ -65,7 +65,7 @@ namespace AuthorizedServer.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("SMSHelper", "SendSMS", "SendSMS", ex.Message);
+                LoggerDataAccess.CreateLog("SMSHelper", "SendSMS", ex.Message);
                 return "Failed";
             }
         }

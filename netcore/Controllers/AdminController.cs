@@ -26,36 +26,53 @@ namespace Arthur_Clive.Controllers
         public IMongoDatabase user_db = MH._client.GetDatabase("UserInfo");
 
         /// <summary>Subscribe user</summary>
-        /// <param name="username">UserName of user who needs to be subscribed</param>
+        /// <param name="emailid">Email of user who needs to be subscribed</param>
         /// <remarks>This api adds user to subscribed user list</remarks>
         /// <response code="200">User subscribed successfully</response>
+        /// <response code="404">User not found</response>    
         /// <response code="401">User already subscribed</response>    
         /// <response code="402">UserName is empty</response>
         /// <response code="400">Process ran into an exception</response>    
-        [HttpPost("subscribe/{username}")]
+        [HttpPost("subscribe/{emailid}")]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> Subscribe(string username)
+        public async Task<ActionResult> Subscribe(string emailid)
         {
             try
             {
-                if (username != null)
+                if (emailid != null)
                 {
-                    if (MH.CheckForDatas("UserName", username, null, null, "SubscribeDB", "SubscribedUsers") == null)
+                    var userData = MH.CheckForDatas("Email", emailid, null, null, "Authentication", "Authentication");
+                    if (userData != null)
                     {
-                        await _db.GetCollection<Subscribe>("SubscribedUsers").InsertOneAsync(new Subscribe { UserName = username });
-                        return Ok(new ResponseData
+                        var checkUser = MH.CheckForDatas("Email", emailid, null, null, "SubscribeDB", "SubscribedUsers");
+                        if (checkUser == null)
                         {
-                            Code = "200",
-                            Message = "Subscribed Succesfully",
-                            Data = null
-                        });
+                            var username = BsonSerializer.Deserialize<RegisterModel>(userData).UserName;
+                            await _db.GetCollection<Subscribe>("SubscribedUsers").InsertOneAsync(new Subscribe { UserName = username, Email = emailid });
+                            var sendEmail = EmailHelper.SendEmail_NewsLetterService(emailid);
+                            return Ok(new ResponseData
+                            {
+                                Code = "200",
+                                Message = "Subscribed Succesfully",
+                                Data = null
+                            });
+                        }
+                        else
+                        {
+                            return BadRequest(new ResponseData
+                            {
+                                Code = "401",
+                                Message = "User Already Subscribed",
+                                Data = null
+                            });
+                        }
                     }
                     else
                     {
                         return BadRequest(new ResponseData
                         {
-                            Code = "401",
-                            Message = "User Already Subscribed",
+                            Code = "404",
+                            Message = "User not found",
                             Data = null
                         });
                     }
@@ -65,14 +82,14 @@ namespace Arthur_Clive.Controllers
                     return BadRequest(new ResponseData
                     {
                         Code = "402",
-                        Message = "UserName connot be empty",
+                        Message = "EmailId connot be empty",
                         Data = null
                     });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "Subscribe", "Subscribe", ex.Message);
+                LoggerDataAccess.CreateLog("AdminContoller", "Subscribe", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -130,7 +147,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "Unsubscribe", "Unsubscribe", ex.Message);
+                LoggerDataAccess.CreateLog("AdminContoller", "Unsubscribe", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -158,7 +175,7 @@ namespace Arthur_Clive.Controllers
                 {
                     foreach (var user in users)
                     {
-                        await EmailHelper.SendEmail_ToUsers(user.UserName, user.UserName, message);
+                        await EmailHelper.SendEmail_ToSubscribedUsers(user.Email, user.Email, message);
                     }
                     return Ok(new ResponseData
                     {
@@ -179,7 +196,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "PublicPost", "PublicPost", ex.Message);
+                LoggerDataAccess.CreateLog("AdminContoller", "PublicPost", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -238,7 +255,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "UploadImageToS3", "UploadImageToS3", ex.Message);
+                LoggerDataAccess.CreateLog("AdminContoller", "UploadImageToS3", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -314,7 +331,150 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "GetAllUsers", "GetAllUsers", ex.Message);
+                LoggerDataAccess.CreateLog("AdminContoller", "GetAllUsers", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        /// <summary>Get all the roles added bt admin</summary>
+        /// <response code="200">Returns all the roles added by the admin</response>   
+        /// <response code="404">No roles found</response>   
+        /// <response code="400">Process ran into an exception</response>
+        [HttpGet("roles")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public ActionResult GetAllRoles()
+        {
+            try
+            {
+                var getRoles = MH.GetListOfObjects(null, null, null, null, null, null, "RolesDB", "Roles").Result;
+                if (getRoles != null)
+                {
+                    List<Roles> rolesList = new List<Roles>();
+                    foreach (var role in getRoles)
+                    {
+                        var roleInfo = BsonSerializer.Deserialize<Roles>(role);
+                        rolesList.Add(roleInfo);
+                    }
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Success",
+                        Data = rolesList
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "No roles found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AdminContoller", "GetAllRoles", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        /// <summary>Get details of role with the matching role name</summary>
+        /// <response code="200">Returns details of role with matching role name added by the admin</response>   
+        /// <response code="404">No role found with this name</response>   
+        /// <response code="400">Process ran into an exception</response>
+        [HttpGet("roles/details/{rolename}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public ActionResult GetRoleDetailByName(string rolename)
+        {
+            try
+            {
+                var getRole = MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("RoleName", rolename), "RolesDB", "Roles").Result;
+                if (getRole != null)
+                {
+                    var roleInfo = BsonSerializer.Deserialize<Roles>(getRole);
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Success",
+                        Data = roleInfo
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "No role found with specified role name",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AdminContoller", "GetRoleDetailByName", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        /// <summary>Get roles which have specified level of access</summary>
+        /// <response code="200">Returns details of roles with matching level of access</response>   
+        /// <response code="404">No role found having the specified level of access</response>   
+        /// <response code="400">Process ran into an exception</response>
+        [HttpGet("roles/details/{levelofaccess}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public ActionResult GetRolesByLevelOfAccess(string levelofaccess)
+        {
+            try
+            {
+                var getRoles = MH.GetListOfObjects(null, null, null, null, null, null, "RolesDB", "Roles").Result;
+                if (getRoles != null)
+                {
+                    List<Roles> rolesList = new List<Roles>();
+                    foreach (var role in getRoles)
+                    {
+                        var roleInfo = BsonSerializer.Deserialize<Roles>(role);
+                        string accessLevel = "Level" + levelofaccess + "Access";
+                        if (roleInfo.LevelOfAccess.Contains(accessLevel))
+                        {
+                            rolesList.Add(roleInfo);
+                        }
+                    }
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Success",
+                        Data = rolesList
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "No roles found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("AdminContoller", "GetRolesByLevelOfAccess", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -368,7 +528,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "InsertRole", "InsertRole", ex.Message);
+                LoggerDataAccess.CreateLog("AdminContoller", "InsertRole", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -390,10 +550,10 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var checkuser = MH.CheckForDatas("UserName",username,null,null,"Authentication", "Authentication");
+                var checkuser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
                 if (checkuser != null)
                 {
-                    var updateRole = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName",username), "Authentication", "Authentication",Builders<BsonDocument>.Update.Set("UserRole",rolename));
+                    var updateRole = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("UserRole", rolename));
                     return Ok(new ResponseData
                     {
                         Code = "200",
@@ -413,7 +573,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "InsertRoles", "InsertRoles", ex.Message);
+                LoggerDataAccess.CreateLog("AdminContoller", "InsertRoles", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

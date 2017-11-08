@@ -48,7 +48,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("UserController", "GetDefaultAddressOfUser", "GetDefaultAddressOfUser", ex.Message);
+                LoggerDataAccess.CreateLog("UserController", "GetDefaultAddressOfUser", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -86,7 +86,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("UserController", "RefreshUserInfo", "RefreshUserInfo", ex.Message);
+                LoggerDataAccess.CreateLog("UserController", "RefreshUserInfo", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -95,7 +95,7 @@ namespace Arthur_Clive.Controllers
                 });
             }
         }
-        
+
         /// <summary>Get products in cart of user</summary>
         /// <param name="username">UserName of user</param>
         /// <remarks>This api is user to get products in cart of an user</remarks>
@@ -125,7 +125,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "GetProductsInCart", "GetProductsInCart", ex.Message);
+                LoggerDataAccess.CreateLog("UserController", "GetProductsInCart", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -163,7 +163,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "RefreshCart", "RefreshCart", ex.Message);
+                LoggerDataAccess.CreateLog("UserController", "RefreshCart", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -172,7 +172,7 @@ namespace Arthur_Clive.Controllers
                 });
             }
         }
-        
+
         /// <summary>Get products in wishlist of user</summary>
         /// <param name="username">UserName of user</param>
         /// <remarks>This api is user to get products in wishlist of an user</remarks>
@@ -202,7 +202,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "GetProductsInWishList", "GetProductsInWishList", ex.Message);
+                LoggerDataAccess.CreateLog("UserController", "GetProductsInWishList", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -240,7 +240,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "RefreshWishList", "RefreshWishList", ex.Message);
+                LoggerDataAccess.CreateLog("UserController", "RefreshWishList", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

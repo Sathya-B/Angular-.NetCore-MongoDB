@@ -11,6 +11,7 @@ using MH = Arthur_Clive.Helper.MongoHelper;
 using Swashbuckle.AspNetCore.Examples;
 using Arthur_Clive.Swagger;
 using Arthur_Clive.Helper;
+using System.Linq;
 
 namespace Arthur_Clive.Controllers
 {
@@ -117,13 +118,29 @@ namespace Arthur_Clive.Controllers
                         RegisterModel userInfo = BsonSerializer.Deserialize<RegisterModel>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication").Result);
                         Address addressInfo = BsonSerializer.Deserialize<Address>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "UserInfo", "UserInfo").Result);
                         PaymentModel paymentModel = new PaymentModel { FirstName = userInfo.FullName, UserName = username, LastName = "", ProductInfo = productInfo, Amount = data.TotalAmount.ToString(), Email = userInfo.Email, PhoneNumber = userInfo.PhoneNumber, AddressLine1 = addressInfo.AddressLines, AddressLine2 = addressInfo.Landmark, City = addressInfo.City, State = addressInfo.State, Country = userInfo.UserLocation, ZipCode = addressInfo.PinCode, OrderId = data.OrderId };
-                        var hashtableData = PayUHelper.GetHashtableData(paymentModel);
-                        return Ok(new ResponseData
+                        if (data.TotalAmount == 0)
                         {
-                            Code = "200",
-                            Message = "Order Placed",
-                            Data = hashtableData
-                        });
+                            var updatePaymentMethod = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentMethod", "Coupon"));
+                            var updatePaymentDetails = await MH.UpdatePaymentDetails(paymentModel.OrderId);
+                            var removecartItems = await MH.RemoveCartItems(paymentModel.OrderId, paymentModel.UserName, paymentModel.Email);
+                            var sendGift = GlobalHelper.SendGift(paymentModel.OrderId);
+                            return Ok(new ResponseData
+                            {
+                                Code = "201",
+                                Message = "Payment success",
+                                Data = null
+                            });
+                        }
+                        else
+                        {
+                            var hashtableData = PayUHelper.GetHashtableData(paymentModel);
+                            return Ok(new ResponseData
+                            {
+                                Code = "200",
+                                Message = "Order Placed",
+                                Data = hashtableData
+                            });
+                        }
                     }
                     else
                     {
@@ -147,7 +164,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("OrderController", "PlaceOrder", "PlaceOrder", ex.Message);
+                LoggerDataAccess.CreateLog("OrderController", "PlaceOrder", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -156,7 +173,7 @@ namespace Arthur_Clive.Controllers
                 });
             }
         }
-        
+
         /// <summary>Get orders by order id</summary>
         /// <param name="orderid">Id of order</param>
         /// <response code="200">Returns order that matches the order id</response>
@@ -168,7 +185,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var checkData = MH.CheckForDatas("OrderId",orderid,null,null,"OrderDB","OrderInfo");
+                var checkData = MH.CheckForDatas("OrderId", orderid, null, null, "OrderDB", "OrderInfo");
                 if (checkData != null)
                 {
                     return Ok(new ResponseData
@@ -190,7 +207,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("OrderController", "GetOrdersOfUser", "GetOrdersOfUser", ex.Message);
+                LoggerDataAccess.CreateLog("OrderController", "GetOrdersOfUser", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -212,11 +229,11 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var orderList = MH.GetListOfObjects("UserName", username,null,null,null,null,"OrderDB","OrderInfo").Result;
+                var orderList = MH.GetListOfObjects("UserName", username, null, null, null, null, "OrderDB", "OrderInfo").Result;
                 if (orderList != null)
                 {
                     List<OrderInfo> orders = new List<OrderInfo>();
-                    foreach(var order in orderList)
+                    foreach (var order in orderList)
                     {
                         orders.Add(BsonSerializer.Deserialize<OrderInfo>(order));
                     }
@@ -239,7 +256,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("OrderController", "GetOrdersOfUser", "GetOrdersOfUser", ex.Message);
+                LoggerDataAccess.CreateLog("OrderController", "GetOrdersOfUser", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -283,7 +300,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("OrderController", "GetOrdersOfUser", "GetOrdersOfUser", ex.Message);
+                LoggerDataAccess.CreateLog("OrderController", "GetOrdersOfUser", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -335,7 +352,7 @@ namespace Arthur_Clive.Controllers
                         }
                         int statusId = 0;
                         if (status == "Packing In Progress") { statusId = 2; }
-                        else if (status == "Order Shipped") { statusId =3; }
+                        else if (status == "Order Shipped") { statusId = 3; }
                         else if (status == "Order Delivered") { statusId = 5; }
                         else if (status == "Order Replaced") { statusId = 7; }
                         else if (status == "Order Refunded") { statusId = 9; }
@@ -372,7 +389,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("OrderController", "UpdateDeliveryStatus", "UpdateDeliveryStatus", ex.Message);
+                LoggerDataAccess.CreateLog("OrderController", "UpdateDeliveryStatus", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -502,7 +519,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("OrderController", "CancelOrder", "CancelOrder", ex.Message);
+                LoggerDataAccess.CreateLog("OrderController", "CancelOrder", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -695,7 +712,7 @@ namespace Arthur_Clive.Controllers
                 }
                 catch (Exception ex)
                 {
-                    LoggerDataAccess.CreateLog("OrderController", "CancelOrder", "CancelOrder", ex.Message);
+                    LoggerDataAccess.CreateLog("OrderController", "CancelOrder", ex.Message);
                     return BadRequest(new ResponseData
                     {
                         Code = "400",

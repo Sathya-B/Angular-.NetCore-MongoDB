@@ -62,13 +62,13 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("SubCategoryController", "Get", "Get Subcategories", ex.Message);
+                LoggerDataAccess.CreateLog("SubCategoryController", "Get", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
                     Message = "Failed",
                     Data = ex.Message
-                }); 
+                });
             }
         }
 

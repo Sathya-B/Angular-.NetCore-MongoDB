@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Amazon.S3;
 using Amazon.S3.Model;
-using Amazon.S3.Transfer;
-using Arthur_Clive.Data;
 using Arthur_Clive.Logger;
 using Microsoft.AspNetCore.Http;
 
@@ -49,7 +44,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                Logger.LoggerDataAccess.CreateLog("AmazonHelper", "GetAmazonS3Object", "GetAmazonS3Object", ex.Message);
+                Logger.LoggerDataAccess.CreateLog("AmazonHelper", "GetAmazonS3Object", ex.Message);
                 return "";
             }
         }
@@ -68,7 +63,7 @@ namespace Arthur_Clive.Helper
         /// <param name="file">Details of image</param>
         /// <param name="bucketName">Details of image</param>
         /// <param name="objectName">Details of image</param>
-        public async static Task<bool> UploadImageToS3(IFormFile file,string bucketName,string objectName)
+        public async static Task<bool> UploadImageToS3(IFormFile file, string bucketName, string objectName)
         {
             try
             {
@@ -89,7 +84,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AmazonHelper", "UploadImageToS3", "UploadImageToS3", ex.Message);
+                LoggerDataAccess.CreateLog("AmazonHelper", "UploadImageToS3", ex.Message);
                 return false;
             }
         }

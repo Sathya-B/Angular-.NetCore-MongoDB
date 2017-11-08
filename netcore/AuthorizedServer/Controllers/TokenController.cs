@@ -74,7 +74,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("TokenController", "Auth", "Auth", ex.Message);
+                LoggerDataAccess.CreateLog("TokenController", "Auth", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

@@ -7,7 +7,6 @@ using MongoDB.Driver;
 using AH = Arthur_Clive.Helper.AmazonHelper;
 using WH = Arthur_Clive.Helper.MinioHelper;
 using MH = Arthur_Clive.Helper.MongoHelper;
-using GH = Arthur_Clive.Helper.GlobalHelper;
 using MongoDB.Bson;
 using Swashbuckle.AspNetCore.Examples;
 using Arthur_Clive.Swagger;
@@ -64,7 +63,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CategoryController", "Get", "Get", ex.Message);
+                LoggerDataAccess.CreateLog("CategoryController", "Get", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -100,7 +99,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CategoryController", "Post", "Post", ex.Message);
+                LoggerDataAccess.CreateLog("CategoryController", "Post", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -147,7 +146,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CategoryController", "Delete", "Delete", ex.Message);
+                LoggerDataAccess.CreateLog("CategoryController", "Delete", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -176,17 +175,17 @@ namespace Arthur_Clive.Controllers
                 {
                     var objectId = BsonSerializer.Deserialize<Category>(checkData).Id;
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", objectId);
-                    if(data.ProductFor!= null)
+                    if (data.ProductFor != null)
                     {
                         var objectName = data.ProductFor + "-" + BsonSerializer.Deserialize<Category>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Category")).ProductType;
-                        await MH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor,productType, data.ProductFor, "ProductFor", objectName + ".jpg");
+                        await MH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor, productType, data.ProductFor, "ProductFor", objectName + ".jpg");
                     }
-                    if(data.ProductType != null)
+                    if (data.ProductType != null)
                     {
                         var objectName = BsonSerializer.Deserialize<Category>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Category")).ProductFor + "-" + data.ProductType;
                         await MH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor, productType, data.ProductType, "ProductType", objectName + ".jpg");
                     }
-                    if(data.Description != null)
+                    if (data.Description != null)
                     {
                         var update = await MH.UpdateSingleObject(filter, "ProductDB", "Category", Builders<BsonDocument>.Update.Set("Description", data.Description));
                     }
@@ -209,7 +208,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CategoryController", "Update", "Update", ex.Message);
+                LoggerDataAccess.CreateLog("CategoryController", "Update", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

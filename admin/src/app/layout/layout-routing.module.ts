@@ -13,6 +13,7 @@ const routes: Routes = [
             { path: 'orders', loadChildren: './orders/orders.module#OrdersModule' },
             { path: 'userinfo', loadChildren: './userinfo/userinfo.module#UserInfoModule' },
             { path: 'reviews', loadChildren: './reviews/reviews.module#ReviewsModule' },
+            { path: 'coupons', loadChildren: './coupons/coupons.module#CouponsModule' },
             { path: 'blank-page', loadChildren: './blank-page/blank-page.module#BlankPageModule' },
         ]
     }

@@ -5,9 +5,14 @@
       <div class="itemDescColourWrap">
         <div class="itemDescColourWrapInner">
           <a (click)="viewItem()" style="cursor: pointer"><span class="itemOderTabHeading">{{item.productFor + ' ' + item.productType}}</span></a>
-          <div class="itemColour">Colour : <span>{{item.productColour}}</span></div>
+          <div class="colourTab">
+          <div>Colour:</div>
+          <div class="colourBoxWrap clearfix">          
+          <label [ngStyle]="{'background-color': item.productColour, 'border':'1px solid #cecece'}">{{item.productColour}}</label>
+          </div>
           <div class="itemSize" title="Selected Size" *ngIf="item.productSize !=''">
-            <span>{{item.productSize | replaceUnderscore}}</span>
+          <div>Size:</div><span>{{item.productSize | replaceUnderscore}}</span>
+          </div>
           </div>
         </div>
       </div>

@@ -13,6 +13,7 @@ import { ApiService } from './shared/services/api.service';
 import { AppState } from './shared/services/app.service';
 import { TokenService } from './shared/services/token.service';
 import { ToastMsgService } from './shared/services/toastmsg.service';
+import { LoginLogoutService } from './shared/services/loginlogout.service';
 import { HttpClientModule } from '@angular/common/http';
 import { ToasterModule, ToasterService, ToasterConfig } from 'angular2-toaster';
 
@@ -45,6 +46,7 @@ export function HttpLoaderFactory(http: Http) {
                 AppState,
                 ApiService,
                 ToastMsgService,
+                LoginLogoutService,
                 TokenService],
     bootstrap: [AppComponent]
 })

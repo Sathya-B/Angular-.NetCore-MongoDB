@@ -50,8 +50,15 @@
                 <div class="itemDescriptionWrap clearfix" *ngIf="product.productInCart.productType != 'Gifts'">
                   <h3>Product Description</h3>
                   <p>{{product.productInCart.productFor +' '+ product.productInCart.productType + ' ' + product.productInCart.productDesign}}</p>
-                  <p>Colour : {{product?.productInCart.productColour}}</p>
-                  <p>Size : {{product?.productInCart.productSize | replaceUnderscore}}</p>
+                  <div class="colourTab">
+                    <div>Colour:</div>
+                    <div class="colourBoxWrap clearfix">
+                      <label [ngStyle]="{'background-color': product.productInCart.productColour, 'border':'1px solid #cecece'}">{{product.productInCart.productColour}}</label>
+                    </div>
+                    <div class="itemSize" title="Selected Size" *ngIf="product.productInCart.productSize !=''">
+                      <div>Size:</div><span>{{product.productInCart.productSize | replaceUnderscore}}</span>
+                    </div>
+                  </div>
                 </div>
                 <div class="itemDescriptionWrap clearfix" *ngIf="product.productInCart.productType == 'Gifts'">
                   <h3>Product Description</h3>
@@ -146,11 +153,11 @@
                     </tr>
                     <tr>
                       <td align="left" valign="top" style="line-height:1.7;">
-                      {{billingAddress?.addressLines}}<br> {{billingAddress?.city}}
-                      <br> {{billingAddress?.state}}
-                      <br> {{billingAddress?.pinCode}}
-                      <br> {{billingAddress?.country}}
-                     </td>
+                        {{billingAddress?.addressLines}}<br> {{billingAddress?.city}}
+                        <br> {{billingAddress?.state}}
+                        <br> {{billingAddress?.pinCode}}
+                        <br> {{billingAddress?.country}}
+                      </td>
                     </tr>
                   </table>
                 </td>
@@ -161,10 +168,10 @@
                     </tr>
                     <tr>
                       <td align="left" valign="top" style="line-height:1.7;">
-                      {{shippingAddress?.addressLines}}<br> {{shippingAddress?.city}}
-                      <br> {{shippingAddress?.state}}
-                      <br> {{shippingAddress?.pinCode}}
-                      <br> {{shippingAddress?.country}}
+                        {{shippingAddress?.addressLines}}<br> {{shippingAddress?.city}}
+                        <br> {{shippingAddress?.state}}
+                        <br> {{shippingAddress?.pinCode}}
+                        <br> {{shippingAddress?.country}}
                       </td>
                     </tr>
                   </table>
@@ -208,29 +215,27 @@
                 <td align="center" valign="top" style="padding:15px 0; border-bottom:1px solid #000;">
                   <table width="1000" cellspacing="0" cellpadding="5" border="0">
                     <div class="productDetails" *ngFor="let product of orderItem.productDetails">
-                    <tr>
-                      <th width="400" align="left" valign="top">Product Description</th>
-                      <th width="200" align="center" valign="top">Qty</th>
-                      <th width="200" align="center" valign="top">Unit Price</th>
-                      <th width="200" align="right" valign="top">Item Total</th>
-                    </tr>
-                    <tr>
-                      <td align="left" valign="top" *ngIf="product.productInCart.productType != 'Gifts'">
-                        {{product.productInCart.productFor +' '+ product.productInCart.productType + ' ' + product.productInCart.productDesign}}
-                        <br>
-                        Colour : {{product?.productInCart.productColour}}
-                        <br>
-                        Size : {{product?.productInCart.productSize | replaceUnderscore}}
-                      </td>
-                      <td align="left" valign="top" *ngIf="product.productInCart.productType == 'Gifts'">
-                        <p>Arthur Clive {{' ' + product.productInCart.productDesign +' '+ product.productInCart.productType}}</p>
-                        <br>
-                        <p>For: {{product.productInCart.productFor}}</p>
-                      </td>
-                      <td align="center" valign="middle">{{product?.productInCart.productQuantity}}</td>
-                      <td align="center" valign="middle"><i class="fa fa-inr"></i><span class="unitPrice">{{product?.productInCart.productPrice}}</span></td>
-                      <td align="right" valign="middle"><i class="fa fa-inr"></i><span class="unitPrice">{{product?.productInCart.productPrice * product?.productInCart.productQuantity}}</span></td>
-                    </tr>
+                      <tr>
+                        <th width="400" align="left" valign="top">Product Description</th>
+                        <th width="200" align="center" valign="top">Qty</th>
+                        <th width="200" align="center" valign="top">Unit Price</th>
+                        <th width="200" align="right" valign="top">Item Total</th>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top" *ngIf="product.productInCart.productType != 'Gifts'">
+                          {{product.productInCart.productFor +' '+ product.productInCart.productType + ' ' + product.productInCart.productDesign}}
+                          <br> Colour : {{product?.productInCart.productColour}}
+                          <br> Size : {{product?.productInCart.productSize | replaceUnderscore}}
+                        </td>
+                        <td align="left" valign="top" *ngIf="product.productInCart.productType == 'Gifts'">
+                          <p>Arthur Clive {{' ' + product.productInCart.productDesign +' '+ product.productInCart.productType}}</p>
+                          <br>
+                          <p>For: {{product.productInCart.productFor}}</p>
+                        </td>
+                        <td align="center" valign="middle">{{product?.productInCart.productQuantity}}</td>
+                        <td align="center" valign="middle"><i class="fa fa-inr"></i><span class="unitPrice">{{product?.productInCart.productPrice}}</span></td>
+                        <td align="right" valign="middle"><i class="fa fa-inr"></i><span class="unitPrice">{{product?.productInCart.productPrice * product?.productInCart.productQuantity}}</span></td>
+                      </tr>
                     </div>
                   </table>
                 </td>

@@ -124,6 +124,7 @@ export class CheckOutComponent implements OnInit, OnDestroy {
             if (response.code === '200') {
               let postData = Util.xwwwfurlenc(response.data);
               this.apiService.formpost('https://test.payu.in/_payment', response.data, 'post');
+        //    this.apiService.formpost('https://secure.payu.in/_payment', response.data, 'post');
               return true;
             } else if (response.code === '201') {
               this.route.navigate(['/paymentsuccess']);

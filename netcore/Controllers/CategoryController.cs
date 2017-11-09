@@ -11,6 +11,7 @@ using MongoDB.Bson;
 using Swashbuckle.AspNetCore.Examples;
 using Arthur_Clive.Swagger;
 using MongoDB.Bson.Serialization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Arthur_Clive.Controllers
 {
@@ -78,6 +79,7 @@ namespace Arthur_Clive.Controllers
         /// <param name="category">Category to be inserted</param>
         /// <response code="200">Category inserted successfully</response>
         /// <response code="400">Process ran into an exception</response>  
+        [Authorize("Level1Access")]
         [HttpPost]
         [SwaggerRequestExample(typeof(Category), typeof(InsertCategoryDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
@@ -116,6 +118,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Category deleted</response>
         /// <response code="404">Category not found</response> 
         /// <response code="400">Process ran into an exception</response>  
+        [Authorize("Level1Access")]
         [HttpDelete("{productFor}/{productType}")]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult Delete(string productFor, string productType)
@@ -163,6 +166,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Category updated successfully</response>
         /// <response code="404">No category found</response>   
         /// <response code="400">Process ran into an exception</response>   
+        [Authorize("Level1Access")]
         [HttpPut("{productFor}/{productType}")]
         [SwaggerRequestExample(typeof(UpdateCategory), typeof(UpdateCategoryDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]

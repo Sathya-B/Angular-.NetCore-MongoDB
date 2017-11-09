@@ -213,6 +213,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="401">Image upload failed</response>   
         /// <response code="404">Image upload data not found</response>   
         /// <response code="400">Process ran into an exception</response>
+        [Authorize("Level1Access")]
         [HttpPost("uploadimage")]
         [SwaggerRequestExample(typeof(ImageData), typeof(ImageUploadDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
@@ -270,6 +271,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Returns all the users</response>   
         /// <response code="404">No users found</response>   
         /// <response code="400">Process ran into an exception</response>
+        [Authorize("Level1Access")]
         [HttpGet("getallusers")]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult GetAllUsers()

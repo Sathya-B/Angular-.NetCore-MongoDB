@@ -12,6 +12,7 @@ using Swashbuckle.AspNetCore.Examples;
 using Arthur_Clive.Swagger;
 using Arthur_Clive.Helper;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Arthur_Clive.Controllers
 {
@@ -271,6 +272,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Returns the all the orders placed</response>
         /// <response code="404">No orders found</response> 
         /// <response code="400">Process ran into an exception</response> 
+        [Authorize("Level1Access")]
         [HttpGet("viewallorders")]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> GetAllOrders()
@@ -318,6 +320,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="402">Product details status update failed</response> 
         /// <response code="404">Order not found</response> 
         /// <response code="400">Process ran into an exception</response> 
+        [Authorize("Level1Access")]
         [HttpPut("deliverystatus/update/{orderid}/{status}")]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult UpdateDeliveryStatus(int orderid, string status)

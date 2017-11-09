@@ -13,6 +13,7 @@ using Swashbuckle.AspNetCore.Examples;
 using Arthur_Clive.Swagger;
 using MongoDB.Bson.Serialization;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Arthur_Clive.Controllers
 {
@@ -137,6 +138,7 @@ namespace Arthur_Clive.Controllers
         /// <param name="product">Details of product to be inserted</param>
         /// <response code="200">Product inserted successfully</response>
         /// <response code="400">Process ran into an exception</response> 
+        [Authorize("Level1Access")]
         [HttpPost]
         [SwaggerRequestExample(typeof(Product), typeof(InsertProductDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
@@ -176,6 +178,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Product deleted successfully</response>
         /// <response code="404">No product found</response>   
         /// <response code="400">Process ran into an exception</response>   
+        [Authorize("Level1Access")]
         [HttpDelete("{productSKU}")]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult Delete(string productSKU)
@@ -220,7 +223,8 @@ namespace Arthur_Clive.Controllers
         /// <param name="productSKU">SKU of product to be updated</param>
         /// <response code="200">Product updated successfully</response>
         /// <response code="404">No product found</response>   
-        /// <response code="400">Process ran into an exception</response>   
+        /// <response code="400">Process ran into an exception</response> 
+        [Authorize("Level1Access")]
         [HttpPut("{productSKU}")]
         [SwaggerRequestExample(typeof(UpdateProduct), typeof(UpdateProductDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
@@ -355,6 +359,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Returns reviews added for each product</response>  
         /// <response code="404">No product found</response>   
         /// <response code="400">Process ran into an exception</response>  
+        [Authorize("Level1Access")]
         [HttpGet("getallreviews")]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult GetAllReviews()
@@ -502,7 +507,8 @@ namespace Arthur_Clive.Controllers
         /// <response code="401">No reviews found</response>    
         /// <response code="402">No reviews found with given id</response>  
         /// <response code="404">No product found</response>   
-        /// <response code="400">Process ran into an exception</response>  
+        /// <response code="400">Process ran into an exception</response> 
+        [Authorize("Level1Access")]
         [HttpPut("updatereview/{productSKU}")]
         [SwaggerRequestExample(typeof(UpdateReview), typeof(UpdateReviewDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]

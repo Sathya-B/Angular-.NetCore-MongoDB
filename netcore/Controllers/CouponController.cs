@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Arthur_Clive.Data;
 using Arthur_Clive.Logger;
 using Arthur_Clive.Swagger;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -24,6 +25,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Returns all the coupons found on db</response>
         /// <response code="404">No coupons found</response>  
         /// <response code="400">Process ran into an exception</response>  
+        [Authorize("Level1Access")]
         [HttpGet]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult GetAllCoupon()
@@ -73,6 +75,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Coupon inserted successfully</response>
         /// <response code="401">Coupon already added</response>  
         /// <response code="400">Process ran into an exception</response>  
+        [Authorize("Level1Access")]
         [HttpPost]
         [SwaggerRequestExample(typeof(Coupon), typeof(CouponData))]
         [ProducesResponseType(typeof(ResponseData), 200)]
@@ -281,6 +284,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Coupon updated successfully</response>
         /// <response code="404">Coupon not found</response>  
         /// <response code="400">Process ran into an exception</response> 
+        [Authorize("Level1Access")]
         [HttpPut("update/{code}")]
         [SwaggerRequestExample(typeof(UpdateCoupon), typeof(CouponUpdateData))]
         [ProducesResponseType(typeof(ResponseData), 200)]
@@ -347,6 +351,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Coupon deleted successfully</response>
         /// <response code="404">Coupon not found</response>  
         /// <response code="400">Process ran into an exception</response> 
+        [Authorize("Level1Access")]
         [HttpDelete("{code}")]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult DeleteCoupon(string code)

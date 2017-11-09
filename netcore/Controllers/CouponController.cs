@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Arthur_Clive.Data;
 using Arthur_Clive.Logger;
@@ -18,6 +19,53 @@ namespace Arthur_Clive.Controllers
     {
         /// <summary></summary>
         public IMongoDatabase _db = MH._client.GetDatabase("CouponDB");
+
+        /// <summary>Get all the coupons added to DB</summary>
+        /// <response code="200">Returns all the coupons found on db</response>
+        /// <response code="404">No coupons found</response>  
+        /// <response code="400">Process ran into an exception</response>  
+        [HttpGet]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public ActionResult GetAllCoupon()
+        {
+            try
+            {
+                var getCoupons = MH.GetListOfObjects(null, null, null, null, null, null, "CouponDB", "Coupon").Result;
+                if (getCoupons != null)
+                {
+                    List<Coupon> couponList = new List<Coupon>();
+                    foreach (var coupon in getCoupons)
+                    {
+                        couponList.Add(BsonSerializer.Deserialize<Coupon>(coupon));
+                    }
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Success",
+                        Data = couponList
+                    });
+                }
+                else
+                {
+                    return Ok(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "No coupons found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("CouponController", "GetAllCoupon", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
 
         /// <summary>Insert coupon</summary>
         /// <remarks>This api is used to insert a new coupon</remarks>
@@ -150,16 +198,16 @@ namespace Arthur_Clive.Controllers
         }
 
         /// <summary>Update coupon</summary>
-        /// <remarks>This api is used to update coupon details</remarks>
+        /// <remarks>This api is used to use coupon and update coupon details</remarks>
         /// <param name="data">Coupon details</param>
         /// <param name="code">Coupon code</param>
         /// <response code="200">Coupon updated successfully</response>
         /// <response code="404">Coupon not found</response>  
         /// <response code="400">Process ran into an exception</response> 
         [HttpPut("{code}")]
-        [SwaggerRequestExample(typeof(UpdateCoupon), typeof(CouponUpdateData))]
+        [SwaggerRequestExample(typeof(UseCoupon), typeof(UseCouponData))]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public ActionResult UpdateCoupon([FromBody]UpdateCoupon data, string code)
+        public ActionResult UseCoupon([FromBody]UseCoupon data, string code)
         {
             try
             {
@@ -168,22 +216,6 @@ namespace Arthur_Clive.Controllers
                 {
                     var result = BsonSerializer.Deserialize<Coupon>(checkData);
                     var filter = Builders<BsonDocument>.Filter.Eq("Code", code);
-                    if (data.ApplicableFor != null)
-                    {
-                        var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("ApplicableFor", data.ApplicableFor));
-                    }
-                    if (data.ExpiryTime != null)
-                    {
-                        var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("ExpiryTime", data.ExpiryTime));
-                    }
-                    if (data.Value > 0)
-                    {
-                        var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("Value", data.Value));
-                    }
-                    if (data.Percentage != null)
-                    {
-                        var updateResult = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("Percentage", data.Percentage));
-                    }
                     if (data.UsageCount > 0)
                     {
                         var coupon = BsonSerializer.Deserialize<Coupon>(MH.CheckForDatas("Code", code, null, null, "CouponDB", "Coupon"));
@@ -232,6 +264,74 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
+                LoggerDataAccess.CreateLog("CouponController", "UseCoupon", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        /// <summary>Update coupon</summary>
+        /// <remarks>This api is used to update coupon details</remarks>
+        /// <param name="data">Coupon details</param>
+        /// <param name="code">Coupon code</param>
+        /// <response code="200">Coupon updated successfully</response>
+        /// <response code="404">Coupon not found</response>  
+        /// <response code="400">Process ran into an exception</response> 
+        [HttpPut("update/{code}")]
+        [SwaggerRequestExample(typeof(UpdateCoupon), typeof(CouponUpdateData))]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public ActionResult UpdateCoupon([FromBody]UpdateCoupon data, string code)
+        {
+            try
+            {
+                var checkData = MH.CheckForDatas("Code", code, null, null, "CouponDB", "Coupon");
+                if (checkData != null)
+                {
+                    var result = BsonSerializer.Deserialize<Coupon>(checkData);
+                    var filter = Builders<BsonDocument>.Filter.Eq("Code", code);
+                    if (data.ApplicableFor != null)
+                    {
+                        var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("ApplicableFor", data.ApplicableFor));
+                    }
+                    if (data.ExpiryTime != null)
+                    {
+                        var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("ExpiryTime", data.ExpiryTime));
+                    }
+                    if(data.Value > 0)
+                    {
+                        var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("Value", data.Value));
+                    }
+                    if(data.Percentage != null)
+                    {
+                        var updateResult = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("Percentage", data.Percentage));
+                    }
+                    if(data.UsageCount > 0)
+                    {
+                        var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("UsageCount", data.UsageCount));
+                    }                    
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Coupon updated successfully",
+                        Data = null
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "Coupon not found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
                 LoggerDataAccess.CreateLog("CouponController", "UpdateCoupon", ex.Message);
                 return BadRequest(new ResponseData
                 {
@@ -240,6 +340,51 @@ namespace Arthur_Clive.Controllers
                     Data = ex.Message
                 });
             }
+        }
+
+        /// <summary>Delete a coupon</summary>
+        /// <param name="code">Code of coupon</param>
+        /// <response code="200">Coupon deleted successfully</response>
+        /// <response code="404">Coupon not found</response>  
+        /// <response code="400">Process ran into an exception</response> 
+        [HttpDelete("{code}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public ActionResult DeleteCoupon(string code)
+        {
+            try
+            {
+                var checkData = MH.CheckForDatas("Code", code, null, null, "CouponDB", "Coupon");
+                if (checkData != null)
+                {
+                    var delete = MH.DeleteSingleObject(Builders<BsonDocument>.Filter.Eq("Code",code),"CouponDB","Coupon");
+                    return Ok(new ResponseData
+                    {
+                        Code = "200",
+                        Message = "Coupon deleted successfully",
+                        Data = null
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "404",
+                        Message = "Coupon not found",
+                        Data = null
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("CouponController", "UpdateCoupon", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+
         }
     }
 }

@@ -133,7 +133,7 @@ namespace Arthur_Clive.Swagger
         {
             return new
             {
-                Code = "CODE1",
+                Code = "CU111111",
                 ApplicableFor = "All",
                 ExpiryTime = DateTime.UtcNow.AddMonths(1),
                 UsageCount = 10,
@@ -149,7 +149,24 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new
+            return new UpdateCoupon
+            {
+                ApplicableFor = "All",
+                ExpiryTime = DateTime.UtcNow,
+                Value = 100,
+                Percentage = false,
+                UsageCount = 1
+            };
+        }
+    }
+
+    /// <summary></summary>
+    public class UseCouponData : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new UseCoupon
             {
                 UsageCount = 1,
                 Amount = 100

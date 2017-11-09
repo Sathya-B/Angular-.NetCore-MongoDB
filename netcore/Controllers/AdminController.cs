@@ -6,6 +6,7 @@ using Arthur_Clive.Data;
 using Arthur_Clive.Helper;
 using Arthur_Clive.Logger;
 using Arthur_Clive.Swagger;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -32,7 +33,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="404">User not found</response>    
         /// <response code="401">User already subscribed</response>    
         /// <response code="402">UserName is empty</response>
-        /// <response code="400">Process ran into an exception</response>    
+        /// <response code="400">Process ran into an exception</response>   
         [HttpPost("subscribe/{emailid}")]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> Subscribe(string emailid)
@@ -106,7 +107,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="404">User not found</response>    
         /// <response code="402">UserName is empty</response>
         /// <response code="400">Process ran into an exception</response>    
-        [HttpPost("unsubscribe/{username}")]
+        [HttpDelete("unsubscribe/{username}")]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult Unsubscribe(string username)
         {

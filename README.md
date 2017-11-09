@@ -16,12 +16,13 @@ Application Features
   - Lazyloading Images
   - Incerceptor
   - Email subscription
+  - Authorization using various levels of access
+  - Payment Gateway Integration
+  - Gift Coupon Workflows
+  - Offer Coupon Workflows
+
 
   Live Site: https://artwear.in
 
 # Swagger UI available for APIs
 
-# Yet to be Implemented!
-
-  - Admin pages to add/reduce stock
-  - Admin dashboarding and reports

@@ -80,7 +80,7 @@ namespace Arthur_Clive.Helper
             {
                 string emailBody;
                 var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                var path = Path.Combine(dir, "EmailTemplate\\MessageFromAdmin.html");
+                var path = Path.Combine(dir, "EmailTemplate/MessageFromAdmin.html");
                 using (StreamReader reader = File.OpenText(path))
                 {
                     emailBody = reader.ReadToEnd();
@@ -144,7 +144,7 @@ namespace Arthur_Clive.Helper
             {
                 string emailBody;
                 var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                var path = Path.Combine(dir, "EmailTemplate\\ErrorReport.html");
+                var path = Path.Combine(dir, "EmailTemplate/ErrorReport.html");
                 using (StreamReader reader = File.OpenText(path))
                 {
                     emailBody = reader.ReadToEnd();
@@ -250,7 +250,7 @@ namespace Arthur_Clive.Helper
             {
                 string emailBody;
                 var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                var path = Path.Combine(dir, "EmailTemplate\\ECard.html");
+                var path = Path.Combine(dir, "EmailTemplate/ECard.html");
                 using (StreamReader reader = File.OpenText(path))
                 {
                     emailBody = reader.ReadToEnd();
@@ -314,7 +314,7 @@ namespace Arthur_Clive.Helper
             {
                 string emailBody;
                 var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                var path = Path.Combine(dir, "EmailTemplate\\Newsletter.html");
+                var path = Path.Combine(dir, "EmailTemplate/Newsletter.html");
                 using (StreamReader reader = File.OpenText(path))
                 {
                     emailBody = reader.ReadToEnd();
@@ -324,6 +324,121 @@ namespace Arthur_Clive.Helper
             catch (Exception ex)
             {
                 LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody_NewsLetterService", ex.Message);
+                return "Failed";
+            }
+        }
+
+        /// <summary>Send email to user who subscribes for news letter service</summary>
+        /// <param name="emailReceiver"></param>
+        /// <param name="orderId"></param>
+        public static async Task<string> SendEmail_ProductDetails(string emailReceiver, long orderId)
+        {
+            try
+            {
+                string emailSender = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsender").First().Value;
+                var orderInfo = BsonSerializer.Deserialize<OrderInfo>(MongoHelper.CheckForDatas("OrderId", orderId, null, null, "OrderDB", "OrderInfo"));
+                foreach (var product in orderInfo.ProductDetails)
+                {
+                    Address billingAddress = new Address();
+                    Address deliveryAddress = new Address();
+                    foreach (var address in orderInfo.Address)
+                    {
+                        if (address.BillingAddress == true)
+                        {
+                            billingAddress = address;
+                        }
+                        if (address.ShippingAddress == true)
+                        {
+                            deliveryAddress = address;
+                        }
+                    }
+                    using (var client = new AmazonSimpleEmailServiceClient(GetCredentials("accesskey"), GetCredentials("secretkey"), Amazon.RegionEndpoint.USWest2))
+                    {
+                        var sendRequest = new SendEmailRequest
+                        {
+                            Source = emailSender,
+                            Destination = new Destination { ToAddresses = new List<string> { emailReceiver } },
+                            Message = new Message
+                            {
+                                Subject = new Content(GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsubject6").First().Value),
+                                Body = new Body
+                                {
+                                    Html = new Content(CreateEmailBody_ProductDetails(orderInfo, product.ProductSKU, billingAddress, deliveryAddress, product))
+                                }
+                            }
+                        };
+                        var responce = await client.SendEmailAsync(sendRequest);
+                    }
+                }
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("EmailHelper", "SendEmail_ProductDetails", ex.Message);
+                return "Failed";
+            }
+        }
+
+        /// <summary>Create email body to send email to user who subscribes for news letter service</summary>
+        /// <param name="orderInfo"></param>
+        /// <param name="productSKU"></param>
+        /// <param name="billingAddress"></param>
+        /// <param name="deliveryAddress"></param>
+        /// <param name="productDetails"></param>
+        public static string CreateEmailBody_ProductDetails(OrderInfo orderInfo, string productSKU, Address billingAddress, Address deliveryAddress, ProductDetails productDetails)
+        {
+            try
+            {
+                string emailBody;
+                var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                var path = Path.Combine(dir, "EmailTemplate/OrderDetails.html");
+                using (StreamReader reader = File.OpenText(path))
+                {
+                    emailBody = reader.ReadToEnd();
+                }
+                var imageUrl = "https://s3.ap-south-1.amazonaws.com/arthurclive-products/" + productSKU + ".jpg";
+                var replaceImage = "<img src=" + imageUrl + " width='250' height='300'>";
+                var colourCircle = "<span style=\"border-radius:50%; border-style:double; padding:20px; background-color:" + productDetails.ProductInCart.ProductColour + "; display:block; width:20px; height:20px\">";
+                var replaceSize = "";
+                if (productDetails.ProductInCart.ProductSize.Contains("_"))
+                {
+                    replaceSize = productDetails.ProductInCart.ProductSize.Replace("_", "-");
+                }
+                else
+                {
+                    replaceSize = productDetails.ProductInCart.ProductSize;
+                }
+                emailBody = emailBody.Replace("{BA_AddressLines}", billingAddress.AddressLines);
+                emailBody = emailBody.Replace("{BA_City}", billingAddress.City);
+                emailBody = emailBody.Replace("{BA_State}", billingAddress.State);
+                emailBody = emailBody.Replace("{BA_PinCode}", billingAddress.PinCode);
+                emailBody = emailBody.Replace("{BA_Country}", billingAddress.Country);
+                emailBody = emailBody.Replace("{DA_AddressLines}", deliveryAddress.AddressLines);
+                emailBody = emailBody.Replace("{DA_City}", deliveryAddress.City);
+                emailBody = emailBody.Replace("{DA_State}", deliveryAddress.State);
+                emailBody = emailBody.Replace("{DA_PinCode}", deliveryAddress.PinCode);
+                emailBody = emailBody.Replace("{DA_Country}", deliveryAddress.Country);
+                emailBody = emailBody.Replace("{Invoice Number}", orderInfo.OrderId.ToString());
+                emailBody = emailBody.Replace("{Order Number}", "ACODR-" + orderInfo.OrderId.ToString());
+                emailBody = emailBody.Replace("{Order Date}", productDetails.StatusCode[0].Date.Date.ToString());
+                emailBody = emailBody.Replace("{Payment Method}", orderInfo.PaymentMethod);
+                emailBody = emailBody.Replace("{Image}", replaceImage);
+                emailBody = emailBody.Replace("{P_For}", productDetails.ProductInCart.ProductFor);
+                emailBody = emailBody.Replace("{P_Type}", productDetails.ProductInCart.ProductType);
+                emailBody = emailBody.Replace("{P_Tshirt}", productDetails.ProductInCart.ProductDesign);
+                emailBody = emailBody.Replace("{Colour_Image}", colourCircle);
+                emailBody = emailBody.Replace("{P_Size}", replaceSize);
+                emailBody = emailBody.Replace("{Quantity}", productDetails.ProductInCart.ProductQuantity.ToString());
+                emailBody = emailBody.Replace("{UnitPrice}", productDetails.ProductInCart.ProductDiscountPrice.ToString());
+                emailBody = emailBody.Replace("{ItemTotal}", (productDetails.ProductInCart.ProductDiscountPrice * productDetails.ProductInCart.ProductQuantity).ToString());
+                emailBody = emailBody.Replace("{Tax}", (((productDetails.ProductInCart.ProductPrice * productDetails.ProductInCart.ProductQuantity * 5) / 100)).ToString());
+                emailBody = emailBody.Replace("{Discount}", productDetails.ProductInCart.ProductDiscount.ToString());
+                emailBody = emailBody.Replace("{GrandTotal}", ((productDetails.ProductInCart.ProductPrice * productDetails.ProductInCart.ProductQuantity) + (((productDetails.ProductInCart.ProductPrice * productDetails.ProductInCart.ProductQuantity * 5) / 100))).ToString());
+                return emailBody;
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody_ProductDetails", ex.Message);
                 return "Failed";
             }
         }

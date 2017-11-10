@@ -52,6 +52,7 @@ namespace Arthur_Clive.Controllers
                         var updatePaymentDetails = await MH.UpdatePaymentDetails(paymentModel.OrderId);
                         var removeCartItems = MH.RemoveCartItems(paymentModel.OrderId, paymentModel.UserName, paymentModel.Email);
                         var sendGift = GlobalHelper.SendGift(paymentModel.OrderId);
+                        var sendProductDetails = EmailHelper.SendEmail_ProductDetails(paymentModel.Email, paymentModel.OrderId);
                         return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectsuccess").First().Value);
                     }
                     else
@@ -92,7 +93,6 @@ namespace Arthur_Clive.Controllers
             {
                 return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
             }
-
         }
 
         /// <summary>Failure responce from the PayU payment gateway</summary>
@@ -166,6 +166,12 @@ namespace Arthur_Clive.Controllers
                 return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectcancelled").First().Value);
             }
         }
-                
+
+        [HttpGet]
+        public void Sample()
+        {
+
+            var sendProductDetails = EmailHelper.SendEmail_ProductDetails("ragu9060@gmail.com", 8);
+        }
     }
 }

@@ -75,7 +75,7 @@ namespace AuthorizedServer.Helper
             {
                 string emailBody;
                 var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                var path = Path.Combine(dir, "EmailTemplate\\VerificationEmail.html");
+                var path = Path.Combine(dir, "EmailTemplate/VerificationEmail.html");
                 using (StreamReader reader = File.OpenText(path))
                 {
                     emailBody = reader.ReadToEnd();

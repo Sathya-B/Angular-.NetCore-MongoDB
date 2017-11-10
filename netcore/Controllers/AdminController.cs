@@ -42,38 +42,24 @@ namespace Arthur_Clive.Controllers
             {
                 if (emailid != null)
                 {
-                    var userData = MH.CheckForDatas("Email", emailid, null, null, "Authentication", "Authentication");
-                    if (userData != null)
+                    var checkUser = MH.CheckForDatas("Email", emailid, null, null, "SubscribeDB", "SubscribedUsers");
+                    if (checkUser == null)
                     {
-                        var checkUser = MH.CheckForDatas("Email", emailid, null, null, "SubscribeDB", "SubscribedUsers");
-                        if (checkUser == null)
+                        await _db.GetCollection<Subscribe>("SubscribedUsers").InsertOneAsync(new Subscribe { Email = emailid });
+                        var sendEmail = EmailHelper.SendEmail_NewsLetterService(emailid);
+                        return Ok(new ResponseData
                         {
-                            var username = BsonSerializer.Deserialize<RegisterModel>(userData).UserName;
-                            await _db.GetCollection<Subscribe>("SubscribedUsers").InsertOneAsync(new Subscribe { UserName = username, Email = emailid });
-                            var sendEmail = EmailHelper.SendEmail_NewsLetterService(emailid);
-                            return Ok(new ResponseData
-                            {
-                                Code = "200",
-                                Message = "Subscribed Succesfully",
-                                Data = null
-                            });
-                        }
-                        else
-                        {
-                            return BadRequest(new ResponseData
-                            {
-                                Code = "401",
-                                Message = "User Already Subscribed",
-                                Data = null
-                            });
-                        }
+                            Code = "200",
+                            Message = "Subscribed Succesfully",
+                            Data = null
+                        });
                     }
                     else
                     {
                         return BadRequest(new ResponseData
                         {
-                            Code = "404",
-                            Message = "User not found",
+                            Code = "401",
+                            Message = "User Already Subscribed",
                             Data = null
                         });
                     }
@@ -101,23 +87,23 @@ namespace Arthur_Clive.Controllers
         }
 
         /// <summary>Unsubscribe user</summary>
-        /// <param name="username">UserName of user who need to get unsubscribed</param>
+        /// <param name="emailid">UserName of user who need to get unsubscribed</param>
         /// <remarks>This api removes user from subscribed user list</remarks>
         /// <response code="200">User unsubscribed successfully</response>
         /// <response code="404">User not found</response>    
         /// <response code="402">UserName is empty</response>
         /// <response code="400">Process ran into an exception</response>    
-        [HttpDelete("unsubscribe/{username}")]
+        [HttpDelete("unsubscribe/{emailid}")]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public ActionResult Unsubscribe(string username)
+        public ActionResult Unsubscribe(string emailid)
         {
             try
             {
-                if (username != null)
+                if (emailid != null)
                 {
-                    if (MH.CheckForDatas("UserName", username, null, null, "SubscribeDB", "SubscribedUsers") != null)
+                    if (MH.CheckForDatas("Email", emailid, null, null, "SubscribeDB", "SubscribedUsers") != null)
                     {
-                        var filter = Builders<BsonDocument>.Filter.Eq("UserName", username);
+                        var filter = Builders<BsonDocument>.Filter.Eq("Email", emailid);
                         MH.DeleteSingleObject(filter, "SubscribeDB", "SubscribedUsers");
                         return Ok(new ResponseData
                         {

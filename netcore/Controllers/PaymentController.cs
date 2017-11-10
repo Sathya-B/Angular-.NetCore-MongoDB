@@ -167,11 +167,5 @@ namespace Arthur_Clive.Controllers
             }
         }
 
-        [HttpGet]
-        public void Sample()
-        {
-
-            var sendProductDetails = EmailHelper.SendEmail_ProductDetails("ragu9060@gmail.com", 8);
-        }
     }
 }

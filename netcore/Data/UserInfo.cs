@@ -9,9 +9,6 @@ namespace Arthur_Clive.Data
     {
         /// <summary>ObjectId given by MongoDB</summary>
         public ObjectId Id { get; set; }
-        /// <summary>UserName of user</summary>
-        [Required]
-        public string UserName { get; set; }
         /// <summary>Email of user</summary>
         [Required]
         public string Email { get; set; }

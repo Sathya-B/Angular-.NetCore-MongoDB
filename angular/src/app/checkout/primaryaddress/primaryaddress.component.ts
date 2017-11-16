@@ -10,20 +10,24 @@ export class PrimaryAddressComponent {
   public billingAddress: any = {};
   public shippingAddress: any = {};
   constructor(private addressService: AddressService) {
-
+    this.updateAddress();
     this.addressService.addressUpdated.subscribe((added) => {
       if (added === true) {
         this.billingAddress = {};
         this.shippingAddress = {};
-        this.addressService.addressItems.listOfAddress.forEach((add) => {
-          if (add.billingAddress === true) {
-            this.billingAddress = add;
-          }
-          if (add.shippingAddress === true) {
-            this.shippingAddress = add;
-          }
-        });
+        this.updateAddress();
+      }
+    });
+  }
+  public updateAddress() {
+    this.addressService.addressItems.listOfAddress.forEach((add) => {
+      if (add.billingAddress === true) {
+        this.billingAddress = add;
+      }
+      if (add.shippingAddress === true) {
+        this.shippingAddress = add;
       }
     });
   }
 }
+

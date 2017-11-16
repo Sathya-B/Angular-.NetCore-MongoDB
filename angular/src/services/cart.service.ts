@@ -10,7 +10,11 @@ export class CartService {
 
     public cartItems: CartModel.Cart = { listOfProducts: [] };
     public cartUpdated = new EventEmitter<boolean>();
+
     constructor(private apiService: ApiService, private appState: AppState) {
+    this.cartUpdated.subscribe((updated)=> {
+       this.refreshCart(); 
+    })
     }
     public getCount() {
         return this.cartItems.listOfProducts.length;

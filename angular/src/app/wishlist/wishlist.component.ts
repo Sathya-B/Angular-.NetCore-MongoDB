@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { WishListItemComponent } from 'wishlistitem/wishlistitem.component';
 import { WishListService } from '../../services/wishlist.service';
 import { Router } from '@angular/router';
@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
   templateUrl: './wishlist.component.html',
   styleUrls: ['./wishlist.component.scss']
 })
-export class WishListComponent implements OnInit, OnDestroy {
+export class WishListComponent implements OnInit {
 
 public wishListItems: any;
 
@@ -21,7 +21,6 @@ public ngOnInit() {
 }
 
 public ngOnDestroy() {
-  this.wishListService.refreshList();
 }
 public continueShopping() {
   this.route.navigate(['/']);

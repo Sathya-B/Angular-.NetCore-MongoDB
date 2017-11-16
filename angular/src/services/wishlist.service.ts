@@ -1,4 +1,4 @@
-import { Inject, Injectable, Optional } from '@angular/core';
+import { Inject, Injectable, Optional, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { ApiService } from './api.service';
 import { AppState } from '../app/app.service';
@@ -9,7 +9,11 @@ import 'rxjs/add/operator/map';
 export class WishListService {
 
     public wishListItems: WishListModel.WishList = { listOfProducts: [] };
+    public wishlistUpdated = new EventEmitter<boolean>();
     constructor(private apiService: ApiService, private appState: AppState) {
+    this.wishlistUpdated.subscribe((updated)=> {
+        this.refreshList();
+    })
     }
     public getCount() {
         return this.wishListItems.listOfProducts.length;

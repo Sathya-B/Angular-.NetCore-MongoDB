@@ -21,6 +21,11 @@
           <span class="ordersWrapRow1Heading">Order Status</span>
           <span class="ordersWrapRow1Desc">{{orderItem.orderStatus | titlecase}}</span>
         </div>
+        <div class="orderStatus">
+          <span class="ordersWrapRow1Heading">Payment Status</span>
+          <span class="ordersWrapRow1Desc">{{paymentStatus | titlecase}}</span>
+        </div>
+
         <div [ngClass]="{'downArrow':true, 'downDown':!opened, 'downUp':opened}">
           <span></span>
         </div>
@@ -28,7 +33,7 @@
     </a>
     <div class="ordersWrapRow2" *ngIf="opened">
       <div class="orderItemRow clearfix" *ngFor="let product of orderItem.productDetails; let i=index">
-        <productdetails  [product]="product" [orderId]="orderItem.orderId"></productdetails>
+        <productdetails [product]="product" [orderId]="orderItem.orderId"></productdetails>
       </div>
     </div>
   </div>

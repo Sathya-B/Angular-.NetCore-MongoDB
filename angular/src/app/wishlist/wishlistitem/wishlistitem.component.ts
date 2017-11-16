@@ -26,15 +26,18 @@ export class WishListItemComponent implements OnInit {
   public addOne() {
     if (this.item.productQuantity < 10) {
       this.item.productQuantity++;
+      this.wishListService.wishlistUpdated.emit(true);
     }
   }
   public reduceOne() {
     if (this.item.productQuantity > 1) {
       this.item.productQuantity--;
+      this.wishListService.wishlistUpdated.emit(true);
     }
   }
   public removeItem() {
     this.wishListService.wishListItems.listOfProducts.splice(this.itemIndex, 1);
+    this.wishListService.wishlistUpdated.emit(true);
   }
   public addToCart() {
     this.cartService.cartItems.listOfProducts.push(this.item);

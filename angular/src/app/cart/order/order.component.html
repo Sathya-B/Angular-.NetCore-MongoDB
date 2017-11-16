@@ -22,7 +22,8 @@
         </tr>
         <tr>
             <td>Delivery Charges</td>
-            <td>Free</td>
+            <td *ngIf="deliveryCharges == 0">Free</td>
+            <td *ngIf="deliveryCharges != 0"><i class="fa fa-inr"></i>{{deliveryCharges}}</td>
         </tr>
         <tr>
             <td>Order Total</td>

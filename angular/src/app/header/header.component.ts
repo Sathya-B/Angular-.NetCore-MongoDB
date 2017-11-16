@@ -43,7 +43,7 @@ export class HeaderComponent implements OnInit {
   }; 
 }
 public ngOnInit() {
-    if (this.appState.get('loggedIn') === true) {
+    if (this.appState.get('loggedIn')) {
     this.cartService.getCartItems(localStorage.getItem('UserName'));
     this.wishListService.getWishListItems(localStorage.getItem('UserName'));
     }

@@ -6,8 +6,8 @@ import { ToastMsgService } from './toastmsg.service';
 import { TokenService } from './token.service';
 import { WishListService } from './wishlist.service';
 import { SpinnerService } from 'angular-spinners';
-
+import { DataService } from './data.service';
 
 export const ServicesBarrel = [
     AddressService, ApiService, CartService, LoginLogoutService, ToastMsgService,
-    TokenService, WishListService, SpinnerService];
+    TokenService, WishListService, SpinnerService, DataService];

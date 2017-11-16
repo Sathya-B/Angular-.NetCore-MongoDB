@@ -3,6 +3,7 @@ import { AppState } from '../app.service';
 import { Title } from './title';
 import { CartService } from '@services/cart.service';
 import { ApiService } from '@services/api.service';
+import { DataService } from '@services/data.service';
 import { CategoryComponent } from './category';
 
 @Component({
@@ -63,14 +64,15 @@ export class HomeComponent implements OnInit {
     loop: true
   };
 
-  public category: any[] = [];
+  public category: any = [];
   public imgStyle: any = 'block';
 
   /**
    * TypeScript public modifiers
    */
   constructor(public appState: AppState, public title: Title,
-              private cartServ: CartService, private apiService: ApiService) {
+              private cartServ: CartService, private apiService: ApiService,
+              private dataService: DataService) {
   }
 
   public ngOnInit() {
@@ -78,13 +80,9 @@ export class HomeComponent implements OnInit {
   }
 
   public GetCategories() {
-    this.apiService.get('category', { useAuth: false }).then(
-      (response: any) => {
-        this.category = response.data;
-      })
-      .catch((error: any) => {
-        console.log(error);
-      });
+    this.dataService.getCategories().then((categoryData)=> {
+    this.category = categoryData;
+    });
   }
   public onCloseImg() {
     this.imgStyle = 'none';

@@ -3,7 +3,8 @@ import { OpaqueToken } from '@angular/core';
 export const apiUrl = {
     serverUrl: '',
     authServer: '',
-    tokenServer: ''
+    tokenServer: '',
+    paymentUrl: ''
 };
 
 export const relatedLogic = {
@@ -20,12 +21,14 @@ if (ENV !== 'production') {
 apiUrl.serverUrl = 'http://192.168.0.113:5000/api/';
 apiUrl.authServer = 'http://192.168.0.113:5001/api/auth';
 apiUrl.tokenServer = 'http://192.168.0.113:5001/api/';
+apiUrl.paymentUrl = 'https://test.payu.in/_payment';
 }
 // ***prod */
 if (ENV === 'production') {
 apiUrl.serverUrl = 'https://artwear.in:5003/api/';
 apiUrl.authServer = 'https://artwear.in:5002/api/auth';
 apiUrl.tokenServer = 'https://artwear.in:5002/api/';
+apiUrl.paymentUrl = 'https://secure.payu.in/_payment';
 }
 
 export class Configuration {

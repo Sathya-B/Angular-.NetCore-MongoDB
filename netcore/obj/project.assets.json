@@ -30,7 +30,7 @@
           "lib/netstandard1.3/AWSSDK.S3.dll": {}
         }
       },
-      "AWSSDK.SimpleEmail/3.3.3.1": {
+      "AWSSDK.SimpleEmail/3.3.4": {
         "type": "package",
         "dependencies": {
           "AWSSDK.Core": "[3.3.18, 3.4.0)"
@@ -2900,6 +2900,9 @@
           "lib/netstandard1.3/Newtonsoft.Json.Bson.dll": {}
         }
       },
+      "NuGet.CommandLine/4.3.0": {
+        "type": "package"
+      },
       "Remotion.Linq/2.1.1": {
         "type": "package",
         "dependencies": {
@@ -3294,7 +3297,7 @@
           "lib/netstandard1.5/StackExchange.Redis.StrongName.dll": {}
         }
       },
-      "Stripe.net/10.4.0": {
+      "Stripe.net/11.4.0": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
@@ -3323,7 +3326,7 @@
           "lib/netstandard1.6/Swashbuckle.AspNetCore.dll": {}
         }
       },
-      "Swashbuckle.AspNetCore.Examples/2.3.0": {
+      "Swashbuckle.AspNetCore.Examples/2.3.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
@@ -5332,13 +5335,13 @@
         "tools/uninstall.ps1"
       ]
     },
-    "AWSSDK.SimpleEmail/3.3.3.1": {
-      "sha512": "NfQCeZA0AMsANSPm/a7ws/TspqTpvEy4TuSsv5dTK6hwNChWyn3xcUdFTgfZL6iYg9OTSvljyYbtkarj8C8NVQ==",
+    "AWSSDK.SimpleEmail/3.3.4": {
+      "sha512": "GQtUDl5uUk0V1//7PT1Jd3zqpu6ThsNRKAeRmQG+69SCFUk8tV0EFvGU7kJSUP2oYdBQf5Ai5NSe0d3Mg2ITVA==",
       "type": "package",
-      "path": "awssdk.simpleemail/3.3.3.1",
+      "path": "awssdk.simpleemail/3.3.4",
       "files": [
         "analyzers/dotnet/cs/AWSSDK.SimpleEmail.CodeAnalysis.dll",
-        "awssdk.simpleemail.3.3.3.1.nupkg.sha512",
+        "awssdk.simpleemail.3.3.4.nupkg.sha512",
         "awssdk.simpleemail.nuspec",
         "lib/MonoAndroid10/AWSSDK.SimpleEmail.XML",
         "lib/MonoAndroid10/AWSSDK.SimpleEmail.dll",
@@ -8358,6 +8361,16 @@
         "newtonsoft.json.bson.nuspec"
       ]
     },
+    "NuGet.CommandLine/4.3.0": {
+      "sha512": "Wo+kltIu41aw8+Kl31acZSlFsVMwB75hSdzPq/zK0z3CCVLILz2oIPgZw5PLUQ0+A7uTHF0YQ9AiF0XNPI1rMg==",
+      "type": "package",
+      "path": "nuget.commandline/4.3.0",
+      "files": [
+        "nuget.commandline.4.3.0.nupkg.sha512",
+        "nuget.commandline.nuspec",
+        "tools/NuGet.exe"
+      ]
+    },
     "Remotion.Linq/2.1.1": {
       "sha512": "IJn0BqkvwEDpP+2qjvci7n4/a9f7DhKESLWb2/uG4xQh3rTkGTBUz69bI4IivCoKkTFAqjXxYDZw2K/npohjsw==",
       "type": "package",
@@ -8784,14 +8797,14 @@
         "stackexchange.redis.strongname.nuspec"
       ]
     },
-    "Stripe.net/10.4.0": {
-      "sha512": "V0SrilaUUw6KoHwmbuv+mxbnBTEMcl8K0H0ccT6WA3ry/ckDNStBd1Amzn5w/CQ3sb+HrJp05GdQIDiB02XECA==",
+    "Stripe.net/11.4.0": {
+      "sha512": "mf09vxV+nfJn9Xhq9Y1hyzt2I5TwjAkH5sk7JiA/PNq1KqhIuhAxC5ItajYtFSCEHPGeJQRJvcw0tiJKc54g1A==",
       "type": "package",
-      "path": "stripe.net/10.4.0",
+      "path": "stripe.net/11.4.0",
       "files": [
         "lib/net45/Stripe.net.dll",
         "lib/netstandard1.2/Stripe.net.dll",
-        "stripe.net.10.4.0.nupkg.sha512",
+        "stripe.net.11.4.0.nupkg.sha512",
         "stripe.net.nuspec"
       ]
     },
@@ -8806,14 +8819,14 @@
         "swashbuckle.aspnetcore.nuspec"
       ]
     },
-    "Swashbuckle.AspNetCore.Examples/2.3.0": {
-      "sha512": "hiZNEBR26OcMnC3GVQbjjt4QWVQ8Z/3GdTbdA//f3DF4KWx2zHvtIB8kGaju7hu4CHBEz/7ic45QuU4YcykmNA==",
+    "Swashbuckle.AspNetCore.Examples/2.3.1": {
+      "sha512": "qTrnTRM/n7rYa0TuoRc62LsFnLe/pBnThkk9QtxA0Zi2jrh6cYi8iOKdzZowX/ZeW3Md/VFvfI7TsgYKeZauiA==",
       "type": "package",
-      "path": "swashbuckle.aspnetcore.examples/2.3.0",
+      "path": "swashbuckle.aspnetcore.examples/2.3.1",
       "files": [
-        "lib/net461/Swashbuckle.AspNetCore.Examples.dll",
+        "lib/net451/Swashbuckle.AspNetCore.Examples.dll",
         "lib/netstandard1.6/Swashbuckle.AspNetCore.Examples.dll",
-        "swashbuckle.aspnetcore.examples.2.3.0.nupkg.sha512",
+        "swashbuckle.aspnetcore.examples.2.3.1.nupkg.sha512",
         "swashbuckle.aspnetcore.examples.nuspec"
       ]
     },
@@ -13851,14 +13864,15 @@
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
       "AWSSDK.S3 >= 3.3.11.1",
-      "AWSSDK.SimpleEmail >= 3.3.3.1",
+      "AWSSDK.SimpleEmail >= 3.3.4",
       "Microsoft.AspNetCore.All >= 2.0.0",
       "Microsoft.AspNetCore.Mvc.Core >= 2.0.0",
       "Microsoft.NETCore.App >= 2.0.0",
       "Minio.NetCore >= 1.0.2",
-      "Stripe.net >= 10.4.0",
+      "NuGet.CommandLine >= 4.3.0",
+      "Stripe.net >= 11.4.0",
       "Swashbuckle.AspNetCore >= 1.0.0",
-      "Swashbuckle.AspNetCore.Examples >= 2.3.0",
+      "Swashbuckle.AspNetCore.Examples >= 2.3.1",
       "Swashbuckle.AspNetCore.Swagger >= 1.0.0",
       "Swashbuckle.AspNetCore.SwaggerGen >= 1.0.0",
       "Swashbuckle.AspNetCore.SwaggerUi >= 1.0.0",
@@ -13894,7 +13908,8 @@
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {},
-        "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json": {}
+        "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json": {},
+        "https://www.myget.org/gallery/efcore-mongodb": {}
       },
       "frameworks": {
         "netcoreapp2.0": {
@@ -13910,6 +13925,10 @@
     "frameworks": {
       "netcoreapp2.0": {
         "dependencies": {
+          "NuGet.CommandLine": {
+            "target": "Package",
+            "version": "4.3.0"
+          },
           "mongocsharpdriver": {
             "target": "Package",
             "version": "2.4.4"
@@ -13920,7 +13939,7 @@
           },
           "AWSSDK.SimpleEmail": {
             "target": "Package",
-            "version": "3.3.3.1"
+            "version": "3.3.4"
           },
           "Swashbuckle.AspNetCore.Swagger": {
             "target": "Package",
@@ -13932,7 +13951,7 @@
           },
           "Swashbuckle.AspNetCore.Examples": {
             "target": "Package",
-            "version": "2.3.0"
+            "version": "2.3.1"
           },
           "Microsoft.NETCore.App": {
             "target": "Package",
@@ -13953,7 +13972,7 @@
           },
           "Stripe.net": {
             "target": "Package",
-            "version": "10.4.0"
+            "version": "11.4.0"
           },
           "Minio.NetCore": {
             "target": "Package",

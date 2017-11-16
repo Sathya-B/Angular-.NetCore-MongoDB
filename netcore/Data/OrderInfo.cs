@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
 
@@ -12,19 +11,24 @@ namespace Arthur_Clive.Data
         /// <summary>ObjectId give by MongoDB</summary>
         public ObjectId Id { get; set; }
         /// <summary>Id given to the placed order</summary>
-        [Required]
-        public int OrderId { get; set; }
+        public long OrderId { get; set; }
         /// <summary>Email or PhoneNumber of the user</summary>
         public string UserName { get; set; }
-        /// <summary>Payment method prefered by the user</summary>
-        [Required]
-        public string PaymentMethod { get; set; }
         /// <summary>Total amount to be paid for order</summary>
+        [Required]
         public double TotalAmount { get; set; }
-        /// <summary>Discounted amount</summary>
-        public double CouponDiscount { get; set; }
+        /// <summary>Tax estimated for the product</summary>
+        [Required]
+        public double EstimatedTax { get; set; }
+        /// <summary>Payment method prefered by the user</summary>
+        public string PaymentMethod { get; set; }
+        /// <summary>Status of order</summary>
+        public string OrderStatus { get; set; }
         /// <summary>Payment method and status of the payment</summary>
         public PaymentMethod PaymentDetails { get; set; }
+        /// <summary>Discounted amount</summary>
+        [Required]
+        public double CouponDiscount { get; set; }
         /// <summary>Address details of user</summary>
         public List<Address> Address { get; set; }
         /// <summary>Product details of the order</summary>
@@ -38,6 +42,8 @@ namespace Arthur_Clive.Data
         public string ProductSKU { get; set; }
         /// <summary>Delivery status of the product</summary>
         public string Status { get; set; }
+        /// <summary>Flag to define if the user has reviewed the product or not</summary>
+        public bool? Reviewed { get; set; }
         /// <summary>Code given to the delivery status</summary>
         public List<StatusCode> StatusCode { get; set; }
         /// <summary>Product details</summary>
@@ -54,24 +60,12 @@ namespace Arthur_Clive.Data
         /// <summary>Date and time when the status is registered</summary>
         public DateTime Date { get; set; }
     }
-
+      
     /// <summary>Contails payment details for the product</summary>
     public class PaymentMethod
-    {
-        /// <summary>Method of the payment</summary>
-        public string Method { get; set; }
+    {   
         /// <summary>Status of the payment</summary>
         public List<StatusCode> Status { get; set; }
     }
     
-    /// <summary>Contails update details for the order</summary>
-    public class StatusUpdate
-    {
-        /// <summary>Id of the order for which the status is to be updated</summary>
-        [Required]
-        public int OrderId { get; set; }
-        /// <summary>Status to be updated</summary>
-        [Required]
-        public string Status { get; set; }
-    }
 }

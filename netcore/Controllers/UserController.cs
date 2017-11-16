@@ -11,6 +11,8 @@ using MH = Arthur_Clive.Helper.MongoHelper;
 using System.Linq;
 using Swashbuckle.AspNetCore.Examples;
 using Arthur_Clive.Swagger;
+using Microsoft.AspNetCore.Authorization;
+using MongoDB.Bson.Serialization;
 
 namespace Arthur_Clive.Controllers
 {
@@ -23,6 +25,38 @@ namespace Arthur_Clive.Controllers
         public IMongoDatabase _db = MH._client.GetDatabase("UserInfo");
         /// <summary></summary>
         public UpdateDefinition<BsonDocument> updateDefinition;
+
+        /// <summary>Get default address of user</summary>
+        /// <param name="username">UserName of user</param>
+        /// <remarks>This api is user to get default address of an user</remarks>
+        /// <response code="200">Returns the default address of the user</response>
+        /// <response code="400">Process ran into an exception</response>  
+        [HttpGet("userinfo/{username}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public async Task<ActionResult> GetDefaultAddressOfUser(string username)
+        {
+            try
+            {
+                IAsyncCursor<Address> cursor = await _db.GetCollection<Address>("UserInfo").FindAsync(Builders<Address>.Filter.Eq("UserName", username) & Builders<Address>.Filter.Eq("DefaultAddress", true));
+                var userInfo = cursor.ToList();
+                return Ok(new ResponseData
+                {
+                    Code = "200",
+                    Message = "Success",
+                    Data = userInfo
+                });
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("UserController", "GetDefaultAddressOfUser", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                }); ;
+            }
+        }
 
         /// <summary>Refresh address details of user</summary>
         /// <remarks>This api is uses to refresh userinfo of a user</remarks>
@@ -37,14 +71,11 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var addressFilter = Builders<Address>.Filter.Eq("UserName", username);
-                var addressCollection = _db.GetCollection<Address>("UserInfo");
-                var result = addressCollection.DeleteManyAsync(addressFilter).Result;
+                var result = _db.GetCollection<Address>("UserInfo").DeleteManyAsync(Builders<Address>.Filter.Eq("UserName", username)).Result;
                 if (data.ListOfAddress.Count > 0)
                 {
                     data.ListOfAddress.ToList().ForEach(c => c.UserName = username);
-                    var authCollection = _db.GetCollection<Address>("UserInfo");
-                    await authCollection.InsertManyAsync(data.ListOfAddress);
+                    await _db.GetCollection<Address>("UserInfo").InsertManyAsync(data.ListOfAddress);
                 }
                 return Ok(new ResponseData
                 {
@@ -55,82 +86,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("UserController", "RefreshUserInfo", "RefreshUserInfo", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
-            }
-        }
-        
-        /// <summary>Get default address of user</summary>
-        /// <param name="username">UserName of user</param>
-        /// <remarks>This api is user to get default address of an user</remarks>
-        /// <response code="200">Returns the default address of the user</response>
-        /// <response code="400">Process ran into an exception</response>  
-        [HttpGet("userinfo/{username}")]
-        [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> GetDefaultAddressOfUser(string username)
-        {
-            try
-            {
-                var userCollection = _db.GetCollection<Address>("UserInfo");
-                var filter = Builders<Address>.Filter.Eq("UserName", username) & Builders<Address>.Filter.Eq("DefaultAddress", true);
-                IAsyncCursor<Address> cursor = await userCollection.FindAsync(filter);
-                var userInfo = cursor.ToList();
-                return Ok(new ResponseData
-                {
-                    Code = "200",
-                    Message = "Success",
-                    Data = userInfo
-                });
-            }
-            catch (Exception ex)
-            {
-                LoggerDataAccess.CreateLog("UserController", "GetDefaultAddressOfUser", "GetDefaultAddressOfUser", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                }); ;
-            }
-        }
-
-        /// <summary>Refresh products in cart</summary>
-        /// <remarks>This api is used to refresh products in cart of the user</remarks>
-        /// <param name="data">List of cart details to be updated</param>
-        /// <param name="username">UserName of user</param>
-        /// <response code="200">Cart of user is refreshed succeddfully</response>
-        /// <response code="400">Process ran into an exception</response> 
-        [HttpPost("cart/{username}")]
-        [SwaggerRequestExample(typeof(CartList), typeof(CartDetail))]
-        [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> RefreshCart([FromBody]CartList data, string username)
-        {
-            try
-            {
-                var cartFilter = Builders<Cart>.Filter.Eq("UserName", username);
-                var cartCollection = _db.GetCollection<Cart>("Cart");
-                var result = cartCollection.DeleteManyAsync(cartFilter).Result;
-                if (data.ListOfProducts.Count > 0)
-                {
-                    data.ListOfProducts.ToList().ForEach(c => c.UserName = username);
-                    var authCollection = _db.GetCollection<Cart>("Cart");
-                    await authCollection.InsertManyAsync(data.ListOfProducts);
-                }
-                return Ok(new ResponseData
-                {
-                    Code = "200",
-                    Message = "Inserted",
-                    Data = null
-                });
-            }
-            catch (Exception ex)
-            {
-                LoggerDataAccess.CreateLog("AuthController", "RefreshCart", "RefreshCart", ex.Message);
+                LoggerDataAccess.CreateLog("UserController", "RefreshUserInfo", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -151,9 +107,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var collection = _db.GetCollection<Cart>("Cart");
-                var filter = Builders<Cart>.Filter.Eq("UserName", username);
-                IAsyncCursor<Cart> cursor = await collection.FindAsync(filter);
+                IAsyncCursor<Cart> cursor = await _db.GetCollection<Cart>("Cart").FindAsync(Builders<Cart>.Filter.Eq("UserName", username));
                 var products = cursor.ToList();
                 foreach (var data in products)
                 {
@@ -171,7 +125,84 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "GetProductsInCart", "GetProductsInCart", ex.Message);
+                LoggerDataAccess.CreateLog("UserController", "GetProductsInCart", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        /// <summary>Refresh products in cart</summary>
+        /// <remarks>This api is used to refresh products in cart of the user</remarks>
+        /// <param name="data">List of cart details to be updated</param>
+        /// <param name="username">UserName of user</param>
+        /// <response code="200">Cart of user is refreshed succeddfully</response>
+        /// <response code="400">Process ran into an exception</response> 
+        [HttpPost("cart/{username}")]
+        [SwaggerRequestExample(typeof(CartList), typeof(CartDetail))]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public async Task<ActionResult> RefreshCart([FromBody]CartList data, string username)
+        {
+            try
+            {
+                var result = _db.GetCollection<Cart>("Cart").DeleteManyAsync(Builders<Cart>.Filter.Eq("UserName", username)).Result;
+                if (data.ListOfProducts.Count > 0)
+                {
+                    data.ListOfProducts.ToList().ForEach(c => c.UserName = username);
+                    await _db.GetCollection<Cart>("Cart").InsertManyAsync(data.ListOfProducts);
+                }
+                return Ok(new ResponseData
+                {
+                    Code = "200",
+                    Message = "Inserted",
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("UserController", "RefreshCart", ex.Message);
+                return BadRequest(new ResponseData
+                {
+                    Code = "400",
+                    Message = "Failed",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        /// <summary>Get products in wishlist of user</summary>
+        /// <param name="username">UserName of user</param>
+        /// <remarks>This api is user to get products in wishlist of an user</remarks>
+        /// <response code="200">Returns the products in wishlist</response>
+        /// <response code="400">Process ran into an exception</response> 
+        [HttpGet("wishlist/{username}")]
+        [ProducesResponseType(typeof(ResponseData), 200)]
+        public async Task<ActionResult> GetProductsInWishList(string username)
+        {
+            try
+            {
+                IAsyncCursor<WishList> cursor = await _db.GetCollection<WishList>("WishList").FindAsync(Builders<WishList>.Filter.Eq("UserName", username));
+                var products = cursor.ToList();
+                foreach (var data in products)
+                {
+                    string objectName = data.ProductSKU + ".jpg";
+                    //data.ObjectUrl = WH.GetMinioObject("products", objectName).Result;
+                    //data.ObjectUrl = AH.GetAmazonS3Object("arthurclive-products", objectName);
+                    data.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
+                }
+                return Ok(new ResponseData
+                {
+                    Code = "200",
+                    Message = "Success",
+                    Data = products
+                });
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("UserController", "GetProductsInWishList", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -194,14 +225,11 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var wishlistFilter = Builders<WishList>.Filter.Eq("UserName", username);
-                var wishlistCollection = _db.GetCollection<WishList>("WishList");
-                var result = wishlistCollection.DeleteManyAsync(wishlistFilter).Result;
+                var result = _db.GetCollection<WishList>("WishList").DeleteManyAsync(Builders<WishList>.Filter.Eq("UserName", username)).Result;
                 if (data.ListOfProducts.Count > 0)
                 {
                     data.ListOfProducts.ToList().ForEach(c => c.UserName = username);
-                    var authCollection = _db.GetCollection<WishList>("WishList");
-                    await authCollection.InsertManyAsync(data.ListOfProducts);
+                    await _db.GetCollection<WishList>("WishList").InsertManyAsync(data.ListOfProducts);
                 }
                 return Ok(new ResponseData
                 {
@@ -212,48 +240,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "RefreshWishList", "RefreshWishList", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
-            }
-        }
-
-        /// <summary>Get products in wishlist of user</summary>
-        /// <param name="username">UserName of user</param>
-        /// <remarks>This api is user to get products in wishlist of an user</remarks>
-        /// <response code="200">Returns the products in wishlist</response>
-        /// <response code="400">Process ran into an exception</response> 
-        [HttpGet("wishlist/{username}")]
-        [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> GetProductsInWishList(string username)
-        {
-            try
-            {
-                var collection = _db.GetCollection<WishList>("WishList");
-                var filter = Builders<WishList>.Filter.Eq("UserName", username);
-                IAsyncCursor<WishList> cursor = await collection.FindAsync(filter);
-                var products = cursor.ToList();
-                foreach (var data in products)
-                {
-                    string objectName = data.ProductSKU + ".jpg";
-                    //data.ObjectUrl = WH.GetMinioObject("products", objectName).Result;
-                    //data.ObjectUrl = AH.GetAmazonS3Object("arthurclive-products", objectName);
-                    data.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
-                }
-                return Ok(new ResponseData
-                {
-                    Code = "200",
-                    Message = "Success",
-                    Data = products
-                });
-            }
-            catch (Exception ex)
-            {
-                LoggerDataAccess.CreateLog("AuthController", "GetProductsInWishList", "GetProductsInWishList", ex.Message);
+                LoggerDataAccess.CreateLog("UserController", "RefreshWishList", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

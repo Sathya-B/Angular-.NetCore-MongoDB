@@ -1,8 +1,4 @@
-﻿
-using System;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using MongoDB.Bson;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Arthur_Clive.Data
 {
@@ -18,30 +14,5 @@ namespace Arthur_Clive.Data
         public object Data { get; set; }
         /// <summary>Other contents of responce</summary>
         public object Content { get; set; }
-    }
-
-    /// <summary>Details of coupon</summary>
-    public class Coupon
-    {
-        /// <summary></summary>
-        public ObjectId Id { get; set; } 
-        /// <summary>Coupon code</summary>
-        [Required]
-        public string Code { get; set; }
-        /// <summary>For whom is the coupon applicable for</summary>
-        [Required]
-        public string ApplicableFor { get; set; }
-        /// <summary>Expiry time of the coupon</summary>
-        [Required]
-        public DateTime ExpiryTime { get; set; }
-        /// <summary>Coupon usage count</summary>
-        [Required]
-        public int UsageCount { get; set; }
-        /// <summary>Value of coupon in percentage or amount</summary>
-        [Required]
-        public double Value { get; set; }
-        /// <summary>If the value of coupon is persentage pass the flag as true</summary>
-        [Required]
-        public bool? Percentage { get; set; }
     }
 }

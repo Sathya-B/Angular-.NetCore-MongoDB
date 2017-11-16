@@ -17,8 +17,16 @@ namespace AuthorizedServer.Helper
         /// <param name="key"></param>
         public static string GetCredentials(string key)
         {
-            var result = GlobalHelper.ReadXML().Elements("amazonses").Where(x => x.Element("current").Value.Equals("Yes")).Descendants(key);
-            return result.First().Value;
+            try
+            {
+                var result = GlobalHelper.ReadXML().Elements("amazonses").Where(x => x.Element("current").Value.Equals("Yes")).Descendants(key);
+                return result.First().Value;
+            }
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("EmailHelper", "GetCredentials", ex.Message);
+                return ex.Message;
+            }
         }
 
         /// <summary>Send email using amason SES service</summary>
@@ -41,7 +49,7 @@ namespace AuthorizedServer.Helper
                         Subject = new Content(GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsubject2").First().Value),
                         Body = new Body
                         {
-                            Html = new Content(CreateEmailBody(fullname, "<a href ='" + link + "'>Click Here To Verify</a>"))
+                            Html = new Content(CreateEmailBody(fullname, "<a href ='" + link + "' style='background-color:#2a2c2e; color:#fff; text-align:center; padding:10px 15px 7px; text-decoration:none;'>Click Here To Verify</a>"))
                         }
                     }
                 };
@@ -52,7 +60,7 @@ namespace AuthorizedServer.Helper
                 }
                 catch (Exception ex)
                 {
-                    LoggerDataAccess.CreateLog("EmailHelper", "SendEmail", "SendEmail", ex.Message);
+                    LoggerDataAccess.CreateLog("EmailHelper", "SendEmail", ex.Message);
                     return ex.Message;
                 }
             }
@@ -63,16 +71,24 @@ namespace AuthorizedServer.Helper
         /// <param name="link"></param>
         public static string CreateEmailBody(string fullname, string link)
         {
-            string emailBody;
-            var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            var path = Path.Combine(dir, "EmailVerification.html");
-            using (StreamReader reader = File.OpenText(path))
+            try
             {
-                emailBody = reader.ReadToEnd();
+                string emailBody;
+                var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                var path = Path.Combine(dir, "EmailTemplate/VerificationEmail.html");
+                using (StreamReader reader = File.OpenText(path))
+                {
+                    emailBody = reader.ReadToEnd();
+                }
+                emailBody = emailBody.Replace("{FullName}", fullname);
+                emailBody = emailBody.Replace("{Link}", link);
+                return emailBody;
             }
-            emailBody = emailBody.Replace("{FullName}", fullname);
-            emailBody = emailBody.Replace("{Link}", link);
-            return emailBody;
+            catch (Exception ex)
+            {
+                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody", ex.Message);
+                return ex.Message;
+            }
         }
     }
 }

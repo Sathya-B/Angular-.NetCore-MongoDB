@@ -1,16 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Arthur_Clive.Helper;
 using System;
-using System.Collections;
-using System.Text;
 using Arthur_Clive.Data;
+using MH = Arthur_Clive.Helper.MongoHelper;
 using PU = Arthur_Clive.Helper.PayUHelper;
 using Arthur_Clive.Logger;
 using System.Linq;
-using System.Xml.Linq;
 using Microsoft.AspNetCore.Http;
-using Swashbuckle.AspNetCore.Examples;
-using Arthur_Clive.Swagger;
+using MongoDB.Driver;
+using System.Threading.Tasks;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace Arthur_Clive.Controllers
 {
@@ -19,129 +21,151 @@ namespace Arthur_Clive.Controllers
     [Route("api/[controller]")]
     public class PaymentController : Controller
     {
-        /// <summary>Make payment using PayUMoney</summary>
-        /// <remarks>This api is used to get fprm for making payment using Pay U Money gateway</remarks>
-        /// <param name="model">Contains the data needed to make payment</param>
-        /// <response code="200">Returns the form needed to make the paymnet through PayUMoney gateway</response>
-        /// <response code="400">Process ran into an exception</response> 
-        [HttpPost]
-        [SwaggerRequestExample(typeof(PaymentModel), typeof(PaymentDetails))]
-        [ProducesResponseType(typeof(ResponseData), 200)]
-        public ActionResult MakePayment([FromBody]PaymentModel model)
+        /// <summary></summary>
+        public IMongoDatabase _db = MH._client.GetDatabase("UserInfo");
+        /// <summary></summary>
+        public IMongoDatabase product_db = MH._client.GetDatabase("ProductDB");
+        /// <summary></summary>
+        public IMongoDatabase order_db = MH._client.GetDatabase("OrderDB");
+
+        /// <summary>Success responce from the PayU payment gateway</summary>
+        /// <param name="paymentResponse">Responce data from PayU</param>
+        [HttpPost("success")]
+        public async Task<ActionResult> PaymentSuccess(IFormCollection paymentResponse)
         {
-            try
+            if (paymentResponse != null)
             {
-                string SuccessUrl = "http://localhost:5001/api/payment/success";
-                string FailureUrl = "http://localhost:5001/api/payment/failed";
-                string txnId = PU.GetTxnId();
-                string hashString = PU.GetHashString(txnId,model);
-                string hash = PU.Generatehash512(hashString).ToLower();
-                string action = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("url").First().Value + "/_payment";
-                Hashtable data = new Hashtable();
-                data.Add("hash", hash);
-                data.Add("txnid", txnId);
-                data.Add("key", "gtKFFx");
-                string AmountForm = Convert.ToDecimal(model.Amount).ToString("g29");
-                data.Add("amount", AmountForm);
-                data.Add("firstname", model.FirstName);
-                data.Add("email", model.Email);
-                data.Add("phone", model.PhoneNumber);
-                data.Add("productinfo", model.ProductInfo);
-                data.Add("surl", SuccessUrl);
-                data.Add("furl", FailureUrl);
-                data.Add("lastname", model.LastName);
-                data.Add("curl", "");
-                data.Add("address1", model.AddressLine1);
-                data.Add("address2", model.AddressLine2);
-                data.Add("city", model.City);
-                data.Add("state", model.State);
-                data.Add("country", model.Country);
-                data.Add("zipcode", model.ZipCode);
-                data.Add("udf1", "");
-                data.Add("udf2", "");
-                data.Add("udf3", "");
-                data.Add("udf4", "");
-                data.Add("udf5", "");
-                data.Add("pg", "");
-                data.Add("service_provider", "PayUMoney");
-                StringBuilder strForm = PU.PreparePOSTForm(action, data);
-                var form = PU.PreparePOSTForm(action, data);
-                dynamic UserInfo = new System.Dynamic.ExpandoObject();
-                UserInfo.form = form;
-                return Ok(new ResponseData
+                PaymentModel paymentModel = new PaymentModel
                 {
-                    Code = "200",
-                    Content = UserInfo,
-                    Data = null
-                });
+                    Email = paymentResponse["email"],
+                    OrderId = Convert.ToInt16(paymentResponse["udf1"]),
+                    UserName = paymentResponse["udf2"],
+                    ProductInfo = paymentResponse["productinfo"],
+                    FirstName = paymentResponse["firstname"],
+                    Amount = paymentResponse["amount"],
+                };
+                try
+                {
+                    if (PU.Generatehash512(PU.GetReverseHashString(paymentResponse["txnid"], paymentModel)) == paymentResponse["hash"])
+                    {
+                        var updatePaymentMethod = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
+                        var updatePaymentDetails = await MH.UpdatePaymentDetails(paymentModel.OrderId);
+                        var removeCartItems = MH.RemoveCartItems(paymentModel.OrderId, paymentModel.UserName, paymentModel.Email);
+                        var sendGift = GlobalHelper.SendGift(paymentModel.OrderId);
+                        var sendProductDetails = EmailHelper.SendEmail_ProductDetails(paymentModel.Email, paymentModel.OrderId);
+                        return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectsuccess").First().Value);
+                    }
+                    else
+                    {
+                        var updatePaymentMethod = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
+                        PaymentMethod paymentDetails = new PaymentMethod();
+                        List<StatusCode> statusCodeList = new List<StatusCode>();
+                        var orderData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo").Result);
+                        foreach (var detail in orderData.PaymentDetails.Status)
+                        {
+                            statusCodeList.Add(detail);
+                        }
+                        statusCodeList.Add(new StatusCode { StatusId = 3, Description = "Payment Failed", Date = DateTime.UtcNow });
+                        paymentDetails.Status = statusCodeList;
+                        var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
+                        return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    LoggerDataAccess.CreateLog("PaymentController", "PaymentSuccess", ex.Message);
+                    var updatePaymentMethod = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
+                    PaymentMethod paymentDetails = new PaymentMethod();
+                    List<StatusCode> statusCodeList = new List<StatusCode>();
+                    var orderData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo").Result);
+                    foreach (var detail in orderData.PaymentDetails.Status)
+                    {
+                        statusCodeList.Add(detail);
+                    }
+                    statusCodeList.Add(new StatusCode { StatusId = 3, Description = "Payment Failed", Date = DateTime.UtcNow });
+                    paymentDetails.Status = statusCodeList;
+                    var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
+                    return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                LoggerDataAccess.CreateLog("PaymentController", "MakePayment", "MakePayment", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = null
-                });
+                return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
             }
         }
 
-        /// <summary>
-        /// Get return responce for payment made
-        /// </summary>
-        /// <param name="form">Form returned when payment is made</param>
-        /// <param name="responce">Responce received paument gateway when payment is made</param>
-        /// <remarks>This api returns the responce for the payment made through Pay U Money</remarks>
-        /// <response code="200">Payment is made successfully made</response>
-        /// <response code="401">Payment failed</response> 
-        /// <response code="400">Process ran into an exception</response> 
-        [HttpPost("{responce}")]
-        [ProducesResponseType(typeof(ResponseData), 200)]
-        public ActionResult Return([FromBody]FormCollection form,string responce)
+        /// <summary>Failure responce from the PayU payment gateway</summary>
+        /// <param name="paymentResponse">Responce data from PayU</param>
+        [HttpPost("failed")]
+        public async Task<ActionResult> PaymentFailed(IFormCollection paymentResponse)
         {
-            try
+            if (paymentResponse != null)
             {
-                if (form["status"].ToString() == "success")
+                string responseHash = paymentResponse["hash"];
+                PaymentModel paymentModel = new PaymentModel
                 {
-                    string[] hashSequence = ("key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5|udf6|udf7|udf8|udf9|udf10").Split('|');
-                    Array.Reverse(hashSequence);
-                    string hashString = GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("saltkey").First().Value + "|" + form["status"].ToString();
-                    foreach (string data in hashSequence)
-                    {
-                        hashString += "|";
-                        hashString = hashString + (form[data].ToString() != null ? form[data].ToString() : "");
-                    }
-                    //Response.Write(merc_hash_string);
-                    string hash = PU.Generatehash512(hashString).ToLower();
-                    dynamic UserInfo = new System.Dynamic.ExpandoObject();
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Content = null,
-                        Data = null
-                    });
-                }
-                else
+                    Email = paymentResponse["email"],
+                    OrderId = Convert.ToInt16(paymentResponse["udf1"]),
+                    UserName = paymentResponse["udf2"],
+                    ProductInfo = paymentResponse["productinfo"],
+                    FirstName = paymentResponse["firstname"],
+                    Amount = paymentResponse["amount"],
+                };
+                var updatePaymentMethod = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
+                PaymentMethod paymentDetails = new PaymentMethod();
+                List<StatusCode> statusCodeList = new List<StatusCode>();
+                var orderData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo").Result);
+                foreach (var detail in orderData.PaymentDetails.Status)
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "401",
-                        Message = "Payment failed",
-                        Data = null
-                    });
+                    statusCodeList.Add(detail);
                 }
+                statusCodeList.Add(new StatusCode { StatusId = 3, Description = "Payment Failed", Date = DateTime.UtcNow });
+                paymentDetails.Status = statusCodeList;
+                var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
+                return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
             }
-            catch (Exception ex)
+            else
             {
-                LoggerDataAccess.CreateLog("PaymentController", "Return", "Return", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = null
-                });
+                return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
             }
         }
+
+        /// <summary>Cancel responce from the PayU payment gateway</summary>
+        /// <param name="paymentResponse">Responce data from PayU</param>
+        [HttpPost("cancel")]
+        public async Task<ActionResult> Paymentcancelled(IFormCollection paymentResponse)
+        {
+            if (paymentResponse != null)
+            {
+                string responseHash = paymentResponse["hash"];
+                PaymentModel paymentModel = new PaymentModel
+                {
+                    Email = paymentResponse["email"],
+                    OrderId = Convert.ToInt16(paymentResponse["udf1"]),
+                    UserName = paymentResponse["udf2"],
+                    ProductInfo = paymentResponse["productinfo"],
+                    FirstName = paymentResponse["firstname"],
+                    Amount = paymentResponse["amount"],
+                };
+                var updatePaymentMethod = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
+                PaymentMethod paymentDetails = new PaymentMethod();
+                List<StatusCode> statusCodeList = new List<StatusCode>();
+                var orderData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo").Result);
+                foreach (var detail in orderData.PaymentDetails.Status)
+                {
+                    statusCodeList.Add(detail);
+                }
+                statusCodeList.Add(new StatusCode { StatusId = 4, Description = "Payment Cancelled", Date = DateTime.UtcNow });
+                paymentDetails.Status = statusCodeList;
+                var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
+                return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectcancelled").First().Value);
+            }
+            else
+            {
+                return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectcancelled").First().Value);
+            }
+        }
+
     }
 }

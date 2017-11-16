@@ -18,10 +18,10 @@
           "lib/netstandard1.3/AWSSDK.Core.dll": {}
         }
       },
-      "AWSSDK.S3/3.3.11": {
+      "AWSSDK.S3/3.3.11.1": {
         "type": "package",
         "dependencies": {
-          "AWSSDK.Core": "[3.3.17.9, 3.4.0)"
+          "AWSSDK.Core": "[3.3.18, 3.4.0)"
         },
         "compile": {
           "lib/netstandard1.3/AWSSDK.S3.dll": {}
@@ -30,7 +30,7 @@
           "lib/netstandard1.3/AWSSDK.S3.dll": {}
         }
       },
-      "AWSSDK.SimpleEmail/3.3.3.1": {
+      "AWSSDK.SimpleEmail/3.3.4": {
         "type": "package",
         "dependencies": {
           "AWSSDK.Core": "[3.3.18, 3.4.0)"
@@ -42,19 +42,7 @@
           "lib/netstandard1.3/AWSSDK.SimpleEmail.dll": {}
         }
       },
-      "AWSSDK.SimpleNotificationService/3.3.0.21": {
-        "type": "package",
-        "dependencies": {
-          "AWSSDK.Core": "[3.3.17.3, 3.4.0)"
-        },
-        "compile": {
-          "lib/netstandard1.3/AWSSDK.SimpleNotificationService.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.3/AWSSDK.SimpleNotificationService.dll": {}
-        }
-      },
-      "Castle.Core/4.2.0": {
+      "Castle.Core/4.2.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
@@ -1669,6 +1657,15 @@
           "lib/netstandard2.0/Microsoft.CodeAnalysis.Razor.dll": {}
         }
       },
+      "Microsoft.CodeCoverage/1.0.3": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Microsoft.VisualStudio.CodeCoverage.Shim.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.0/Microsoft.VisualStudio.CodeCoverage.Shim.dll": {}
+        }
+      },
       "Microsoft.CSharp/4.4.0": {
         "type": "package",
         "compile": {
@@ -2541,10 +2538,11 @@
           "lib/netstandard2.0/Microsoft.Net.Http.Headers.dll": {}
         }
       },
-      "Microsoft.NET.Test.Sdk/15.5.0-preview-20170810-02": {
+      "Microsoft.NET.Test.Sdk/15.5.0-preview-20171012-09": {
         "type": "package",
         "dependencies": {
-          "Microsoft.TestPlatform.TestHost": "15.5.0-preview-20170810-02"
+          "Microsoft.CodeCoverage": "1.0.3",
+          "Microsoft.TestPlatform.TestHost": "15.5.0-preview-20171012-09"
         },
         "build": {
           "build/netcoreapp1.0/Microsoft.Net.Test.Sdk.props": {},
@@ -2770,22 +2768,22 @@
           "lib/netstandard1.4/Microsoft.Rest.ClientRuntime.Azure.dll": {}
         }
       },
-      "Microsoft.TestPlatform.ObjectModel/15.5.0-preview-20170810-02": {
+      "Microsoft.TestPlatform.ObjectModel/15.5.0-preview-20171012-09": {
         "type": "package",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.ComponentModel.EventBasedAsync": "4.3.0",
-          "System.ComponentModel.TypeConverter": "4.3.0",
-          "System.Diagnostics.Process": "4.3.0",
-          "System.Diagnostics.TextWriterTraceListener": "4.3.0",
-          "System.Diagnostics.TraceSource": "4.3.0",
+          "NETStandard.Library": "1.6.0",
+          "System.ComponentModel.EventBasedAsync": "4.0.11",
+          "System.ComponentModel.TypeConverter": "4.1.0",
+          "System.Diagnostics.Process": "4.1.0",
+          "System.Diagnostics.TextWriterTraceListener": "4.0.0",
+          "System.Diagnostics.TraceSource": "4.0.0",
           "System.Reflection.Metadata": "1.3.0",
-          "System.Reflection.TypeExtensions": "4.3.0",
-          "System.Runtime.InteropServices.RuntimeInformation": "4.3.0",
-          "System.Runtime.Loader": "4.3.0",
-          "System.Runtime.Serialization.Json": "4.3.0",
-          "System.Runtime.Serialization.Primitives": "4.3.0",
-          "System.Threading.Thread": "4.3.0",
+          "System.Reflection.TypeExtensions": "4.1.0",
+          "System.Runtime.InteropServices.RuntimeInformation": "4.0.0",
+          "System.Runtime.Loader": "4.0.0",
+          "System.Runtime.Serialization.Json": "4.0.2",
+          "System.Runtime.Serialization.Primitives": "4.1.1",
+          "System.Threading.Thread": "4.0.0",
           "System.Xml.XPath.XmlDocument": "4.0.1"
         },
         "compile": {
@@ -2879,11 +2877,11 @@
           }
         }
       },
-      "Microsoft.TestPlatform.TestHost/15.5.0-preview-20170810-02": {
+      "Microsoft.TestPlatform.TestHost/15.5.0-preview-20171012-09": {
         "type": "package",
         "dependencies": {
           "Microsoft.Extensions.DependencyModel": "1.0.3",
-          "Microsoft.TestPlatform.ObjectModel": "15.5.0-preview-20170810-02",
+          "Microsoft.TestPlatform.ObjectModel": "15.5.0-preview-20171012-09",
           "Newtonsoft.Json": "9.0.1"
         },
         "compile": {
@@ -3149,10 +3147,10 @@
           "lib/netstandard1.5/MongoDB.Driver.Core.dll": {}
         }
       },
-      "Moq/4.7.137": {
+      "Moq/4.7.142": {
         "type": "package",
         "dependencies": {
-          "Castle.Core": "4.2.0",
+          "Castle.Core": "4.2.1",
           "NETStandard.Library": "1.6.1",
           "System.Linq.Queryable": "4.3.0",
           "System.Reflection.TypeExtensions": "4.3.0"
@@ -3164,7 +3162,7 @@
           "lib/netstandard1.3/Moq.dll": {}
         }
       },
-      "MSTest.TestAdapter/1.2.0-beta3": {
+      "MSTest.TestAdapter/1.2.0": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
@@ -3174,7 +3172,7 @@
           "build/netcoreapp1.0/MSTest.TestAdapter.props": {}
         }
       },
-      "MSTest.TestFramework/1.2.0-beta3": {
+      "MSTest.TestFramework/1.2.0": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll": {},
@@ -3229,6 +3227,9 @@
         "runtime": {
           "lib/netstandard1.3/Newtonsoft.Json.Bson.dll": {}
         }
+      },
+      "NuGet.CommandLine/4.3.0": {
+        "type": "package"
       },
       "Remotion.Linq/2.1.1": {
         "type": "package",
@@ -3624,7 +3625,7 @@
           "lib/netstandard1.5/StackExchange.Redis.StrongName.dll": {}
         }
       },
-      "Stripe.net/10.4.0": {
+      "Stripe.net/11.4.0": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
@@ -3653,7 +3654,7 @@
           "lib/netstandard1.6/Swashbuckle.AspNetCore.dll": {}
         }
       },
-      "Swashbuckle.AspNetCore.Examples/2.3.0": {
+      "Swashbuckle.AspNetCore.Examples/2.3.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
@@ -3832,13 +3833,13 @@
           "lib/netcoreapp2.0/_._": {}
         }
       },
-      "System.ComponentModel.EventBasedAsync/4.3.0": {
+      "System.ComponentModel.EventBasedAsync/4.0.11": {
         "type": "package",
         "dependencies": {
-          "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Threading": "4.3.0",
-          "System.Threading.Tasks": "4.3.0"
+          "System.Resources.ResourceManager": "4.0.1",
+          "System.Runtime": "4.1.0",
+          "System.Threading": "4.0.11",
+          "System.Threading.Tasks": "4.0.11"
         },
         "compile": {
           "ref/netstandard1.3/System.ComponentModel.EventBasedAsync.dll": {}
@@ -3984,30 +3985,30 @@
           }
         }
       },
-      "System.Diagnostics.Process/4.3.0": {
+      "System.Diagnostics.Process/4.1.0": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.Win32.Primitives": "4.3.0",
-          "Microsoft.Win32.Registry": "4.3.0",
-          "System.Collections": "4.3.0",
-          "System.Diagnostics.Debug": "4.3.0",
-          "System.Globalization": "4.3.0",
-          "System.IO": "4.3.0",
-          "System.IO.FileSystem": "4.3.0",
-          "System.IO.FileSystem.Primitives": "4.3.0",
-          "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
-          "System.Runtime.Handles": "4.3.0",
-          "System.Runtime.InteropServices": "4.3.0",
-          "System.Text.Encoding": "4.3.0",
-          "System.Text.Encoding.Extensions": "4.3.0",
-          "System.Threading": "4.3.0",
-          "System.Threading.Tasks": "4.3.0",
-          "System.Threading.Thread": "4.3.0",
-          "System.Threading.ThreadPool": "4.3.0",
-          "runtime.native.System": "4.3.0"
+          "Microsoft.NETCore.Platforms": "1.0.1",
+          "Microsoft.Win32.Primitives": "4.0.1",
+          "Microsoft.Win32.Registry": "4.0.0",
+          "System.Collections": "4.0.11",
+          "System.Diagnostics.Debug": "4.0.11",
+          "System.Globalization": "4.0.11",
+          "System.IO": "4.1.0",
+          "System.IO.FileSystem": "4.0.1",
+          "System.IO.FileSystem.Primitives": "4.0.1",
+          "System.Resources.ResourceManager": "4.0.1",
+          "System.Runtime": "4.1.0",
+          "System.Runtime.Extensions": "4.1.0",
+          "System.Runtime.Handles": "4.0.1",
+          "System.Runtime.InteropServices": "4.1.0",
+          "System.Text.Encoding": "4.0.11",
+          "System.Text.Encoding.Extensions": "4.0.11",
+          "System.Threading": "4.0.11",
+          "System.Threading.Tasks": "4.0.11",
+          "System.Threading.Thread": "4.0.0",
+          "System.Threading.ThreadPool": "4.0.10",
+          "runtime.native.System": "4.0.0"
         },
         "compile": {
           "ref/netstandard1.4/System.Diagnostics.Process.dll": {}
@@ -4865,12 +4866,12 @@
           "lib/netstandard1.3/System.Runtime.InteropServices.WindowsRuntime.dll": {}
         }
       },
-      "System.Runtime.Loader/4.3.0": {
+      "System.Runtime.Loader/4.0.0": {
         "type": "package",
         "dependencies": {
-          "System.IO": "4.3.0",
-          "System.Reflection": "4.3.0",
-          "System.Runtime": "4.3.0"
+          "System.IO": "4.1.0",
+          "System.Reflection": "4.1.0",
+          "System.Runtime": "4.1.0"
         },
         "compile": {
           "ref/netstandard1.5/System.Runtime.Loader.dll": {}
@@ -4910,12 +4911,12 @@
           "lib/netstandard1.4/System.Runtime.Serialization.Formatters.dll": {}
         }
       },
-      "System.Runtime.Serialization.Json/4.3.0": {
+      "System.Runtime.Serialization.Json/4.0.2": {
         "type": "package",
         "dependencies": {
-          "System.IO": "4.3.0",
-          "System.Private.DataContractSerialization": "4.3.0",
-          "System.Runtime": "4.3.0"
+          "System.IO": "4.1.0",
+          "System.Private.DataContractSerialization": "4.1.1",
+          "System.Runtime": "4.1.0"
         },
         "compile": {
           "ref/netstandard1.0/System.Runtime.Serialization.Json.dll": {}
@@ -5657,14 +5658,15 @@
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
           "AWSSDK.S3": "3.3.11.1",
-          "AWSSDK.SimpleEmail": "3.3.3.1",
+          "AWSSDK.SimpleEmail": "3.3.4",
           "Microsoft.AspNetCore.All": "2.0.0",
           "Microsoft.AspNetCore.Mvc.Core": "2.0.0",
           "Microsoft.NETCore.App": "2.0.0",
           "Minio.NetCore": "1.0.2",
-          "Stripe.net": "10.4.0",
+          "NuGet.CommandLine": "4.3.0",
+          "Stripe.net": "11.4.0",
           "Swashbuckle.AspNetCore": "1.0.0",
-          "Swashbuckle.AspNetCore.Examples": "2.3.0",
+          "Swashbuckle.AspNetCore.Examples": "2.3.1",
           "Swashbuckle.AspNetCore.Swagger": "1.0.0",
           "Swashbuckle.AspNetCore.SwaggerGen": "1.0.0",
           "Swashbuckle.AspNetCore.SwaggerUi": "1.0.0",
@@ -5675,28 +5677,6 @@
         },
         "runtime": {
           "bin/placeholder/Arthur_Clive.dll": {}
-        }
-      },
-      "AuthorizedServer/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v2.0",
-        "dependencies": {
-          "AWSSDK.Core": "3.3.17.9",
-          "AWSSDK.SimpleEmail": "3.3.3",
-          "AWSSDK.SimpleNotificationService": "3.3.0.21",
-          "Microsoft.AspNetCore.All": "2.0.0",
-          "Microsoft.AspNetCore.Authentication.Google": "2.0.0",
-          "Microsoft.NETCore.App": "2.0.0",
-          "MongoDB.Driver": "2.4.4",
-          "Moq": "4.7.137",
-          "Swashbuckle.AspNetCore": "1.0.0",
-          "Swashbuckle.AspNetCore.Examples": "2.3.0"
-        },
-        "compile": {
-          "bin/placeholder/AuthorizedServer.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/AuthorizedServer.dll": {}
         }
       }
     }
@@ -5745,13 +5725,13 @@
         "tools/account-management.ps1"
       ]
     },
-    "AWSSDK.S3/3.3.11": {
-      "sha512": "cMe0yG16Jw5jmw5IvGNhs0PsrJXnN9qNkI1hUKqdQBMcUrjy02MRDe4vQ7DDH7xo5vJJJSAWpzbB0UeyV6Q0nw==",
+    "AWSSDK.S3/3.3.11.1": {
+      "sha512": "ndu1JUP6KaXhfEa0mJTXF2A6Btau0n/Cw9bJxA7e4hXZIv+TmLP2hy687lFaq7dd5PA6buoJKNegEbEYFYDPzQ==",
       "type": "package",
-      "path": "awssdk.s3/3.3.11",
+      "path": "awssdk.s3/3.3.11.1",
       "files": [
         "analyzers/dotnet/cs/AWSSDK.S3.CodeAnalysis.dll",
-        "awssdk.s3.3.3.11.nupkg.sha512",
+        "awssdk.s3.3.3.11.1.nupkg.sha512",
         "awssdk.s3.nuspec",
         "lib/MonoAndroid10/AWSSDK.S3.XML",
         "lib/MonoAndroid10/AWSSDK.S3.dll",
@@ -5776,13 +5756,13 @@
         "tools/uninstall.ps1"
       ]
     },
-    "AWSSDK.SimpleEmail/3.3.3.1": {
-      "sha512": "NfQCeZA0AMsANSPm/a7ws/TspqTpvEy4TuSsv5dTK6hwNChWyn3xcUdFTgfZL6iYg9OTSvljyYbtkarj8C8NVQ==",
+    "AWSSDK.SimpleEmail/3.3.4": {
+      "sha512": "GQtUDl5uUk0V1//7PT1Jd3zqpu6ThsNRKAeRmQG+69SCFUk8tV0EFvGU7kJSUP2oYdBQf5Ai5NSe0d3Mg2ITVA==",
       "type": "package",
-      "path": "awssdk.simpleemail/3.3.3.1",
+      "path": "awssdk.simpleemail/3.3.4",
       "files": [
         "analyzers/dotnet/cs/AWSSDK.SimpleEmail.CodeAnalysis.dll",
-        "awssdk.simpleemail.3.3.3.1.nupkg.sha512",
+        "awssdk.simpleemail.3.3.4.nupkg.sha512",
         "awssdk.simpleemail.nuspec",
         "lib/MonoAndroid10/AWSSDK.SimpleEmail.XML",
         "lib/MonoAndroid10/AWSSDK.SimpleEmail.dll",
@@ -5807,51 +5787,24 @@
         "tools/uninstall.ps1"
       ]
     },
-    "AWSSDK.SimpleNotificationService/3.3.0.21": {
-      "sha512": "MYfUhmq3/wEd3dQjhtCowJcE8VbkGWa4z1wyCw5RdPc3ER6SMXbCG9r+Cg4XEWjQek9WW0r4GrtdmFN4L1p3cg==",
+    "Castle.Core/4.2.1": {
+      "sha512": "XSNA0Gc1Zu33L+8+/3Tqt+aFu8QWS8UenVHZ7RenIP5wJfhoLrA4PnNscpxReeo5aBq8PDoGnV8rNaOzIOUo/w==",
       "type": "package",
-      "path": "awssdk.simplenotificationservice/3.3.0.21",
-      "files": [
-        "analyzers/dotnet/cs/AWSSDK.SimpleNotificationService.CodeAnalysis.dll",
-        "awssdk.simplenotificationservice.3.3.0.21.nupkg.sha512",
-        "awssdk.simplenotificationservice.nuspec",
-        "lib/MonoAndroid10/AWSSDK.SimpleNotificationService.XML",
-        "lib/MonoAndroid10/AWSSDK.SimpleNotificationService.dll",
-        "lib/MonoTouch10/AWSSDK.SimpleNotificationService.XML",
-        "lib/MonoTouch10/AWSSDK.SimpleNotificationService.dll",
-        "lib/MonoTouch10/AWSSDK.SimpleNotificationService.pdb",
-        "lib/Xamarin.iOS10/AWSSDK.SimpleNotificationService.XML",
-        "lib/Xamarin.iOS10/AWSSDK.SimpleNotificationService.dll",
-        "lib/net35/AWSSDK.SimpleNotificationService.dll",
-        "lib/net35/AWSSDK.SimpleNotificationService.pdb",
-        "lib/net35/AWSSDK.SimpleNotificationService.xml",
-        "lib/net45/AWSSDK.SimpleNotificationService.dll",
-        "lib/net45/AWSSDK.SimpleNotificationService.pdb",
-        "lib/net45/AWSSDK.SimpleNotificationService.xml",
-        "lib/netstandard1.3/AWSSDK.SimpleNotificationService.dll",
-        "lib/netstandard1.3/AWSSDK.SimpleNotificationService.pdb",
-        "lib/netstandard1.3/AWSSDK.SimpleNotificationService.xml",
-        "lib/portable-net45+win8+wpa81+wp8/AWSSDK.SimpleNotificationService.XML",
-        "lib/portable-net45+win8+wpa81+wp8/AWSSDK.SimpleNotificationService.dll",
-        "lib/portable-net45+win8+wpa81+wp8/AWSSDK.SimpleNotificationService.pdb",
-        "tools/install.ps1",
-        "tools/uninstall.ps1"
-      ]
-    },
-    "Castle.Core/4.2.0": {
-      "sha512": "1TtKHYYVfox7aUZ0akCqkULmAjpG8X5ZRzTzTiONY34xtvvaPuUSSdVL1VaF/1/ljRhOkpy+uKOGn6XoFGvorw==",
-      "type": "package",
-      "path": "castle.core/4.2.0",
+      "path": "castle.core/4.2.1",
       "files": [
         "ASL - Apache Software Foundation License.txt",
         "CHANGELOG.md",
         "LICENSE",
-        "castle.core.4.2.0.nupkg.sha512",
+        "castle.core.4.2.1.nupkg.sha512",
         "castle.core.nuspec",
         "lib/net35/Castle.Core.dll",
+        "lib/net35/Castle.Core.xml",
         "lib/net40/Castle.Core.dll",
+        "lib/net40/Castle.Core.xml",
         "lib/net45/Castle.Core.dll",
+        "lib/net45/Castle.Core.xml",
         "lib/netstandard1.3/Castle.Core.dll",
+        "lib/netstandard1.3/Castle.Core.xml",
         "readme.txt"
       ]
     },
@@ -6963,6 +6916,16 @@
         "microsoft.codeanalysis.razor.nuspec"
       ]
     },
+    "Microsoft.CodeCoverage/1.0.3": {
+      "sha512": "5KfX12XPfvBomjrZv9nCBfQ6lhZdroVxXvGnY6MqzG83bjqdq6SQ3xxJFdPgHv6oli83M9oNhZlynYehjmboUg==",
+      "type": "package",
+      "path": "microsoft.codecoverage/1.0.3",
+      "files": [
+        "lib/netstandard1.0/Microsoft.VisualStudio.CodeCoverage.Shim.dll",
+        "microsoft.codecoverage.1.0.3.nupkg.sha512",
+        "microsoft.codecoverage.nuspec"
+      ]
+    },
     "Microsoft.CSharp/4.4.0": {
       "sha512": "vvVR/B08YVghQ4jHEloxqw2ZWzEGE1AOA5E0DioUM3ujbXz6FD3AfB/0Jl2ohJPd0nXYGwmPe1En6HTsSriq1A==",
       "type": "package",
@@ -8066,17 +8029,18 @@
         "microsoft.net.http.headers.nuspec"
       ]
     },
-    "Microsoft.NET.Test.Sdk/15.5.0-preview-20170810-02": {
-      "sha512": "x+uriTD0saQYn5rinVc+2/JPtFwkbRZJ1BertVe5R/zLmKO913r6GzWNpTkSfF82EfvyhX0eFCN24NmDNpFz7Q==",
+    "Microsoft.NET.Test.Sdk/15.5.0-preview-20171012-09": {
+      "sha512": "b1DuIu2D38hW+BoDa3qPUFwEnr8GH0I8161UJGvS+lwGAQociTMW74TH7ELj8Cc1aPhNIG7WcTSPfiEC1pc/aA==",
       "type": "package",
-      "path": "microsoft.net.test.sdk/15.5.0-preview-20170810-02",
+      "path": "microsoft.net.test.sdk/15.5.0-preview-20171012-09",
       "files": [
         "build/net45/Microsoft.Net.Test.Sdk.props",
         "build/net45/Microsoft.Net.Test.Sdk.targets",
         "build/netcoreapp1.0/Microsoft.Net.Test.Sdk.props",
         "build/netcoreapp1.0/Microsoft.Net.Test.Sdk.targets",
+        "build/uap10.0/Microsoft.Net.Test.Sdk.props",
         "buildMultiTargeting/Microsoft.Net.Test.Sdk.props",
-        "microsoft.net.test.sdk.15.5.0-preview-20170810-02.nupkg.sha512",
+        "microsoft.net.test.sdk.15.5.0-preview-20171012-09.nupkg.sha512",
         "microsoft.net.test.sdk.nuspec"
       ]
     },
@@ -8452,10 +8416,10 @@
         "microsoft.rest.clientruntime.azure.nuspec"
       ]
     },
-    "Microsoft.TestPlatform.ObjectModel/15.5.0-preview-20170810-02": {
-      "sha512": "et1PWKkiADJPgkm+TqGbJPh42FzJ7vFlz2WubZKxclhXtRfEB1Pl6u7at1ez4xPfagyjK3BCChygnNJNdJ/RCg==",
+    "Microsoft.TestPlatform.ObjectModel/15.5.0-preview-20171012-09": {
+      "sha512": "gkbmnlzwiUq5X9GNyJ+kk5zzaaQyInoH2G4U13YQ/Wi4iFiICizhl1bwiRA2FoE44KTOLEDVhbe5XFy8yzUKGw==",
       "type": "package",
-      "path": "microsoft.testplatform.objectmodel/15.5.0-preview-20170810-02",
+      "path": "microsoft.testplatform.objectmodel/15.5.0-preview-20171012-09",
       "files": [
         "lib/net451/Microsoft.TestPlatform.CoreUtilities.dll",
         "lib/net451/Microsoft.TestPlatform.PlatformAbstractions.dll",
@@ -8486,6 +8450,9 @@
         "lib/net451/zh-Hans/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
         "lib/net451/zh-Hant/Microsoft.TestPlatform.CoreUtilities.resources.dll",
         "lib/net451/zh-Hant/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
+        "lib/netstandard1.4/Microsoft.TestPlatform.CoreUtilities.dll",
+        "lib/netstandard1.4/Microsoft.TestPlatform.PlatformAbstractions.dll",
+        "lib/netstandard1.4/Microsoft.VisualStudio.TestPlatform.ObjectModel.dll",
         "lib/netstandard1.5/Microsoft.TestPlatform.CoreUtilities.dll",
         "lib/netstandard1.5/Microsoft.TestPlatform.PlatformAbstractions.dll",
         "lib/netstandard1.5/Microsoft.VisualStudio.TestPlatform.ObjectModel.dll",
@@ -8515,16 +8482,98 @@
         "lib/netstandard1.5/zh-Hans/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
         "lib/netstandard1.5/zh-Hant/Microsoft.TestPlatform.CoreUtilities.resources.dll",
         "lib/netstandard1.5/zh-Hant/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
-        "microsoft.testplatform.objectmodel.15.5.0-preview-20170810-02.nupkg.sha512",
+        "microsoft.testplatform.objectmodel.15.5.0-preview-20171012-09.nupkg.sha512",
         "microsoft.testplatform.objectmodel.nuspec"
       ]
     },
-    "Microsoft.TestPlatform.TestHost/15.5.0-preview-20170810-02": {
-      "sha512": "6e351eiA4OIaP0h5A6YKdU5VFL9TkQ1MjZxPITBCK3M+zj82vOR4PH1+QcHtRzVuGzKacVYvFnUtiH6eOZa1kA==",
+    "Microsoft.TestPlatform.TestHost/15.5.0-preview-20171012-09": {
+      "sha512": "sbidyEyU8HKy+Hkb64dagDFZxxcI+nPZDA2zxnm6Gxsaltjk/ajRyx1oXaJ8a6C7Vf0Ij0V1147OAttPoLsFnw==",
       "type": "package",
-      "path": "microsoft.testplatform.testhost/15.5.0-preview-20170810-02",
+      "path": "microsoft.testplatform.testhost/15.5.0-preview-20171012-09",
       "files": [
         "ThirdPartyNotices.txt",
+        "build/uap10.0/Microsoft.TestPlatform.TestHost.props",
+        "build/uap10.0/Microsoft.TestPlatform.TestHost.targets",
+        "build/uap10.0/cs/Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
+        "build/uap10.0/cs/Microsoft.TestPlatform.CoreUtilities.resources.dll",
+        "build/uap10.0/cs/Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
+        "build/uap10.0/cs/Microsoft.TestPlatform.Utilities.resources.dll",
+        "build/uap10.0/cs/Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
+        "build/uap10.0/cs/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
+        "build/uap10.0/de/Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
+        "build/uap10.0/de/Microsoft.TestPlatform.CoreUtilities.resources.dll",
+        "build/uap10.0/de/Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
+        "build/uap10.0/de/Microsoft.TestPlatform.Utilities.resources.dll",
+        "build/uap10.0/de/Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
+        "build/uap10.0/de/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
+        "build/uap10.0/es/Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
+        "build/uap10.0/es/Microsoft.TestPlatform.CoreUtilities.resources.dll",
+        "build/uap10.0/es/Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
+        "build/uap10.0/es/Microsoft.TestPlatform.Utilities.resources.dll",
+        "build/uap10.0/es/Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
+        "build/uap10.0/es/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
+        "build/uap10.0/fr/Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
+        "build/uap10.0/fr/Microsoft.TestPlatform.CoreUtilities.resources.dll",
+        "build/uap10.0/fr/Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
+        "build/uap10.0/fr/Microsoft.TestPlatform.Utilities.resources.dll",
+        "build/uap10.0/fr/Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
+        "build/uap10.0/fr/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
+        "build/uap10.0/it/Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
+        "build/uap10.0/it/Microsoft.TestPlatform.CoreUtilities.resources.dll",
+        "build/uap10.0/it/Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
+        "build/uap10.0/it/Microsoft.TestPlatform.Utilities.resources.dll",
+        "build/uap10.0/it/Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
+        "build/uap10.0/it/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
+        "build/uap10.0/ja/Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
+        "build/uap10.0/ja/Microsoft.TestPlatform.CoreUtilities.resources.dll",
+        "build/uap10.0/ja/Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
+        "build/uap10.0/ja/Microsoft.TestPlatform.Utilities.resources.dll",
+        "build/uap10.0/ja/Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
+        "build/uap10.0/ja/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
+        "build/uap10.0/ko/Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
+        "build/uap10.0/ko/Microsoft.TestPlatform.CoreUtilities.resources.dll",
+        "build/uap10.0/ko/Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
+        "build/uap10.0/ko/Microsoft.TestPlatform.Utilities.resources.dll",
+        "build/uap10.0/ko/Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
+        "build/uap10.0/ko/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
+        "build/uap10.0/pl/Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
+        "build/uap10.0/pl/Microsoft.TestPlatform.CoreUtilities.resources.dll",
+        "build/uap10.0/pl/Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
+        "build/uap10.0/pl/Microsoft.TestPlatform.Utilities.resources.dll",
+        "build/uap10.0/pl/Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
+        "build/uap10.0/pl/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
+        "build/uap10.0/pt-BR/Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
+        "build/uap10.0/pt-BR/Microsoft.TestPlatform.CoreUtilities.resources.dll",
+        "build/uap10.0/pt-BR/Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
+        "build/uap10.0/pt-BR/Microsoft.TestPlatform.Utilities.resources.dll",
+        "build/uap10.0/pt-BR/Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
+        "build/uap10.0/pt-BR/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
+        "build/uap10.0/ru/Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
+        "build/uap10.0/ru/Microsoft.TestPlatform.CoreUtilities.resources.dll",
+        "build/uap10.0/ru/Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
+        "build/uap10.0/ru/Microsoft.TestPlatform.Utilities.resources.dll",
+        "build/uap10.0/ru/Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
+        "build/uap10.0/ru/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
+        "build/uap10.0/tr/Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
+        "build/uap10.0/tr/Microsoft.TestPlatform.CoreUtilities.resources.dll",
+        "build/uap10.0/tr/Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
+        "build/uap10.0/tr/Microsoft.TestPlatform.Utilities.resources.dll",
+        "build/uap10.0/tr/Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
+        "build/uap10.0/tr/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
+        "build/uap10.0/x64/msdia140.dll",
+        "build/uap10.0/x86/msdia140.dll",
+        "build/uap10.0/zh-Hans/Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
+        "build/uap10.0/zh-Hans/Microsoft.TestPlatform.CoreUtilities.resources.dll",
+        "build/uap10.0/zh-Hans/Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
+        "build/uap10.0/zh-Hans/Microsoft.TestPlatform.Utilities.resources.dll",
+        "build/uap10.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
+        "build/uap10.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
+        "build/uap10.0/zh-Hant/Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
+        "build/uap10.0/zh-Hant/Microsoft.TestPlatform.CoreUtilities.resources.dll",
+        "build/uap10.0/zh-Hant/Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
+        "build/uap10.0/zh-Hant/Microsoft.TestPlatform.Utilities.resources.dll",
+        "build/uap10.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
+        "build/uap10.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
         "lib/net45/_._",
         "lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll",
         "lib/netstandard1.5/Microsoft.TestPlatform.CrossPlatEngine.dll",
@@ -8564,13 +8613,20 @@
         "lib/netstandard1.5/tr/Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
         "lib/netstandard1.5/tr/Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
         "lib/netstandard1.5/tr/Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
+        "lib/netstandard1.5/x64/msdia140.dll",
+        "lib/netstandard1.5/x86/msdia140.dll",
         "lib/netstandard1.5/zh-Hans/Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
         "lib/netstandard1.5/zh-Hans/Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
         "lib/netstandard1.5/zh-Hans/Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
         "lib/netstandard1.5/zh-Hant/Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
         "lib/netstandard1.5/zh-Hant/Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
         "lib/netstandard1.5/zh-Hant/Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
-        "microsoft.testplatform.testhost.15.5.0-preview-20170810-02.nupkg.sha512",
+        "lib/uap10.0/Microsoft.TestPlatform.CommunicationUtilities.dll",
+        "lib/uap10.0/Microsoft.TestPlatform.CrossPlatEngine.dll",
+        "lib/uap10.0/Microsoft.TestPlatform.Utilities.dll",
+        "lib/uap10.0/Microsoft.VisualStudio.TestPlatform.Common.dll",
+        "lib/uap10.0/testhost.dll",
+        "microsoft.testplatform.testhost.15.5.0-preview-20171012-09.nupkg.sha512",
         "microsoft.testplatform.testhost.nuspec"
       ]
     },
@@ -8818,10 +8874,10 @@
         "mongodb.driver.core.nuspec"
       ]
     },
-    "Moq/4.7.137": {
-      "sha512": "CtVIMofBEyHAMPixhup7nSXZO/UG1DCqEI2E816XgQzJ4dkJvi/JaPEvTndLNKBzcfDMfA8yhAwzpRXRn/GBiA==",
+    "Moq/4.7.142": {
+      "sha512": "LeQTESlgZJMYWpyLX/jQLkIx2Uf9CLTu9WfO2o/W0gl+qduhTRDqviVGPlP36RHfCwhNMDf42WSNhIFWbyj8aQ==",
       "type": "package",
-      "path": "moq/4.7.137",
+      "path": "moq/4.7.142",
       "files": [
         "lib/net45/Moq.dll",
         "lib/net45/Moq.pdb",
@@ -8829,14 +8885,14 @@
         "lib/netstandard1.3/Moq.dll",
         "lib/netstandard1.3/Moq.pdb",
         "lib/netstandard1.3/Moq.xml",
-        "moq.4.7.137.nupkg.sha512",
+        "moq.4.7.142.nupkg.sha512",
         "moq.nuspec"
       ]
     },
-    "MSTest.TestAdapter/1.2.0-beta3": {
-      "sha512": "nDdOwAjr8T6bdcZJ7tVs+A9DgIvhiyfQsPwHHYbccgRIMyCC43QF1FnkiGuRwApwrSLPE93nOjneB8xwNBJOyg==",
+    "MSTest.TestAdapter/1.2.0": {
+      "sha512": "n0xgVkGNisHCHJNTfDBQBWsp3pdFMEkvex3ah7ybAa4NEIXc+rp1Kpa4tsScTNZKH0uzpR6BZ14sJvtwPm4VgQ==",
       "type": "package",
-      "path": "mstest.testadapter/1.2.0-beta3",
+      "path": "mstest.testadapter/1.2.0",
       "files": [
         "build/_common/Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll",
         "build/_common/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll",
@@ -8888,14 +8944,14 @@
         "build/uap10.0/MSTest.TestAdapter.props",
         "build/uap10.0/MSTest.TestAdapter.targets",
         "build/uap10.0/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll",
-        "mstest.testadapter.1.2.0-beta3.nupkg.sha512",
+        "mstest.testadapter.1.2.0.nupkg.sha512",
         "mstest.testadapter.nuspec"
       ]
     },
-    "MSTest.TestFramework/1.2.0-beta3": {
-      "sha512": "p+pNcfeZtOmKTpXaqgJqd3ScBuRBPE2lDL/Un9wxfs39qEDtVqRXVZQaCd2DaMhCf7WUpEmb7auTE3hSIbFYsw==",
+    "MSTest.TestFramework/1.2.0": {
+      "sha512": "8MLtlVC0UrqrMeE7V4VmSEFiApgvtUHLizJv0W1DTCOrxyY4YPhlbcClUkLtw4I5sD5P/YWP2S+rL3/MW2pM3Q==",
       "type": "package",
-      "path": "mstest.testframework/1.2.0-beta3",
+      "path": "mstest.testframework/1.2.0",
       "files": [
         "lib/net45/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
         "lib/net45/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll",
@@ -8987,7 +9043,7 @@
         "lib/uap10.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.TestFramework.xml",
         "lib/uap10.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml",
         "lib/uap10.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.TestFramework.xml",
-        "mstest.testframework.1.2.0-beta3.nupkg.sha512",
+        "mstest.testframework.1.2.0.nupkg.sha512",
         "mstest.testframework.nuspec"
       ]
     },
@@ -9157,6 +9213,16 @@
         "lib/netstandard1.3/Newtonsoft.Json.Bson.xml",
         "newtonsoft.json.bson.1.0.1.nupkg.sha512",
         "newtonsoft.json.bson.nuspec"
+      ]
+    },
+    "NuGet.CommandLine/4.3.0": {
+      "sha512": "Wo+kltIu41aw8+Kl31acZSlFsVMwB75hSdzPq/zK0z3CCVLILz2oIPgZw5PLUQ0+A7uTHF0YQ9AiF0XNPI1rMg==",
+      "type": "package",
+      "path": "nuget.commandline/4.3.0",
+      "files": [
+        "nuget.commandline.4.3.0.nupkg.sha512",
+        "nuget.commandline.nuspec",
+        "tools/NuGet.exe"
       ]
     },
     "Remotion.Linq/2.1.1": {
@@ -9585,14 +9651,14 @@
         "stackexchange.redis.strongname.nuspec"
       ]
     },
-    "Stripe.net/10.4.0": {
-      "sha512": "V0SrilaUUw6KoHwmbuv+mxbnBTEMcl8K0H0ccT6WA3ry/ckDNStBd1Amzn5w/CQ3sb+HrJp05GdQIDiB02XECA==",
+    "Stripe.net/11.4.0": {
+      "sha512": "mf09vxV+nfJn9Xhq9Y1hyzt2I5TwjAkH5sk7JiA/PNq1KqhIuhAxC5ItajYtFSCEHPGeJQRJvcw0tiJKc54g1A==",
       "type": "package",
-      "path": "stripe.net/10.4.0",
+      "path": "stripe.net/11.4.0",
       "files": [
         "lib/net45/Stripe.net.dll",
         "lib/netstandard1.2/Stripe.net.dll",
-        "stripe.net.10.4.0.nupkg.sha512",
+        "stripe.net.11.4.0.nupkg.sha512",
         "stripe.net.nuspec"
       ]
     },
@@ -9607,14 +9673,14 @@
         "swashbuckle.aspnetcore.nuspec"
       ]
     },
-    "Swashbuckle.AspNetCore.Examples/2.3.0": {
-      "sha512": "hiZNEBR26OcMnC3GVQbjjt4QWVQ8Z/3GdTbdA//f3DF4KWx2zHvtIB8kGaju7hu4CHBEz/7ic45QuU4YcykmNA==",
+    "Swashbuckle.AspNetCore.Examples/2.3.1": {
+      "sha512": "qTrnTRM/n7rYa0TuoRc62LsFnLe/pBnThkk9QtxA0Zi2jrh6cYi8iOKdzZowX/ZeW3Md/VFvfI7TsgYKeZauiA==",
       "type": "package",
-      "path": "swashbuckle.aspnetcore.examples/2.3.0",
+      "path": "swashbuckle.aspnetcore.examples/2.3.1",
       "files": [
-        "lib/net461/Swashbuckle.AspNetCore.Examples.dll",
+        "lib/net451/Swashbuckle.AspNetCore.Examples.dll",
         "lib/netstandard1.6/Swashbuckle.AspNetCore.Examples.dll",
-        "swashbuckle.aspnetcore.examples.2.3.0.nupkg.sha512",
+        "swashbuckle.aspnetcore.examples.2.3.1.nupkg.sha512",
         "swashbuckle.aspnetcore.examples.nuspec"
       ]
     },
@@ -10102,10 +10168,10 @@
         "version.txt"
       ]
     },
-    "System.ComponentModel.EventBasedAsync/4.3.0": {
-      "sha512": "fCFl8f0XdwA/BuoNrVBB5D0Y48/hv2J+w4xSDdXQitXZsR6UCSOrDVE7TCUraY802ENwcHUnUCv4En8CupDU1g==",
+    "System.ComponentModel.EventBasedAsync/4.0.11": {
+      "sha512": "Z7SO6vvQIR84daPE4uhaNdef9CjgjDMGYkas8epUhf0U3WGuaGgZ0Mm4QuNycMdbHUY8KEdZrtgxonkAiJaAlA==",
       "type": "package",
-      "path": "system.componentmodel.eventbasedasync/4.3.0",
+      "path": "system.componentmodel.eventbasedasync/4.0.11",
       "files": [
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
@@ -10166,7 +10232,7 @@
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._",
-        "system.componentmodel.eventbasedasync.4.3.0.nupkg.sha512",
+        "system.componentmodel.eventbasedasync.4.0.11.nupkg.sha512",
         "system.componentmodel.eventbasedasync.nuspec"
       ]
     },
@@ -10549,10 +10615,10 @@
         "system.diagnostics.fileversioninfo.nuspec"
       ]
     },
-    "System.Diagnostics.Process/4.3.0": {
-      "sha512": "J0wOX07+QASQblsfxmIMFc9Iq7KTXYL3zs2G/Xc704Ylv3NpuVdo6gij6V3PGiptTxqsK0K7CdXenRvKUnkA2g==",
+    "System.Diagnostics.Process/4.1.0": {
+      "sha512": "mpVZ5bnlSs3tTeJ6jYyDJEIa6tavhAd88lxq1zbYhkkCu0Pno2+gHXcvZcoygq2d8JxW3gojXqNJMTAshduqZA==",
       "type": "package",
-      "path": "system.diagnostics.process/4.3.0",
+      "path": "system.diagnostics.process/4.1.0",
       "files": [
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
@@ -10600,7 +10666,7 @@
         "runtimes/win/lib/net461/System.Diagnostics.Process.dll",
         "runtimes/win/lib/netstandard1.4/System.Diagnostics.Process.dll",
         "runtimes/win7/lib/netcore50/_._",
-        "system.diagnostics.process.4.3.0.nupkg.sha512",
+        "system.diagnostics.process.4.1.0.nupkg.sha512",
         "system.diagnostics.process.nuspec"
       ]
     },
@@ -12952,21 +13018,15 @@
         "system.runtime.interopservices.windowsruntime.nuspec"
       ]
     },
-    "System.Runtime.Loader/4.3.0": {
-      "sha512": "DHMaRn8D8YCK2GG2pw+UzNxn/OHVfaWx7OTLBD/hPegHZZgcZh3H6seWegrC4BYwsfuGrywIuT+MQs+rPqRLTQ==",
+    "System.Runtime.Loader/4.0.0": {
+      "sha512": "4UN78GOVU/mbDFcXkEWtetJT/sJ0yic2gGk1HSlSpWI0TDf421xnrZTDZnwNBapk1GQeYN7U1lTj/aQB1by6ow==",
       "type": "package",
-      "path": "system.runtime.loader/4.3.0",
+      "path": "system.runtime.loader/4.0.0",
       "files": [
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
-        "lib/MonoAndroid10/_._",
-        "lib/MonoTouch10/_._",
         "lib/net462/_._",
         "lib/netstandard1.5/System.Runtime.Loader.dll",
-        "lib/xamarinios10/_._",
-        "lib/xamarinmac20/_._",
-        "lib/xamarintvos10/_._",
-        "lib/xamarinwatchos10/_._",
         "ref/netstandard1.5/System.Runtime.Loader.dll",
         "ref/netstandard1.5/System.Runtime.Loader.xml",
         "ref/netstandard1.5/de/System.Runtime.Loader.xml",
@@ -12978,7 +13038,7 @@
         "ref/netstandard1.5/ru/System.Runtime.Loader.xml",
         "ref/netstandard1.5/zh-hans/System.Runtime.Loader.xml",
         "ref/netstandard1.5/zh-hant/System.Runtime.Loader.xml",
-        "system.runtime.loader.4.3.0.nupkg.sha512",
+        "system.runtime.loader.4.0.0.nupkg.sha512",
         "system.runtime.loader.nuspec"
       ]
     },
@@ -13064,10 +13124,10 @@
         "system.runtime.serialization.formatters.nuspec"
       ]
     },
-    "System.Runtime.Serialization.Json/4.3.0": {
-      "sha512": "CpVfOH0M/uZ5PH+M9+Gu56K0j9lJw3M+PKRegTkcrY/stOIvRUeonggxNrfBYLA5WOHL2j15KNJuTuld3x4o9w==",
+    "System.Runtime.Serialization.Json/4.0.2": {
+      "sha512": "g7ji+qzauhWhkcho7sqs2H/QghsvmpWC7ZfQIeugpR1KIte2eyW+mS9mySHvmYjW4UILndUl/NphRAWghDwLzw==",
       "type": "package",
-      "path": "system.runtime.serialization.json/4.3.0",
+      "path": "system.runtime.serialization.json/4.0.2",
       "files": [
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
@@ -13117,7 +13177,7 @@
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._",
-        "system.runtime.serialization.json.4.3.0.nupkg.sha512",
+        "system.runtime.serialization.json.4.0.2.nupkg.sha512",
         "system.runtime.serialization.json.nuspec"
       ]
     },
@@ -14822,26 +14882,17 @@
       "type": "project",
       "path": "../netcore/Arthur_Clive.csproj",
       "msbuildProject": "../netcore/Arthur_Clive.csproj"
-    },
-    "AuthorizedServer/1.0.0": {
-      "type": "project",
-      "path": "../netcore/AuthorizedServer/AuthorizedServer.csproj",
-      "msbuildProject": "../netcore/AuthorizedServer/AuthorizedServer.csproj"
     }
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
-      "AWSSDK.S3 >= 3.3.11",
-      "AWSSDK.SimpleNotificationService >= 3.3.0.21",
       "Arthur_Clive >= 1.0.0",
-      "AuthorizedServer >= 1.0.0",
-      "MSTest.TestAdapter >= 1.2.0-beta3",
-      "MSTest.TestFramework >= 1.2.0-beta3",
+      "MSTest.TestAdapter >= 1.2.0",
+      "MSTest.TestFramework >= 1.2.0",
       "Microsoft.AspNetCore.Mvc >= 2.0.0",
-      "Microsoft.NET.Test.Sdk >= 15.5.0-preview-20170810-02",
+      "Microsoft.NET.Test.Sdk >= 15.5.0-preview-20171012-09",
       "Microsoft.NETCore.App >= 2.0.0",
-      "Minio.NetCore >= 1.0.2",
-      "MongoDB.Driver >= 2.4.4"
+      "Moq >= 4.7.142"
     ]
   },
   "packageFolders": {
@@ -14873,16 +14924,14 @@
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {},
-        "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json": {}
+        "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json": {},
+        "https://www.myget.org/gallery/efcore-mongodb": {}
       },
       "frameworks": {
         "netcoreapp2.0": {
           "projectReferences": {
             "D:\\Arthur_Clive\\netcore\\Arthur_Clive.csproj": {
               "projectPath": "D:\\Arthur_Clive\\netcore\\Arthur_Clive.csproj"
-            },
-            "D:\\Arthur_Clive\\netcore\\AuthorizedServer\\AuthorizedServer.csproj": {
-              "projectPath": "D:\\Arthur_Clive\\netcore\\AuthorizedServer\\AuthorizedServer.csproj"
             }
           }
         }
@@ -14896,17 +14945,17 @@
     "frameworks": {
       "netcoreapp2.0": {
         "dependencies": {
-          "MongoDB.Driver": {
-            "target": "Package",
-            "version": "2.4.4"
-          },
           "MSTest.TestFramework": {
             "target": "Package",
-            "version": "1.2.0-beta3"
+            "version": "1.2.0"
           },
           "MSTest.TestAdapter": {
             "target": "Package",
-            "version": "1.2.0-beta3"
+            "version": "1.2.0"
+          },
+          "Moq": {
+            "target": "Package",
+            "version": "4.7.142"
           },
           "Microsoft.NETCore.App": {
             "target": "Package",
@@ -14919,19 +14968,7 @@
           },
           "Microsoft.NET.Test.Sdk": {
             "target": "Package",
-            "version": "15.5.0-preview-20170810-02"
-          },
-          "AWSSDK.SimpleNotificationService": {
-            "target": "Package",
-            "version": "3.3.0.21"
-          },
-          "Minio.NetCore": {
-            "target": "Package",
-            "version": "1.0.2"
-          },
-          "AWSSDK.S3": {
-            "target": "Package",
-            "version": "3.3.11"
+            "version": "15.5.0-preview-20171012-09"
           }
         },
         "imports": [
@@ -14941,16 +14978,5 @@
         "warn": true
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1605",
-      "level": "Error",
-      "message": "Detected package downgrade: AWSSDK.S3 from 3.3.11.1 to 3.3.11. Reference the package directly from the project to select a different version. \r\n UnitTest_ArthurClive (>= 1.0.0) -> Arthur_Clive (>= 1.0.0) -> AWSSDK.S3 (>= 3.3.11.1) \r\n UnitTest_ArthurClive (>= 1.0.0) -> AWSSDK.S3 (>= 3.3.11)",
-      "libraryId": "AWSSDK.S3",
-      "targetGraphs": [
-        ".NETCoreApp,Version=v2.0"
-      ]
-    }
-  ]
+  }
 }

@@ -18,10 +18,7 @@ namespace AuthorizedServer.Helper
         /// <param name="key"></param>
         public static string GetCredentials(string key)
         {
-            var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            var xmlStr = File.ReadAllText(Path.Combine(dir,"AmazonKeys.xml"));
-            var str = XElement.Parse(xmlStr);
-            var result = str.Elements("amazonsns").Where(x => x.Element("current").Value.Equals("Yes")).Descendants(key);
+            var result = GlobalHelper.ReadXML().Elements("amazonsns").Where(x => x.Element("current").Value.Equals("Yes")).Descendants(key);
             return result.First().Value;
         }
 
@@ -68,7 +65,7 @@ namespace AuthorizedServer.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("SMSHelper", "SendSMS", "SendSMS", ex.Message);
+                LoggerDataAccess.CreateLog("SMSHelper", "SendSMS", ex.Message);
                 return "Failed";
             }
         }

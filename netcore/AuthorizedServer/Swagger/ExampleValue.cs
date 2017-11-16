@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AuthorizedServer.Models;
+﻿using AuthorizedServer.Models;
 using Swashbuckle.AspNetCore.Examples;
 
 namespace AuthorizedServer.Swagger
@@ -15,7 +11,7 @@ namespace AuthorizedServer.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new Parameters()
+            return new 
             {
                 username = "sample@gmail.com",
                 fullname = "Sample User"
@@ -33,7 +29,7 @@ namespace AuthorizedServer.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new RegisterModel()
+            return new 
             {
                 Title = "Mr",
                 FullName = "Sample User",
@@ -52,7 +48,7 @@ namespace AuthorizedServer.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new LoginModel()
+            return new 
             {
                 UserName = "12341234",
                 Password = "asd123",
@@ -66,7 +62,7 @@ namespace AuthorizedServer.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new ForgotPasswordModel()
+            return new 
             {
                 UserName = "12341234",
                 UserLocation = "IN",
@@ -80,7 +76,7 @@ namespace AuthorizedServer.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new LoginModel()
+            return new 
             {
                 UserName = "12341234",
                 Password = "qwe123",
@@ -94,7 +90,7 @@ namespace AuthorizedServer.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new ChangePasswordModel()
+            return new 
             {
                 UserName = "12341234",
                 OldPassword = "asd123",
@@ -109,7 +105,7 @@ namespace AuthorizedServer.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new LoginModel()
+            return new 
             {
                 UserName = "12341234",
                 Password = "asd123",
@@ -123,11 +119,65 @@ namespace AuthorizedServer.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new SocialLoginModel()
+            return new 
             {
                 Token = "Token received from google or facebook",
                 Email = "sample@gmail.com",
                 ID = "ID given by google or facebook"
+            };
+        }
+    }
+
+    /// <summary></summary>
+    public class UpdateFullNameDetails : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new
+            {
+                FullName = "Updated Sample User"
+            };
+        }
+    }
+
+    /// <summary></summary>
+    public class UpdatePhoneNumberDetails : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new 
+            {
+                DialCode = "+11",
+                PhoneNumber = "23452345"
+            };
+        }
+    }
+
+    /// <summary></summary>
+    public class UpdateEmailDetails : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new 
+            {
+                Email = "updatedsample@email.com"
+            };
+        }
+    }
+
+    /// <summary></summary>
+    public class UpdatePasswordDetails : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new 
+            {
+                CurrentPassword = "asd123",
+                NewPassword = "qwe123"
             };
         }
     }

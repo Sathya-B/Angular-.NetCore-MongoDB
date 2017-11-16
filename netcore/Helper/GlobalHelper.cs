@@ -1,112 +1,95 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using Arthur_Clive.Data;
 using Arthur_Clive.Logger;
 using MongoDB.Bson.Serialization;
-using MongoDB.Driver;
-using Minio;
-using AH = Arthur_Clive.Helper.AmazonHelper;
-using WH = Arthur_Clive.Helper.MinioHelper;
-using MH = Arthur_Clive.Helper.MongoHelper;
-using MongoDB.Bson;
 
 namespace Arthur_Clive.Helper
 {
     /// <summary>Global helper method</summary>
     public class GlobalHelper
     {
+        /// <summary>Get current directory of project</summary>
+        public static string GetCurrentDir()
+        {
+            return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        }
+
         /// <summary>xml file</summary>
         public static XElement ReadXML()
         {
-            var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            var xmlStr = File.ReadAllText(Path.Combine(dir, "AmazonKeys.xml"));
-            return XElement.Parse(xmlStr);
-        }
-
-        /// <summary>Get order list from MongoDB</summary>
-        /// <param name="username"></param>
-        /// <param name="order_db"></param>
-        public async static Task<List<OrderInfo>> GetOrders(string username, IMongoDatabase order_db)
-        {
             try
             {
-                IAsyncCursor<OrderInfo> cursor = await order_db.GetCollection<OrderInfo>("OrderInfo").FindAsync(Builders<OrderInfo>.Filter.Eq("UserName", username));
-                var orders = cursor.ToList();
-                return orders;
+                var dir = GetCurrentDir();
+                var xmlStr = File.ReadAllText(Path.Combine(dir, "AmazonKeys.xml"));
+                return XElement.Parse(xmlStr);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                LoggerDataAccess.CreateLog("GlobalHelper", "GetOrders", "GetOrders", ex.Message);
+                LoggerDataAccess.CreateLog("GlobalHelper", "ReadXML", ex.Message);
                 return null;
             }
         }
 
-        /// <summary>Get product list  from MongoDB</summary>
-        /// <param name="productSKU"></param>
-        /// <param name="product_db"></param>
-        public async static Task<List<Product>> GetProducts(string productSKU, IMongoDatabase product_db)
+        /// <summary>Send gift through email after payment success</summary>
+        /// <param name="orderId"></param>
+        public static string SendGift(long orderId)
         {
             try
             {
-                IAsyncCursor<Product> productCursor = await product_db.GetCollection<Product>("Product").FindAsync(Builders<Product>.Filter.Eq("ProductSKU", productSKU));
-                var products = productCursor.ToList();
-                return products;
+                var checkOrder = MongoHelper.CheckForDatas("OrderId", orderId, null, null, "OrderDB", "OrderInfo");
+                if (checkOrder != null)
+                {
+                    var orderInfo = BsonSerializer.Deserialize<OrderInfo>(checkOrder);
+                    List<string> productInfoList = new List<string>();
+                    foreach (var product in orderInfo.ProductDetails)
+                    {
+                        productInfoList.Add(product.ProductSKU);
+                    }
+                    var productInfoString = String.Join(":", productInfoList);
+                    var sendGift = EmailHelper.SendGift(orderId, productInfoString);
+                }
+                return "Success";
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                LoggerDataAccess.CreateLog("GlobalHelper", "GetProducts", "GetProducts", ex.Message);
+                LoggerDataAccess.CreateLog("GlobalHelper", "SendGift", ex.Message);
                 return null;
             }
         }
 
-        /// <summary></summary>
-        /// <param name="objectId"></param>
-        /// <param name="productSKU"></param>
-        /// <param name="updateData"></param>
-        /// <param name="updateField"></param>
-        /// <param name="objectName"></param>
-        public async static void UpdateProductDetails(dynamic objectId,string productSKU, dynamic updateData , string updateField,string objectName)
+        /// <summary>Get string between to characters</summary>
+        /// <param name="text"></param>
+        /// <param name="startString"></param>
+        /// <param name="endString"></param>
+        public static List<string> StringBetweenTwoCharacters(string text, string startString, string endString)
         {
             try
             {
-                var update = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Product", Builders<BsonDocument>.Update.Set(updateField, updateData));
-                string MinioObject_URL;
-                //MinioObject_URL = WH.GetMinioObject("arthurclive-products", objectName).Result;
-                //MinioObject_URL = AH.GetAmazonS3Object("arthurclive-products", objectName);
-                MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
-                var update1 = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductSKU", objectName));
-                var update2 = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Product", Builders<BsonDocument>.Update.Set("MinioObject_URL", MinioObject_URL));
+                List<string> matched = new List<string>();
+                int indexStart = 0, indexEnd = 0;
+                bool exit = false;
+                while (!exit)
+                {
+                    indexStart = text.IndexOf(startString);
+                    indexEnd = text.IndexOf(endString);
+                    if (indexStart != -1 && indexEnd != -1)
+                    {
+                        matched.Add(text.Substring(indexStart + startString.Length,
+                            indexEnd - indexStart - startString.Length));
+                        text = text.Substring(indexEnd + endString.Length);
+                    }
+                    else
+                        exit = true;
+                }
+                return matched;
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("GlobalHelper", "UpdateProductDetails", "UpdateProductDetails", ex.Message);
-            }
-        }
-
-        /// <summary></summary>
-        /// <param name="objectId"></param>
-        /// <param name="productFor"></param>
-        /// <param name="productType"></param>
-        /// <param name="updateData"></param>
-        /// <param name="updateField"></param>
-        /// <param name="objectName"></param>
-        public async static void UpdateCategoryDetails(dynamic objectId, string productFor,string productType, dynamic updateData, string updateField, string objectName)
-        {
-            try
-            {
-                var update = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Category", Builders<BsonDocument>.Update.Set(updateField, updateData));
-                string MinioObject_URL;
-                //MinioObject_URL = WH.GetMinioObject("products", objectName).Result;
-                //MinioObject_URL = AH.GetAmazonS3Object("product-category", objectName);
-                MinioObject_URL = AH.GetS3Object("product-category", objectName);
-                var update1 = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Category", Builders<BsonDocument>.Update.Set("MinioObject_URL", MinioObject_URL));
-            }
-            catch (Exception ex)
-            {
-                LoggerDataAccess.CreateLog("GlobalHelper", "UpdateCategoryDetails", "UpdateCategoryDetails", ex.Message);
+                LoggerDataAccess.CreateLog("GlobalHelper", "StringBetweenTwoCharacters", ex.Message);
+                return null;
             }
         }
     }

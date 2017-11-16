@@ -40,8 +40,6 @@ namespace AuthorizedServer.Controllers
         [SwaggerRequestExample(typeof(Parameters), typeof(ParameterDetails))]
         [ProducesResponseType(typeof(ResponseData), 999)]
         [ProducesResponseType(typeof(ResponseData), 909)]
-        [ProducesResponseType(typeof(ResponseData), 901)]
-        [ProducesResponseType(typeof(ResponseData), 904)]
         public ActionResult Auth([FromQuery]Parameters parameters)
         {
             try
@@ -76,7 +74,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("TokenController", "Auth", "Auth", ex.Message);
+                LoggerDataAccess.CreateLog("TokenController", "Auth", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

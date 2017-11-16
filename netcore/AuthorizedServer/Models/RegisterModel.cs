@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
 
@@ -18,6 +17,8 @@ namespace AuthorizedServer.Models
         public string FullName { get; set; }
         /// <summary>Username of user</summary>
         public string UserName { get; set; }
+        /// <summary>Role for user</summary>
+        public string UserRole { get; set; }
         /// <summary>Dialcode for phonenumber of the user</summary>
         [Required]
         public string DialCode { get; set; }
@@ -85,6 +86,28 @@ namespace AuthorizedServer.Models
         public string Password { get; set; }
     }
 
+    /// <summary>Contains data need to change password when user forgets password</summary>
+    public class ChangePassword_ForgotPasswordModel
+    {
+        /// <summary>Username of user</summary>
+        [Required]
+        public string UserName { get; set; }
+        /// <summary>Password od user</summary>
+        [Required]
+        public string Password { get; set; }
+    }
+
+    /// <summary>Contains data need to deactivate account of user</summary>
+    public class DeactivateAccountModel
+    {
+        /// <summary>Username of user</summary>
+        [Required]
+        public string UserName { get; set; }
+        /// <summary>Password od user</summary>
+        [Required]
+        public string Password { get; set; }
+    }
+
     /// <summary>Contains deatils need to change password </summary>
     public class ChangePasswordModel
     {
@@ -112,7 +135,7 @@ namespace AuthorizedServer.Models
         [Required]
         public string ID { get; set; }
     }
-    
+
     /// <summary>Contains data obtained from google token</summary>
     public class GoogleVerificationModel
     {
@@ -166,4 +189,45 @@ namespace AuthorizedServer.Models
         [Required]
         public string name { get; set; }
     }
+
+    /// <summary>Contains data needed for updating fullname of user</summary>
+    public class FullNameUpdateModel
+    {
+        /// <summary>Update data for fullname</summary>
+        [Required]
+        public string FullName { get; set; }
+
+    }
+
+    /// <summary>Contains data needed for updating phonenumber of user</summary>
+    public class PhoneNumberUpdateModel
+    {
+        /// <summary>Update data for dial code</summary>
+        [Required]
+        public string DialCode { get; set; }
+        /// <summary>Update data for phonenumber</summary>
+        [Required]
+        public string PhoneNumber { get; set; }
+    }
+
+    /// <summary>Contains data needed for updating email of user</summary>
+    public class EmailUpdateModel
+    {
+        /// <summary>Update data for email</summary>
+        public string Email { get; set; }
+    }
+
+    /// <summary>Contains data needed for updating password of user</summary>
+    public class PasswordUpdateModel
+    {
+        /// <summary>Current password of user</summary>
+        [Required]
+        public string CurrentPassword { get; set; }
+        /// <summary>Update data for password</summary>
+        [Required]
+        public string NewPassword { get; set; }
+    }
 }
+
+
+

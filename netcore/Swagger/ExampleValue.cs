@@ -8,12 +8,12 @@ namespace Arthur_Clive.Swagger
 {
     #region ProductController
     /// <summary></summary>
-    public class InsertProduct : IExamplesProvider
+    public class InsertProductDetails : IExamplesProvider
     {
         /// <summary></summary>
         public object GetExamples()
         {
-            return new Product
+            return new 
             {
                 ProductFor = "Girls",
                 ProductType = "Tshirt",
@@ -33,12 +33,12 @@ namespace Arthur_Clive.Swagger
     }
 
     /// <summary></summary>
-    public class UpdateProduct : IExamplesProvider
+    public class UpdateProductDetails : IExamplesProvider
     {
         /// <summary></summary>
         public object GetExamples()
         {
-            return new Product
+            return new
             {
                 ProductFor = "Men",
                 ProductType = "Shirt",
@@ -52,9 +52,37 @@ namespace Arthur_Clive.Swagger
                 ReplacementApplicable = false,
                 ProductDescription = "Updated description",
                 RefundApplicable = false,
-                ProductMaterial = "Flax",
-                ProductRating = 4.5,
-                ProductReviews = new Review[] { new Review { Name = "Sample1", Comment = "Good" }, new Review { Name = "Sample2", Comment = "Bad" } }
+                ProductMaterial = "Flax"
+            };
+        }
+    }
+
+    /// <summary></summary>
+    public class InsertReviewDetails : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new 
+            {
+                Name = "Sample1",
+                Comment = "Good",
+                Rating = 4,
+                OrderId = 1
+            };
+        }
+    }
+
+    /// <summary></summary>
+    public class UpdateReviewDetails : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new 
+            {
+                Id = 1,
+                Approved = true
             };
         }
     }
@@ -64,12 +92,12 @@ namespace Arthur_Clive.Swagger
     #region CategoryController
 
     /// <summary></summary>
-    public class InsertCategory : IExamplesProvider
+    public class InsertCategoryDetails : IExamplesProvider
     {
         /// <summary></summary>
         public object GetExamples()
         {
-            return new Category
+            return new
             {
                 ProductFor = "Women",
                 ProductType = "Tops",
@@ -79,12 +107,12 @@ namespace Arthur_Clive.Swagger
     }
 
     /// <summary></summary>
-    public class UpdateCategory : IExamplesProvider
+    public class UpdateCategoryDetails : IExamplesProvider
     {
         /// <summary></summary>
         public object GetExamples()
         {
-            return new Category
+            return new
             {
                 ProductFor = "Men",
                 ProductType = "Shirt",
@@ -103,9 +131,9 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new Coupon
+            return new
             {
-                Code = "CODE1",
+                Code = "CU111111",
                 ApplicableFor = "All",
                 ExpiryTime = DateTime.UtcNow.AddMonths(1),
                 UsageCount = 10,
@@ -121,9 +149,27 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new Coupon
+            return new UpdateCoupon
             {
+                ApplicableFor = "All",
+                ExpiryTime = DateTime.UtcNow,
+                Value = 100,
+                Percentage = false,
                 UsageCount = 1
+            };
+        }
+    }
+
+    /// <summary></summary>
+    public class UseCouponData : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new UseCoupon
+            {
+                UsageCount = 1,
+                Amount = 100
             };
         }
     }
@@ -138,19 +184,21 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new AddressList()
+            return new
             {
                 ListOfAddress = new List<Address>
                 {
                     new Address
                     {
-                        UserName = "sample@gmail.com",
+                        UserName = "12341234",
                         Name = "Sample",
+                        DialCode = "+91",
                         PhoneNumber = "12341234",
                         AddressLines = "GSK street",
                         PostOffice = "Saravanampati",
                         City = "Coimbatore",
                         State = "TamilNadu",
+                        Country = "India",
                         PinCode = "641035",
                         Landmark = "Near KGISL",
                         BillingAddress = true,
@@ -159,13 +207,15 @@ namespace Arthur_Clive.Swagger
                     },
                     new Address
                     {
-                        UserName = "sample@gmail.com",
+                        UserName = "12341234",
                         Name = "Sample",
+                        DialCode = "+91",
                         PhoneNumber = "12341234",
                         AddressLines = "GSK street",
                         PostOffice = "Saravanampati",
                         City = "Coimbatore",
                         State = "TamilNadu",
+                        Country = "India",
                         PinCode = "641035",
                         Landmark = "Near KGISL",
                         BillingAddress = false,
@@ -183,7 +233,7 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new CartList()
+            return new
             {
                 ListOfProducts = new List<Cart>
                 {
@@ -207,19 +257,15 @@ namespace Arthur_Clive.Swagger
                     new Cart
                     {
                         UserName="sample@gamil.com",
-                        ProductSKU="Men-Tshirt-Om-Black-L",
-                        MinioObject_URL="https://s3.ap-south-1.amazonaws.com/arthurclive-products/Men-Tshirt-Om-Black-L.jpg",
-                        ProductFor="Men",
-                        ProductType="Tshirt",
-                        ProductDesign = "Om",
+                        ProductSKU="All-Gifts-BirthDay--",
+                        MinioObject_URL="https://s3.ap-south-1.amazonaws.com/arthurclive-products/All-Gifts-BirthDay--.jpg",
+                        ProductFor="recipient@gmail.com",
+                        ProductType="Gifts",
+                        ProductDesign = "BirthDay",
                         ProductBrand = "Arthur Clive",
-                        ProductPrice = 695,
-                        ProductDiscount = 0,
-                        ProductDiscountPrice = 695,
+                        ProductPrice = 100,
                         ProductQuantity = 1,
-                        ProductSize = "L",
-                        ProductColour = "Black",
-                        ProductDescription = "Tshirt for men"
+                        ProductDescription = "Gift for birthday"
                     }
                 }
             };
@@ -232,43 +278,43 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new WishlistList()
+            return new
             {
-                //ListOfProducts =
-                //{
-                //    new WishList
-                //    {
-                //        UserName="sample@gamil.com",
-                //        ProductSKU="Men-Tshirt-Om-Black-S",
-                //        MinioObject_URL="https://s3.ap-south-1.amazonaws.com/arthurclive-products/Men-Tshirt-Om-Black-S.jpg",
-                //        ProductFor="Men",
-                //        ProductType="Tshirt",
-                //        ProductDesign = "Om",
-                //        ProductBrand = "Arthur Clive",
-                //        ProductPrice = 695,
-                //        ProductDiscount = 0,
-                //        ProductDiscountPrice = 695,
-                //        ProductSize = "S",
-                //        ProductColour = "Black",
-                //        ProductDescription = "Tshirt for men"
-                //    },
-                //    new WishList
-                //    {
-                //        UserName="sample@gamil.com",
-                //        ProductSKU="Men-Tshirt-Om-Black-L",
-                //        MinioObject_URL="https://s3.ap-south-1.amazonaws.com/arthurclive-products/Men-Tshirt-Om-Black-L.jpg",
-                //        ProductFor="Men",
-                //        ProductType="Tshirt",
-                //        ProductDesign = "Om",
-                //        ProductBrand = "Arthur Clive",
-                //        ProductPrice = 695,
-                //        ProductDiscount = 0,
-                //        ProductDiscountPrice = 695,
-                //        ProductSize = "L",
-                //        ProductColour = "Black",
-                //        ProductDescription = "Tshirt for men"
-                //    }
-                //}
+                ListOfProducts = new List<WishList>
+                {
+                    new WishList
+                    {
+                        UserName = "sample@gamil.com",
+                        ProductSKU = "Men-Tshirt-Om-Black-S",
+                        MinioObject_URL = "https://s3.ap-south-1.amazonaws.com/arthurclive-products/Men-Tshirt-Om-Black-S.jpg",
+                        ProductFor = "Men",
+                        ProductType = "Tshirt",
+                        ProductDesign = "Om",
+                        ProductBrand = "Arthur Clive",
+                        ProductPrice = 695,
+                        ProductDiscount = 0,
+                        ProductDiscountPrice = 695,
+                        ProductSize = "S",
+                        ProductColour = "Black",
+                        ProductDescription = "Tshirt for men"
+                    },
+                    new WishList
+                    {
+                        UserName = "sample@gamil.com",
+                        ProductSKU = "Men-Tshirt-Om-Black-L",
+                        MinioObject_URL = "https://s3.ap-south-1.amazonaws.com/arthurclive-products/Men-Tshirt-Om-Black-L.jpg",
+                        ProductFor = "Men",
+                        ProductType = "Tshirt",
+                        ProductDesign = "Om",
+                        ProductBrand = "Arthur Clive",
+                        ProductPrice = 695,
+                        ProductDiscount = 0,
+                        ProductDiscountPrice = 695,
+                        ProductSize = "L",
+                        ProductColour = "Black",
+                        ProductDescription = "Tshirt for men"
+                    }
+                }
             };
         }
     }
@@ -283,7 +329,7 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new PaymentModel()
+            return new
             {
                 FirstName = "Sample",
                 LastName = "User",
@@ -312,10 +358,11 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new OrderInfo
+            return new
             {
-                PaymentMethod = "Cash On Delivery",
-                CouponDiscount = 0
+                CouponDiscount = 0,
+                TotalAmount = 700,
+                EstimatedTax = 5
             };
         }
     }
@@ -326,10 +373,9 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new OrderInfo
+            return new
             {
                 OrderId = 1,
-                PaymentMethod = "Cash On Delivery"
             };
         }
     }
@@ -340,10 +386,44 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new StatusUpdate
+            return new
             {
                 OrderId = 1,
                 Status = "Delivered",
+            };
+        }
+    }
+
+    #endregion
+
+    #region AdminController
+
+    /// <summary></summary>
+    public class ImageUploadDetails : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new
+            {
+                LocalPath = "D'\\ac\\EmailTemplate\\Arthur Clive_files",
+                BucketName = "product-category",
+                ObjectName = "sampleobject"
+            };
+        }
+    }
+
+    /// <summary></summary>
+    public class RoleDetails : IExamplesProvider
+    {
+        /// <summary></summary>
+        public object GetExamples()
+        {
+            return new 
+            {
+                RoleID = 4,
+                RoleName = "SampleRole",
+                LevelOfAccess = new List<string> { "Level1Access", "Level2Access", "Level3Access" }
             };
         }
     }

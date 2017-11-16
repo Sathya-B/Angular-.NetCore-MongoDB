@@ -7,11 +7,11 @@ using MongoDB.Driver;
 using AH = Arthur_Clive.Helper.AmazonHelper;
 using WH = Arthur_Clive.Helper.MinioHelper;
 using MH = Arthur_Clive.Helper.MongoHelper;
-using GH = Arthur_Clive.Helper.GlobalHelper;
 using MongoDB.Bson;
 using Swashbuckle.AspNetCore.Examples;
 using Arthur_Clive.Swagger;
 using MongoDB.Bson.Serialization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Arthur_Clive.Controllers
 {
@@ -34,9 +34,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var collection = _db.GetCollection<Category>("Category");
-                var filter = FilterDefinition<Category>.Empty;
-                IAsyncCursor<Category> cursor = await collection.FindAsync(filter);
+                IAsyncCursor<Category> cursor = await _db.GetCollection<Category>("Category").FindAsync(FilterDefinition<Category>.Empty);
                 var categories = cursor.ToList();
                 if (categories.Count > 0)
                 {
@@ -66,7 +64,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CategoryController", "Get", "Get", ex.Message);
+                LoggerDataAccess.CreateLog("CategoryController", "Get", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -81,8 +79,9 @@ namespace Arthur_Clive.Controllers
         /// <param name="category">Category to be inserted</param>
         /// <response code="200">Category inserted successfully</response>
         /// <response code="400">Process ran into an exception</response>  
+        [Authorize("Level1Access")]
         [HttpPost]
-        [SwaggerRequestExample(typeof(Category), typeof(InsertCategory))]
+        [SwaggerRequestExample(typeof(Category), typeof(InsertCategoryDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> Post([FromBody]Category category)
         {
@@ -92,8 +91,7 @@ namespace Arthur_Clive.Controllers
                 //product.MinioObject_URL = WH.GetMinioObject("products", objectName).Result;
                 //product.MinioObject_URL = AH.GetAmazonS3Object("product-category", objectName);
                 category.MinioObject_URL = AH.GetS3Object("product-category", objectName);
-                var collection = _db.GetCollection<Category>("Category");
-                await collection.InsertOneAsync(category);
+                await _db.GetCollection<Category>("Category").InsertOneAsync(category);
                 return Ok(new ResponseData
                 {
                     Code = "200",
@@ -103,7 +101,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CategoryController", "Post", "Post", ex.Message);
+                LoggerDataAccess.CreateLog("CategoryController", "Post", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -120,6 +118,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Category deleted</response>
         /// <response code="404">Category not found</response> 
         /// <response code="400">Process ran into an exception</response>  
+        [Authorize("Level1Access")]
         [HttpDelete("{productFor}/{productType}")]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult Delete(string productFor, string productType)
@@ -150,7 +149,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CategoryController", "Delete", "Delete", ex.Message);
+                LoggerDataAccess.CreateLog("CategoryController", "Delete", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -167,10 +166,11 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Category updated successfully</response>
         /// <response code="404">No category found</response>   
         /// <response code="400">Process ran into an exception</response>   
+        [Authorize("Level1Access")]
         [HttpPut("{productFor}/{productType}")]
-        [SwaggerRequestExample(typeof(Category), typeof(UpdateCategory))]
+        [SwaggerRequestExample(typeof(UpdateCategory), typeof(UpdateCategoryDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> UpdateCategory([FromBody]Category data, string productFor, string productType)
+        public async Task<ActionResult> Update([FromBody]UpdateCategory data, string productFor, string productType)
         {
             try
             {
@@ -179,19 +179,17 @@ namespace Arthur_Clive.Controllers
                 {
                     var objectId = BsonSerializer.Deserialize<Category>(checkData).Id;
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", objectId);
-                    if(data.ProductFor!= null)
+                    if (data.ProductFor != null)
                     {
-                        var value = BsonSerializer.Deserialize<Category>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Category")).ProductType;
-                        var objectName = data.ProductFor + "-" + value;
-                        GH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor,productType, data.ProductFor, "ProductFor", objectName);
+                        var objectName = data.ProductFor + "-" + BsonSerializer.Deserialize<Category>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Category")).ProductType;
+                        await MH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor, productType, data.ProductFor, "ProductFor", objectName + ".jpg");
                     }
-                    if(data.ProductType != null)
+                    if (data.ProductType != null)
                     {
-                        var value = BsonSerializer.Deserialize<Category>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Category")).ProductFor;
-                        var objectName = value + "-" + data.ProductType;
-                        GH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor, productType, data.ProductType, "ProductType", objectName);
+                        var objectName = BsonSerializer.Deserialize<Category>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Category")).ProductFor + "-" + data.ProductType;
+                        await MH.UpdateCategoryDetails(BsonSerializer.Deserialize<Category>(checkData).Id, productFor, productType, data.ProductType, "ProductType", objectName + ".jpg");
                     }
-                    if(data.Description != null)
+                    if (data.Description != null)
                     {
                         var update = await MH.UpdateSingleObject(filter, "ProductDB", "Category", Builders<BsonDocument>.Update.Set("Description", data.Description));
                     }
@@ -214,7 +212,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CategoryController", "UpdateCategory", "UpdateCategory", ex.Message);
+                LoggerDataAccess.CreateLog("CategoryController", "Update", ex.Message);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

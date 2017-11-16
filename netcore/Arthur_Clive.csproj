@@ -9,6 +9,10 @@
     <DocumentationFile>bin\Debug\netcoreapp2.0\Arthur_Clive.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netcoreapp2.0\Arthur_Clive.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="AuthorizedServer\**" />
     <Compile Remove="wwwroot\swagger\css\**" />
@@ -22,14 +26,15 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.3.11.1" />
-    <PackageReference Include="AWSSDK.SimpleEmail" Version="3.3.3.1" />
+    <PackageReference Include="AWSSDK.SimpleEmail" Version="3.3.4" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.0.0" />
     <PackageReference Include="Minio.NetCore" Version="1.0.2" />
     <PackageReference Include="mongocsharpdriver" Version="2.4.4" />
-    <PackageReference Include="Stripe.net" Version="10.4.0" />
+    <PackageReference Include="NuGet.CommandLine" Version="4.3.0" />
+    <PackageReference Include="Stripe.net" Version="11.4.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="1.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Examples" Version="2.3.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Examples" Version="2.3.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="1.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="1.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUi" Version="1.0.0" />

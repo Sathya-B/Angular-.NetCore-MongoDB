@@ -1,17 +1,31 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Arthur_Clive.Data;
+using Arthur_Clive.Helper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
+using MongoDB.Bson.Serialization;
 using Swashbuckle.AspNetCore.Examples;
 using Swashbuckle.AspNetCore.Swagger;
+using MH = Arthur_Clive.Helper.MongoHelper;
 
 namespace Arthur_Clive
 {
     public partial class Startup
     {
+        /// <summary></summary>
+        public List<string> level1RoleList = new List<string>();
+        /// <summary></summary>
+        public List<string> level2RoleList = new List<string>();
+        /// <summary></summary>
+        public List<string> level3RoleList = new List<string>();
+
         /// <summary></summary>
         /// <param name="env"></param>
         public Startup(IHostingEnvironment env)
@@ -31,7 +45,9 @@ namespace Arthur_Clive
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            #region JWT 
             ConfigureJwtAuthService(services);
+            #endregion
             services.AddMvc();
             #region Cors
             services.AddCors(options =>
@@ -43,6 +59,7 @@ namespace Arthur_Clive
                     .AllowCredentials());
             });
             #endregion
+
             #region Swagger
             services.AddSwaggerGen(c =>
             {
@@ -61,6 +78,16 @@ namespace Arthur_Clive
                 c.OperationFilter<ExamplesOperationFilter>();
             });
             #endregion
+
+            #region Role based authorization
+            CreatePolicy();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Level1Access", policy => policy.RequireRole(level1RoleList));
+                options.AddPolicy("Level2Access", policy => policy.RequireRole(level2RoleList));
+                options.AddPolicy("Level3Access", policy => policy.RequireRole(level3RoleList));
+            });
+            #endregion
         }
 
         /// <summary></summary>
@@ -70,6 +97,7 @@ namespace Arthur_Clive
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             app.UseStaticFiles();
+
             #region Swagger
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -77,15 +105,47 @@ namespace Arthur_Clive
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Arthur_Clive");
             });
             #endregion
+
             #region LoggerFactory
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
             #endregion
+
             #region Cors
             app.UseCors("CorsPolicy");
             #endregion
+
             app.UseAuthentication();
             app.UseMvc();
         }
+
+        /// <summary>Add roles to policy list based on access level</summary>
+        public void CreatePolicy()
+        {
+            var roles = MH.GetListOfObjects(null, null, null, null, null, null, "RolesDB", "Roles").Result;
+            if (roles != null)
+            {
+                foreach (var role in roles)
+                {
+                    var data = BsonSerializer.Deserialize<Roles>(role).LevelOfAccess;
+                    foreach (var access in data)
+                    {
+                        if (access == "Level1Access")
+                        {
+                            level1RoleList.Add((BsonSerializer.Deserialize<Roles>(role).RoleName));
+                        }
+                        else if (access == "Level2Access")
+                        {
+                            level2RoleList.Add((BsonSerializer.Deserialize<Roles>(role).RoleName));
+                        }
+                        else if (access == "Level3Access")
+                        {
+                            level3RoleList.Add((BsonSerializer.Deserialize<Roles>(role).RoleName));
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }

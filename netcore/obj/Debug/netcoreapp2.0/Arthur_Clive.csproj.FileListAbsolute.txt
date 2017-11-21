@@ -10,3 +10,4 @@ D:\Arthur_Clive\netcore\obj\Debug\netcoreapp2.0\Arthur_Clive.dll
 D:\Arthur_Clive\netcore\obj\Debug\netcoreapp2.0\Arthur_Clive.pdb
 D:\Arthur_Clive\netcore\bin\Debug\netcoreapp2.0\Arthur_Clive.xml
 D:\Arthur_Clive\netcore\obj\Debug\netcoreapp2.0\UserSecretsAssemblyInfo.cs
+D:\Arthur_Clive\netcore\obj\Debug\netcoreapp2.0\Arthur_Clive.csprojResolveAssemblyReference.cache

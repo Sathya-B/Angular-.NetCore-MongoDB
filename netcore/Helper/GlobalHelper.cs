@@ -4,13 +4,31 @@ using System.IO;
 using System.Xml.Linq;
 using Arthur_Clive.Data;
 using Arthur_Clive.Logger;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
+using MH = Arthur_Clive.Helper.MongoHelper;
 
 namespace Arthur_Clive.Helper
 {
     /// <summary>Global helper method</summary>
     public class GlobalHelper
     {
+        /// <summary></summary>
+        public static MongoClient _client;
+        /// <summary></summary>
+        public static IMongoDatabase logger_db;
+        /// <summary></summary>
+        public static IMongoCollection<ApplicationLogger> serverlogCollection;
+
+        /// <summary></summary>
+        public GlobalHelper()
+        {
+            _client = MH.GetClient();
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
+        }
+
         /// <summary>Get current directory of project</summary>
         public static string GetCurrentDir()
         {
@@ -26,20 +44,21 @@ namespace Arthur_Clive.Helper
                 var xmlStr = File.ReadAllText(Path.Combine(dir, "AmazonKeys.xml"));
                 return XElement.Parse(xmlStr);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("GlobalHelper", "ReadXML", ex.Message);
+                LoggerDataAccess.CreateLog("GlobalHelper", "ReadXML", ex.Message, serverlogCollection);
                 return null;
             }
         }
 
         /// <summary>Send gift through email after payment success</summary>
         /// <param name="orderId"></param>
-        public static string SendGift(long orderId)
+        /// <param name="orderinfo_collection"></param>
+        public static string SendGift(long orderId, IMongoCollection<BsonDocument> orderinfo_collection)
         {
             try
             {
-                var checkOrder = MongoHelper.CheckForDatas("OrderId", orderId, null, null, "OrderDB", "OrderInfo");
+                var checkOrder = MH.GetSingleObject(orderinfo_collection, "OrderId", orderId, null, null).Result;
                 if (checkOrder != null)
                 {
                     var orderInfo = BsonSerializer.Deserialize<OrderInfo>(checkOrder);
@@ -53,9 +72,9 @@ namespace Arthur_Clive.Helper
                 }
                 return "Success";
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("GlobalHelper", "SendGift", ex.Message);
+                LoggerDataAccess.CreateLog("GlobalHelper", "SendGift", ex.Message, serverlogCollection);
                 return null;
             }
         }
@@ -88,7 +107,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("GlobalHelper", "StringBetweenTwoCharacters", ex.Message);
+                LoggerDataAccess.CreateLog("GlobalHelper", "StringBetweenTwoCharacters", ex.Message, serverlogCollection);
                 return null;
             }
         }

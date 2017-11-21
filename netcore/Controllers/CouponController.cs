@@ -18,8 +18,32 @@ namespace Arthur_Clive.Controllers
     [Route("api/[controller]")]
     public class CouponController : Controller
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public MongoClient _client;
         /// <summary></summary>
-        public IMongoDatabase _db = MH._client.GetDatabase("CouponDB");
+        public IMongoDatabase coupon_db;
+        /// <summary>
+        /// 
+        /// </summary>
+        public IMongoCollection<BsonDocument> coupon_collection;
+        /// <summary></summary>
+        public IMongoDatabase logger_db;
+        /// <summary></summary>
+        public IMongoCollection<ApplicationLogger> serverlogCollection;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public CouponController()
+        {
+            _client = MH.GetClient();
+            coupon_db = _client.GetDatabase("CouponDB");
+            coupon_collection = coupon_db.GetCollection<BsonDocument>("Coupon");
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
+        }
 
         /// <summary>Get all the coupons added to DB</summary>
         /// <response code="200">Returns all the coupons found on db</response>
@@ -32,7 +56,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var getCoupons = MH.GetListOfObjects(null, null, null, null, null, null, "CouponDB", "Coupon").Result;
+                var getCoupons = MH.GetListOfObjects(coupon_collection, null, null, null, null).Result;
                 if (getCoupons != null)
                 {
                     List<Coupon> couponList = new List<Coupon>();
@@ -40,32 +64,17 @@ namespace Arthur_Clive.Controllers
                     {
                         couponList.Add(BsonSerializer.Deserialize<Coupon>(coupon));
                     }
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Success",
-                        Data = couponList
-                    });
+                    return Ok(new ResponseData { Code = "200", Message = "Success", Data = couponList });
                 }
                 else
                 {
-                    return Ok(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "No coupons found",
-                        Data = null
-                    });
+                    return Ok(new ResponseData { Code = "404", Message = "No coupons found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CouponController", "GetAllCoupon", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("CouponController", "GetAllCoupon", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -83,9 +92,9 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                if (MH.CheckForDatas("Code", data.Code, null, null, "CouponDB", "Coupon") == null)
+                if (MH.CheckForDatas(coupon_collection, "Code", data.Code, null, null) == false)
                 {
-                    await _db.GetCollection<Coupon>("Coupon").InsertOneAsync(data);
+                    await coupon_db.GetCollection<Coupon>("Coupon").InsertOneAsync(data);
                     return Ok(new ResponseData
                     {
                         Code = "200",
@@ -105,7 +114,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CouponController", "InsertCoupon", ex.Message);
+                LoggerDataAccess.CreateLog("CouponController", "InsertCoupon", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -131,7 +140,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var checkData = MH.CheckForDatas("Code", code, null, null, "CouponDB", "Coupon");
+                var checkData = MH.GetSingleObject(coupon_collection, "Code", code, null, null).Result;
                 if (checkData != null)
                 {
                     var data = BsonSerializer.Deserialize<Coupon>(checkData);
@@ -141,62 +150,32 @@ namespace Arthur_Clive.Controllers
                         {
                             if (data.UsageCount != 0)
                             {
-                                return Ok(new ResponseData
-                                {
-                                    Code = "200",
-                                    Message = "Coupon is valid",
-                                    Data = new CouponContent { Value = data.Value, Percentage = data.Percentage }
-                                });
+                                return Ok(new ResponseData { Code = "200", Message = "Coupon is valid", Data = new CouponContent { Value = data.Value, Percentage = data.Percentage } });
                             }
                             else
                             {
-                                return BadRequest(new ResponseData
-                                {
-                                    Code = "403",
-                                    Message = "Coupon usage limit exceeded",
-                                    Data = null
-                                });
+                                return BadRequest(new ResponseData { Code = "403", Message = "Coupon usage limit exceeded" });
                             }
                         }
                         else
                         {
-                            return BadRequest(new ResponseData
-                            {
-                                Code = "402",
-                                Message = "Coupon invalid",
-                                Data = null
-                            });
+                            return BadRequest(new ResponseData { Code = "402", Message = "Coupon invalid" });
                         }
                     }
                     else
                     {
-                        return BadRequest(new ResponseData
-                        {
-                            Code = "401",
-                            Message = "Coupon expired",
-                            Data = null
-                        });
+                        return BadRequest(new ResponseData { Code = "401", Message = "Coupon expired" });
                     }
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "Coupon not found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "Coupon not found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CouponController", "CheckCoupon", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("CouponController", "CheckCoupon", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -214,66 +193,45 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var checkData = MH.CheckForDatas("Code", code, null, null, "CouponDB", "Coupon");
+                var checkData = MH.GetSingleObject(coupon_collection, "Code", code, null, null).Result;
                 if (checkData != null)
                 {
                     var result = BsonSerializer.Deserialize<Coupon>(checkData);
-                    var filter = Builders<BsonDocument>.Filter.Eq("Code", code);
                     if (data.UsageCount > 0)
                     {
-                        var coupon = BsonSerializer.Deserialize<Coupon>(MH.CheckForDatas("Code", code, null, null, "CouponDB", "Coupon"));
+                        var coupon = BsonSerializer.Deserialize<Coupon>(MH.GetSingleObject(coupon_collection, "Code", code, null, null).Result);
                         if (result.Percentage == true)
                         {
-                            var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("UsageCount", result.UsageCount - data.UsageCount));
+                            var update = MH.UpdateSingleObject(coupon_collection, "Code", code, null, null, Builders<BsonDocument>.Update.Set("UsageCount", result.UsageCount - data.UsageCount));
                         }
                         else
                         {
                             if (data.Amount > coupon.Value)
                             {
-                                return Ok(new ResponseData
-                                {
-                                    Code = "401",
-                                    Message = "Amount is higher than the coupon value",
-                                    Data = null
-                                });
+                                return Ok(new ResponseData { Code = "401", Message = "Amount is higher than the coupon value" });
                             }
                             else
                             {
                                 var balance = coupon.Value - data.Amount;
-                                var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("Value", balance));
+                                var update = MH.UpdateSingleObject(coupon_collection, "Code", code, null, null, Builders<BsonDocument>.Update.Set("Value", balance));
                                 if (balance == 0)
                                 {
-                                    var updateUsageCount = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("UsageCount", 0));
+                                    var updateUsageCount = MH.UpdateSingleObject(coupon_collection, "Code", code, null, null, Builders<BsonDocument>.Update.Set("UsageCount", 0));
                                 }
                             }
                         }
                     }
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Coupon updated successfully",
-                        Data = null
-                    });
+                    return Ok(new ResponseData { Code = "200", Message = "Coupon updated successfully" });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "Coupon not found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "Coupon not found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CouponController", "UseCoupon", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("CouponController", "UseCoupon", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -292,57 +250,41 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var checkData = MH.CheckForDatas("Code", code, null, null, "CouponDB", "Coupon");
+                var checkData = MH.GetSingleObject(coupon_collection, "Code", code, null, null).Result;
                 if (checkData != null)
                 {
                     var result = BsonSerializer.Deserialize<Coupon>(checkData);
-                    var filter = Builders<BsonDocument>.Filter.Eq("Code", code);
                     if (data.ApplicableFor != null)
                     {
-                        var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("ApplicableFor", data.ApplicableFor));
+                        var update = MH.UpdateSingleObject(coupon_collection, "Code", code, null, null, Builders<BsonDocument>.Update.Set("ApplicableFor", data.ApplicableFor));
                     }
                     if (data.ExpiryTime != null)
                     {
-                        var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("ExpiryTime", data.ExpiryTime));
+                        var update = MH.UpdateSingleObject(coupon_collection, "Code", code, null, null, Builders<BsonDocument>.Update.Set("ExpiryTime", data.ExpiryTime));
                     }
-                    if(data.Value > 0)
+                    if (data.Value > 0)
                     {
-                        var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("Value", data.Value));
+                        var update = MH.UpdateSingleObject(coupon_collection, "Code", code, null, null, Builders<BsonDocument>.Update.Set("Value", data.Value));
                     }
-                    if(data.Percentage != null)
+                    if (data.Percentage != null)
                     {
-                        var updateResult = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("Percentage", data.Percentage));
+                        var updateResult = MH.UpdateSingleObject(coupon_collection, "Code", code, null, null, Builders<BsonDocument>.Update.Set("Percentage", data.Percentage));
                     }
-                    if(data.UsageCount > 0)
+                    if (data.UsageCount > 0)
                     {
-                        var update = MH.UpdateSingleObject(filter, "CouponDB", "Coupon", Builders<BsonDocument>.Update.Set("UsageCount", data.UsageCount));
-                    }                    
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Coupon updated successfully",
-                        Data = null
-                    });
+                        var update = MH.UpdateSingleObject(coupon_collection, "Code", code, null, null, Builders<BsonDocument>.Update.Set("UsageCount", data.UsageCount));
+                    }
+                    return Ok(new ResponseData { Code = "200", Message = "Coupon updated successfully" });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "Coupon not found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "Coupon not found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CouponController", "UpdateCoupon", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("CouponController", "UpdateCoupon", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -358,36 +300,21 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var checkData = MH.CheckForDatas("Code", code, null, null, "CouponDB", "Coupon");
+                var checkData = MH.CheckForDatas(coupon_collection, "Code", code, null, null);
                 if (checkData != null)
                 {
-                    var delete = MH.DeleteSingleObject(Builders<BsonDocument>.Filter.Eq("Code",code),"CouponDB","Coupon");
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Coupon deleted successfully",
-                        Data = null
-                    });
+                    var delete = MH.DeleteSingleObject(coupon_collection, "Code", code, null, null);
+                    return Ok(new ResponseData { Code = "200", Message = "Coupon deleted successfully" });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "Coupon not found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "Coupon not found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("CouponController", "UpdateCoupon", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("CouponController", "UpdateCoupon", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
 
         }

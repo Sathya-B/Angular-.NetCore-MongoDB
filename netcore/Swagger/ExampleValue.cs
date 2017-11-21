@@ -13,7 +13,7 @@ namespace Arthur_Clive.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new 
+            return new
             {
                 ProductFor = "Girls",
                 ProductType = "Tshirt",
@@ -22,6 +22,7 @@ namespace Arthur_Clive.Swagger
                 ProductPrice = 395.0,
                 ProductDiscount = 0.0,
                 ProductStock = 10,
+                ProductReviews = new Review[0],
                 ProductSize = "9_10Y",
                 ProductColour = "Black",
                 ReplacementApplicable = true,

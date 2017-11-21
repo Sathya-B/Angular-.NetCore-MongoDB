@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Swashbuckle.AspNetCore.Examples;
@@ -22,6 +23,13 @@ namespace AuthorizedServer
     /// <summary></summary>
     public class Startup
     {
+        /// <summary>Client for MongoDB</summary>
+        public MongoClient _client;
+        /// <summary></summary>
+        public IMongoDatabase roles_db;
+        /// <summary></summary>
+        public IMongoCollection<BsonDocument> roles_collection;
+
         /// <summary></summary>
         public List<string> level1RoleList = new List<string>();
         /// <summary></summary>
@@ -33,6 +41,9 @@ namespace AuthorizedServer
         /// <param name="env"></param>
         public Startup(IHostingEnvironment env)
         {
+            _client = MH.GetClient();
+            roles_db = _client.GetDatabase("RolesDB");
+            roles_collection = roles_db.GetCollection<BsonDocument>("Roles");
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
@@ -84,8 +95,11 @@ namespace AuthorizedServer
                 c.OperationFilter<ExamplesOperationFilter>();
             });
             #endregion
+
+            #region Audience
             services.AddOptions();
             services.Configure<Audience>(Configuration.GetSection("Audience"));
+            #endregion
 
             #region Role based authorization
             CreatePolicy();
@@ -115,13 +129,13 @@ namespace AuthorizedServer
             #region Cors
             app.UseCors("CorsPolicy");
             #endregion
-            app.UseMvc();            
+            app.UseMvc();
         }
 
         /// <summary>Add roles to policy list based on access level</summary>
         public void CreatePolicy()
         {
-            var roles = MH.GetListOfObjects(null, null, null, null, null, null, "RolesDB", "Roles").Result;
+            var roles = MH.GetListOfObjects(roles_collection, null, null, null, null).Result;
             if (roles != null)
             {
                 foreach (var role in roles)

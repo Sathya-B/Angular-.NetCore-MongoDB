@@ -23,7 +23,33 @@ namespace Arthur_Clive.Controllers
     public class ProductController : Controller
     {
         /// <summary></summary>
-        public IMongoDatabase _db = MH._client.GetDatabase("ProductDB");
+        public MongoClient _client;
+        /// <summary></summary>
+        public IMongoDatabase product_db;
+        /// <summary></summary>
+        public IMongoCollection<BsonDocument> product_collection;
+        /// <summary></summary>
+        public IMongoDatabase order_db;
+        /// <summary></summary>
+        public IMongoCollection<BsonDocument> orderinfo_collection;
+        /// <summary></summary>
+        public IMongoDatabase logger_db;
+        /// <summary></summary>
+        public IMongoCollection<ApplicationLogger> serverlogCollection;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ProductController()
+        {
+            _client = MH.GetClient();
+            product_db = _client.GetDatabase("ProductDB");
+            product_collection = product_db.GetCollection<BsonDocument>("Product");
+            order_db = _client.GetDatabase("OrderDB");
+            orderinfo_collection = order_db.GetCollection<BsonDocument>("OrderInfo");
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
+        }
 
         /// <summary>Get all the products </summary>
         /// <remarks>This api is used to get all the products</remarks>
@@ -36,9 +62,8 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var collection = _db.GetCollection<Product>("Product");
                 var filter = FilterDefinition<Product>.Empty;
-                IAsyncCursor<Product> cursor = await collection.FindAsync(filter);
+                IAsyncCursor<Product> cursor = await product_db.GetCollection<Product>("Product").FindAsync(filter);
                 var products = cursor.ToList();
                 if (products.Count > 0)
                 {
@@ -49,32 +74,17 @@ namespace Arthur_Clive.Controllers
                         //data.ObjectURL = AH.GetAmazonS3Object("arthurclive-products", objectName);
                         data.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
                     }
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Success",
-                        Data = products
-                    });
+                    return Ok(new ResponseData { Code = "200", Message = "Success", Data = products });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "No products found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "No products found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "Get", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("ProductController", "Get", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -91,9 +101,8 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var collection = _db.GetCollection<Product>("Product");
                 var filter = Builders<Product>.Filter.Eq("ProductFor", productFor) & Builders<Product>.Filter.Eq("ProductType", productType) & Builders<Product>.Filter.Eq("ProductDesign", productDesign);
-                IAsyncCursor<Product> cursor = await collection.FindAsync(filter);
+                var cursor = await product_db.GetCollection<Product>("Product").FindAsync(filter);
                 var products = cursor.ToList();
                 if (products.Count > 0)
                 {
@@ -104,32 +113,17 @@ namespace Arthur_Clive.Controllers
                         //data.ObjectURL = AH.GetAmazonS3Object("arthurclive-products", objectName);
                         data.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
                     }
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Success",
-                        Data = products
-                    });
+                    return Ok(new ResponseData { Code = "200", Message = "Success", Data = products });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "No products found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "No products found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "Get", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("ProductController", "Get", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -152,23 +146,13 @@ namespace Arthur_Clive.Controllers
                 //product.MinioObject_URL = WH.GetMinioObject("arthurclive-products", objectName).Result;
                 //product.MinioObject_URL = AH.GetAmazonS3Object("arthurclive-products", objectName);
                 product.MinioObject_URL = AH.GetS3Object("arthurclive-products", objectName);
-                await _db.GetCollection<Product>("Product").InsertOneAsync(product);
-                return Ok(new ResponseData
-                {
-                    Code = "200",
-                    Message = "Inserted",
-                    Data = null
-                });
+                await product_db.GetCollection<Product>("Product").InsertOneAsync(product);
+                return Ok(new ResponseData { Code = "200", Message = "Inserted" });
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "Post", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("ProductController", "Post", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -185,36 +169,25 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var product = MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("ProductSKU", productSKU), "ProductDB", "Product").Result;
-                if (product != null)
+                var check = MH.CheckForDatas(product_collection, "ProductSKU", productSKU, null, null);
+                if (check == true)
                 {
-                    var response = _db.GetCollection<Product>("Product").DeleteOneAsync(product);
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Deleted",
-                        Data = null
-                    });
+                    var delete = MH.DeleteSingleObject(product_collection, "ProductSKU", productSKU, null, null); ;
+                    return Ok(new ResponseData { Code = "200", Message = "Deleted" });
+                }
+                else if (check == false)
+                {
+                    return BadRequest(new ResponseData { Code = "404", Message = "Product Not Found" });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "Product Not Found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "400", Message = "Failed" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "Delete", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("ProductController", "Delete", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -232,36 +205,35 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var checkData = MH.CheckForDatas("ProductSKU", productSKU, null, null, "ProductDB", "Product");
+                var checkData = MH.GetSingleObject(product_collection, "ProductSKU", productSKU, null, null).Result;
                 if (checkData != null)
                 {
                     var objectId = BsonSerializer.Deserialize<Product>(checkData).Id;
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", objectId);
                     if (data.ProductFor != null)
                     {
-                        productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
+                        productSKU = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(product_collection, "_id", objectId, null, null).Result).ProductSKU;
                         var objectName = data.ProductFor + "-" + productSKU.Split('-')[1] + "-" + productSKU.Split('-')[2] + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4];
-                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductFor, "ProductFor", objectName);
+                        await MH.UpdateProductDetails(product_collection, BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductFor, "ProductFor", objectName);
                     }
                     if (data.ProductType != null)
                     {
-                        productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
+                        productSKU = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(product_collection, "_id", objectId, null, null).Result).ProductSKU;
                         var objectName = productSKU.Split('-')[0] + "-" + data.ProductType + "-" + productSKU.Split('-')[2] + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4];
-                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductType, "ProductType", objectName);
+                        await MH.UpdateProductDetails(product_collection, BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductType, "ProductType", objectName);
                     }
                     if (data.ProductDesign != null)
                     {
-                        productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
+                        productSKU = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(product_collection, "_id", objectId, null, null).Result).ProductSKU;
                         var objectName = productSKU.Split('-')[0] + "-" + productSKU.Split('-')[1] + "-" + data.ProductDesign + "-" + productSKU.Split('-')[3] + "-" + productSKU.Split('-')[4];
-                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductDesign, "ProductDesign", objectName);
+                        await MH.UpdateProductDetails(product_collection, BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductDesign, "ProductDesign", objectName);
                     }
                     if (data.ProductBrand != null)
                     {
-                        var update = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductBrand", data.ProductBrand));
+                        var update = await MH.UpdateSingleObject(product_collection, "_id", objectId, null, null, Builders<BsonDocument>.Update.Set("ProductBrand", data.ProductBrand));
                     }
                     if (data.ProductPrice > 0)
                     {
-                        var update = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductPrice", data.ProductPrice));
+                        var update = await MH.UpdateSingleObject(product_collection, "_id", objectId, null, null, Builders<BsonDocument>.Update.Set("ProductPrice", data.ProductPrice));
                         double discountPercentage;
                         if (data.ProductDiscount > 0)
                         {
@@ -269,17 +241,17 @@ namespace Arthur_Clive.Controllers
                         }
                         else
                         {
-                            discountPercentage = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("ProductSKU", productSKU, null, null, "ProductDB", "Product")).ProductDiscount;
+                            discountPercentage = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(product_collection, "ProductSKU", productSKU, null, null).Result).ProductDiscount;
                         }
                         var discountPrice = (data.ProductPrice - (data.ProductPrice * (discountPercentage / 100)));
 
 
-                        var update1 = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductDiscountPrice", discountPrice));
+                        var update1 = await MH.UpdateSingleObject(product_collection, "_id", objectId, null, null, Builders<BsonDocument>.Update.Set("ProductDiscountPrice", discountPrice));
                     }
                     if (data.ProductDiscount > 0)
                     {
 
-                        var update = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductDiscount", data.ProductDiscount));
+                        var update = await MH.UpdateSingleObject(product_collection, "_id", objectId, null, null, Builders<BsonDocument>.Update.Set("ProductDiscount", data.ProductDiscount));
                         double price;
                         if (data.ProductPrice > 0)
                         {
@@ -287,45 +259,45 @@ namespace Arthur_Clive.Controllers
                         }
                         else
                         {
-                            price = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("ProductSKU", productSKU, null, null, "ProductDB", "Product")).ProductPrice;
+                            price = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(product_collection, "ProductSKU", productSKU, null, null).Result).ProductPrice;
                         }
                         var discountPrice = (price - (price * (data.ProductDiscount / 100)));
-                        var update1 = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductDiscountPrice", discountPrice));
+                        var update1 = await MH.UpdateSingleObject(product_collection, "_id", objectId, null, null, Builders<BsonDocument>.Update.Set("ProductDiscountPrice", discountPrice));
                     }
                     if (data.ProductStock > 0)
                     {
-                        var update = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductStock", data.ProductStock));
+                        var update = await MH.UpdateSingleObject(product_collection, "_id", objectId, null, null, Builders<BsonDocument>.Update.Set("ProductStock", data.ProductStock));
                     }
                     if (data.ProductSize != null)
                     {
-                        productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
+                        productSKU = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(product_collection, "_id", objectId, null, null).Result).ProductSKU;
                         var objectName = productSKU.Split('-')[0] + "-" + productSKU.Split('-')[1] + "-" + productSKU.Split('-')[2] + "-" + productSKU.Split('-')[3] + "-" + data.ProductSize;
-                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductSize, "ProductSize", objectName);
+                        await MH.UpdateProductDetails(product_collection, BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductSize, "ProductSize", objectName);
                     }
                     if (data.ProductMaterial != null)
                     {
-                        var update = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductMaterial", data.ProductMaterial));
+                        var update = await MH.UpdateSingleObject(product_collection, "_id", objectId, null, null, Builders<BsonDocument>.Update.Set("ProductMaterial", data.ProductMaterial));
                     }
                     if (data.ProductColour != null)
                     {
-                        productSKU = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductSKU;
+                        productSKU = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(product_collection, "_id", objectId, null, null).Result).ProductSKU;
                         var objectName = productSKU.Split('-')[0] + "-" + productSKU.Split('-')[1] + "-" + productSKU.Split('-')[2] + "-" + data.ProductColour + "-" + productSKU.Split('-')[4];
-                        await MH.UpdateProductDetails(BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductColour, "ProductColour", objectName);
+                        await MH.UpdateProductDetails(product_collection, BsonSerializer.Deserialize<Product>(checkData).Id, data.ProductColour, "ProductColour", objectName);
                     }
                     if (data.RefundApplicable != null)
                     {
-                        var update = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("RefundApplicable", data.RefundApplicable));
+                        var update = await MH.UpdateSingleObject(product_collection, "_id", objectId, null, null, Builders<BsonDocument>.Update.Set("RefundApplicable", data.RefundApplicable));
                     }
                     if (data.ReplacementApplicable != null)
                     {
-                        var update = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ReplacementApplicable", data.ReplacementApplicable));
+                        var update = await MH.UpdateSingleObject(product_collection, "_id", objectId, null, null, Builders<BsonDocument>.Update.Set("ReplacementApplicable", data.ReplacementApplicable));
                     }
                     if (data.ProductDescription != null)
                     {
-                        var update = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductDescription", data.ProductDescription));
+                        var update = await MH.UpdateSingleObject(product_collection, "_id", objectId, null, null, Builders<BsonDocument>.Update.Set("ProductDescription", data.ProductDescription));
                     }
                     var MinioObject_URl = "https://s3.ap-south-1.amazonaws.com/arthurclive-products/" + data.ProductFor + "-" + data.ProductType + "-" + data.ProductDesign + "-" + data.ProductColour + "-" + data.ProductSize + ".jpg";
-                    var updateURL = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("MinioObject_URL", MinioObject_URl));
+                    var updateURL = await MH.UpdateSingleObject(product_collection, "_id", objectId, null, null, Builders<BsonDocument>.Update.Set("MinioObject_URL", MinioObject_URl));
                     return Ok(new ResponseData
                     {
                         Code = "200",
@@ -345,7 +317,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "Update", ex.Message);
+                LoggerDataAccess.CreateLog("ProductController", "Update", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -366,7 +338,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var productList = MH.GetListOfObjects(null, null, null, null, null, null, "ProductDB", "Product").Result;
+                var productList = MH.GetListOfObjects(product_collection, null, null, null, null).Result;
                 if (productList != null)
                 {
                     List<ReviewsForEachProduct> reviewsList = new List<ReviewsForEachProduct>();
@@ -375,31 +347,17 @@ namespace Arthur_Clive.Controllers
                         var productData = BsonSerializer.Deserialize<Product>(product);
                         reviewsList.Add(new ReviewsForEachProduct { ProductSKU = productData.ProductSKU, ProductReviews = productData.ProductReviews });
                     }
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Success",
-                        Data = reviewsList
-                    });
+                    return Ok(new ResponseData { Code = "200", Message = "Success", Data = reviewsList });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "No products found"
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "No products found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "GetAllReviews", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("ProductController", "GetAllReviews", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -418,13 +376,13 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var checkData = MH.CheckForDatas("ProductSKU", productSKU, null, null, "ProductDB", "Product");
+                var checkData = MH.GetSingleObject(product_collection, "ProductSKU", productSKU, null, null).Result;
                 if (checkData != null)
                 {
                     var objectId = BsonSerializer.Deserialize<Product>(checkData).Id;
                     if (data != null)
                     {
-                        var reviews = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductReviews;
+                        var reviews = BsonSerializer.Deserialize<Product>(checkData).ProductReviews;
                         Review[] reviewArray = new Review[reviews.Length + 1];
                         data.Id = reviews.Length + 1;
                         data.Approved = false;
@@ -438,16 +396,11 @@ namespace Arthur_Clive.Controllers
                             }
                         }
                         reviewArray[i] = data;
-                        var updateReview = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("_id", objectId), "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductReviews", reviewArray));
-                        var checkOrder = MH.CheckForDatas("OrderId", data.OrderId, null, null, "OrderDB", "OrderInfo");
+                        var updateReview = await MH.UpdateSingleObject(product_collection, "_id", objectId, null, null, Builders<BsonDocument>.Update.Set("ProductReviews", reviewArray));
+                        var checkOrder = MH.GetSingleObject(orderinfo_collection, "OrderId", data.OrderId, null, null).Result;
                         if (checkOrder == null)
                         {
-                            return BadRequest(new ResponseData
-                            {
-                                Code = "402",
-                                Message = "No orders with id '" + data.OrderId + "' is found",
-                                Data = null
-                            });
+                            return BadRequest(new ResponseData { Code = "402", Message = "No orders with id '" + data.OrderId + "' is found" });
                         }
                         var orderInfo = BsonSerializer.Deserialize<OrderInfo>(checkOrder);
                         List<ProductDetails> productDetails = new List<ProductDetails>();
@@ -459,44 +412,24 @@ namespace Arthur_Clive.Controllers
                             }
                             productDetails.Add(product);
                         }
-                        var updateOrderInfo = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", data.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("ProductDetails", productDetails));
+                        var updateOrderInfo = await MH.UpdateSingleObject(orderinfo_collection, "_id", objectId, null, null, Builders<BsonDocument>.Update.Set("ProductDetails", productDetails));
 
-                        return Ok(new ResponseData
-                        {
-                            Code = "200",
-                            Message = "Inserted",
-                            Data = null
-                        });
+                        return Ok(new ResponseData { Code = "200", Message = "Inserted" });
                     }
                     else
                     {
-                        return BadRequest(new ResponseData
-                        {
-                            Code = "401",
-                            Message = "Review data from body is empty",
-                            Data = null
-                        });
+                        return BadRequest(new ResponseData { Code = "401", Message = "Review data from body is empty" });
                     }
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "Product not found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "Product not found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "InsertReview", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("ProductController", "InsertReview", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -516,22 +449,17 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var checkData = MH.CheckForDatas("ProductSKU", productSKU, null, null, "ProductDB", "Product");
+                var checkData = MH.GetSingleObject(product_collection, "ProductSKU", productSKU, null, null).Result;
                 if (checkData != null)
                 {
                     var objectId = BsonSerializer.Deserialize<Product>(checkData).Id;
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", objectId);
-                    var reviews = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductReviews;
+                    var reviews = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(product_collection, "_id", objectId, null, null).Result).ProductReviews;
                     List<Review> reviewList = new List<Review>();
                     Review[] reviewArray = new Review[reviews.Length];
                     int i = 0;
                     if (reviews.Length == 0)
                     {
-                        return BadRequest(new ResponseData
-                        {
-                            Code = "401",
-                            Message = "No reviews found"
-                        });
+                        return BadRequest(new ResponseData { Code = "401", Message = "No reviews found" });
                     }
                     else
                     {
@@ -549,14 +477,10 @@ namespace Arthur_Clive.Controllers
                     var result = reviewList.FindAll(x => x.Id == data.Id);
                     if (result.Count == 0)
                     {
-                        return BadRequest(new ResponseData
-                        {
-                            Code = "402",
-                            Message = "No reviews with id '" + data.Id + "' is found"
-                        });
+                        return BadRequest(new ResponseData { Code = "402", Message = "No reviews with id '" + data.Id + "' is found" });
                     }
-                    var updateReview = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductReviews", reviewArray));
-                    var updatedReviews = BsonSerializer.Deserialize<Product>(MH.CheckForDatas("_id", objectId, null, null, "ProductDB", "Product")).ProductReviews;
+                    var updateReview = await MH.UpdateSingleObject(product_collection, "_id", objectId, null, null, Builders<BsonDocument>.Update.Set("ProductReviews", reviewArray));
+                    var updatedReviews = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(product_collection, "_id", objectId, null, null).Result).ProductReviews;
                     double numberOfReviews = 0;
                     double totalRating = 0;
                     foreach (var review in updatedReviews)
@@ -576,31 +500,18 @@ namespace Arthur_Clive.Controllers
                     {
                         overallRating = 0;
                     }
-                    var updateRating = await MH.UpdateSingleObject(filter, "ProductDB", "Product", Builders<BsonDocument>.Update.Set("ProductRating", overallRating));
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Updated"
-                    });
+                    var updateRating = await MH.UpdateSingleObject(product_collection, "_id", objectId, null, null, Builders<BsonDocument>.Update.Set("ProductRating", overallRating));
+                    return Ok(new ResponseData { Code = "200", Message = "Updated" });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "Product not found"
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "Product not found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("ProductController", "InsertReview", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("ProductController", "InsertReview", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 

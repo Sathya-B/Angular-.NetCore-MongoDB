@@ -22,11 +22,42 @@ namespace Arthur_Clive.Controllers
     public class PaymentController : Controller
     {
         /// <summary></summary>
-        public IMongoDatabase _db = MH._client.GetDatabase("UserInfo");
+        public MongoClient _client;
         /// <summary></summary>
-        public IMongoDatabase product_db = MH._client.GetDatabase("ProductDB");
+        public IMongoDatabase userinfo_db;
         /// <summary></summary>
-        public IMongoDatabase order_db = MH._client.GetDatabase("OrderDB");
+        public IMongoCollection<BsonDocument> userinfo_collection;
+        /// <summary></summary>
+        public IMongoCollection<Cart> cartCollection;
+        /// <summary></summary>
+        public IMongoDatabase order_db;
+        /// <summary></summary>
+        public IMongoDatabase product_db;
+        /// <summary></summary>
+        public IMongoCollection<BsonDocument> product_collection;
+        /// <summary></summary>
+        public IMongoCollection<BsonDocument> orderinfo_collection;
+        /// <summary></summary>
+        public IMongoDatabase logger_db;
+        /// <summary></summary>
+        public IMongoCollection<ApplicationLogger> serverlogCollection;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public PaymentController()
+        {
+            _client = MH.GetClient();
+            product_db = _client.GetDatabase("productDB");
+            product_collection = product_db.GetCollection<BsonDocument>("Product");
+            userinfo_db = _client.GetDatabase("UserInfo");
+            userinfo_collection = userinfo_db.GetCollection<BsonDocument>("UserInfo");
+            cartCollection = userinfo_db.GetCollection<Cart>("Cart");
+            order_db = _client.GetDatabase("OrderDB");
+            orderinfo_collection = order_db.GetCollection<BsonDocument>("OrderInfo");
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
+        }
 
         /// <summary>Success responce from the PayU payment gateway</summary>
         /// <param name="paymentResponse">Responce data from PayU</param>
@@ -48,44 +79,44 @@ namespace Arthur_Clive.Controllers
                 {
                     if (PU.Generatehash512(PU.GetReverseHashString(paymentResponse["txnid"], paymentModel)) == paymentResponse["hash"])
                     {
-                        var updatePaymentMethod = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
-                        var updatePaymentDetails = await MH.UpdatePaymentDetails(paymentModel.OrderId);
-                        var removeCartItems = MH.RemoveCartItems(paymentModel.OrderId, paymentModel.UserName, paymentModel.Email);
-                        var sendGift = GlobalHelper.SendGift(paymentModel.OrderId);
-                        var sendProductDetails = EmailHelper.SendEmail_ProductDetails(paymentModel.Email, paymentModel.OrderId);
+                        var updatePaymentMethod = await MH.UpdateSingleObject(orderinfo_collection, "OrderId", paymentModel.OrderId, null, null, Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
+                        var updatePaymentDetails = await MH.UpdatePaymentDetails(orderinfo_collection, paymentModel.OrderId);
+                        var removeCartItems = MH.RemoveCartItems(userinfo_collection, cartCollection, product_collection, paymentModel.OrderId, paymentModel.UserName, paymentModel.Email);
+                        var sendGift = GlobalHelper.SendGift(paymentModel.OrderId, orderinfo_collection);
+                        var sendProductDetails = EmailHelper.SendEmail_ProductDetails(paymentModel.Email, paymentModel.OrderId, orderinfo_collection);
                         return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectsuccess").First().Value);
                     }
                     else
                     {
-                        var updatePaymentMethod = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
+                        var updatePaymentMethod = await MH.UpdateSingleObject(orderinfo_collection, "OrderId", paymentModel.OrderId, null, null, Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
                         PaymentMethod paymentDetails = new PaymentMethod();
                         List<StatusCode> statusCodeList = new List<StatusCode>();
-                        var orderData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo").Result);
+                        var orderData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(orderinfo_collection, "OrderId", paymentModel.OrderId, null, null).Result);
                         foreach (var detail in orderData.PaymentDetails.Status)
                         {
                             statusCodeList.Add(detail);
                         }
                         statusCodeList.Add(new StatusCode { StatusId = 3, Description = "Payment Failed", Date = DateTime.UtcNow });
                         paymentDetails.Status = statusCodeList;
-                        var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
+                        var updatePaymentDetails = await MH.UpdateSingleObject(orderinfo_collection, "OrderId", paymentModel.OrderId, null, null, Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
                         return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
                     }
 
                 }
                 catch (Exception ex)
                 {
-                    LoggerDataAccess.CreateLog("PaymentController", "PaymentSuccess", ex.Message);
-                    var updatePaymentMethod = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
+                    LoggerDataAccess.CreateLog("PaymentController", "PaymentSuccess", ex.Message, serverlogCollection);
+                    var updatePaymentMethod = await MH.UpdateSingleObject(orderinfo_collection, "OrderId", paymentModel.OrderId, null, null, Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
                     PaymentMethod paymentDetails = new PaymentMethod();
                     List<StatusCode> statusCodeList = new List<StatusCode>();
-                    var orderData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo").Result);
+                    var orderData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(orderinfo_collection, "OrderId", paymentModel.OrderId, null, null).Result);
                     foreach (var detail in orderData.PaymentDetails.Status)
                     {
                         statusCodeList.Add(detail);
                     }
                     statusCodeList.Add(new StatusCode { StatusId = 3, Description = "Payment Failed", Date = DateTime.UtcNow });
                     paymentDetails.Status = statusCodeList;
-                    var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
+                    var updatePaymentDetails = await MH.UpdateSingleObject(orderinfo_collection, "OrderId", paymentModel.OrderId, null, null, Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
                     return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
                 }
             }
@@ -112,17 +143,17 @@ namespace Arthur_Clive.Controllers
                     FirstName = paymentResponse["firstname"],
                     Amount = paymentResponse["amount"],
                 };
-                var updatePaymentMethod = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
+                var updatePaymentMethod = await MH.UpdateSingleObject(orderinfo_collection, "OrderId", paymentModel.OrderId, null, null, Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
                 PaymentMethod paymentDetails = new PaymentMethod();
                 List<StatusCode> statusCodeList = new List<StatusCode>();
-                var orderData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo").Result);
+                var orderData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(orderinfo_collection, "OrderId", paymentModel.OrderId, null, null).Result);
                 foreach (var detail in orderData.PaymentDetails.Status)
                 {
                     statusCodeList.Add(detail);
                 }
                 statusCodeList.Add(new StatusCode { StatusId = 3, Description = "Payment Failed", Date = DateTime.UtcNow });
                 paymentDetails.Status = statusCodeList;
-                var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
+                var updatePaymentDetails = await MH.UpdateSingleObject(orderinfo_collection, "OrderId", paymentModel.OrderId, null, null, Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
                 return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectfailure").First().Value);
             }
             else
@@ -148,17 +179,17 @@ namespace Arthur_Clive.Controllers
                     FirstName = paymentResponse["firstname"],
                     Amount = paymentResponse["amount"],
                 };
-                var updatePaymentMethod = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
+                var updatePaymentMethod = await MH.UpdateSingleObject(orderinfo_collection, "OrderId", paymentModel.OrderId, null, null, Builders<BsonDocument>.Update.Set("PaymentMethod", paymentResponse["mode"].ToString()));
                 PaymentMethod paymentDetails = new PaymentMethod();
                 List<StatusCode> statusCodeList = new List<StatusCode>();
-                var orderData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo").Result);
+                var orderData = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(orderinfo_collection, "OrderId", paymentModel.OrderId, null, null).Result);
                 foreach (var detail in orderData.PaymentDetails.Status)
                 {
                     statusCodeList.Add(detail);
                 }
                 statusCodeList.Add(new StatusCode { StatusId = 4, Description = "Payment Cancelled", Date = DateTime.UtcNow });
                 paymentDetails.Status = statusCodeList;
-                var updatePaymentDetails = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
+                var updatePaymentDetails = await MH.UpdateSingleObject(orderinfo_collection, "OrderId", paymentModel.OrderId, null, null, Builders<BsonDocument>.Update.Set("PaymentDetails", paymentDetails));
                 return Redirect(GlobalHelper.ReadXML().Elements("payu").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("redirectcancelled").First().Value);
             }
             else

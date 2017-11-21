@@ -11,7 +11,7 @@ namespace AuthorizedServer.Swagger
         /// <summary></summary>
         public object GetExamples()
         {
-            return new 
+            return new Parameters
             {
                 username = "sample@gmail.com",
                 fullname = "Sample User"

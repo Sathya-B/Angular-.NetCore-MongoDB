@@ -7,12 +7,29 @@ using System.Xml.Linq;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
 using AuthorizedServer.Logger;
+using MongoDB.Driver;
+using MH = AuthorizedServer.Helper.MongoHelper;
 
 namespace AuthorizedServer.Helper
 {
     /// <summary>Helper methos for Amazon SES service for sending email</summary>
     public class EmailHelper
     {
+        /// <summary>Client for MongoDB</summary>
+        public MongoClient _client;
+        /// <summary></summary>
+        public static IMongoDatabase logger_db;
+        /// <summary></summary>
+        public static IMongoCollection<ApplicationLogger> serverlogCollection;
+
+        /// <summary></summary>
+        public EmailHelper()
+        {
+            _client = MH.GetClient();
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
+        }
+
         /// <summary>Get amazon SES credentials from xml file</summary>
         /// <param name="key"></param>
         public static string GetCredentials(string key)
@@ -24,7 +41,7 @@ namespace AuthorizedServer.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("EmailHelper", "GetCredentials", ex.Message);
+                LoggerDataAccess.CreateLog("EmailHelper", "GetCredentials", ex.Message, serverlogCollection);
                 return ex.Message;
             }
         }
@@ -33,7 +50,7 @@ namespace AuthorizedServer.Helper
         /// <param name="fullname"></param>
         /// <param name="emailReceiver"></param>
         /// <param name="link"></param>
-        public static async Task<string> SendEmail(string fullname,string emailReceiver, string link)
+        public static async Task<string> SendEmail(string fullname, string emailReceiver, string link)
         {
             var cc = GetCredentials("accesskey");
             var ss = GetCredentials("secretkey");
@@ -60,7 +77,7 @@ namespace AuthorizedServer.Helper
                 }
                 catch (Exception ex)
                 {
-                    LoggerDataAccess.CreateLog("EmailHelper", "SendEmail", ex.Message);
+                    LoggerDataAccess.CreateLog("EmailHelper", "SendEmail", ex.Message, serverlogCollection);
                     return ex.Message;
                 }
             }
@@ -86,7 +103,7 @@ namespace AuthorizedServer.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody", ex.Message);
+                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody", ex.Message, serverlogCollection);
                 return ex.Message;
             }
         }

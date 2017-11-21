@@ -7,14 +7,38 @@ using AuthorizedServer.Models;
 using AuthorizedServer.Repositories;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
 using Newtonsoft.Json;
+using MH = AuthorizedServer.Helper.MongoHelper;
 
 namespace AuthorizedServer.Helper
 {
     /// <summary>Helper method for authentication </summary>
     public class AuthHelper
     {
+        /// <summary>Client for MongoDB</summary>
+        public static MongoClient _client;
+        /// <summary></summary>
+        public IMongoDatabase auth_db;
+        /// <summary></summary>
+        public static IMongoCollection<BsonDocument> authentication_collection;
+        /// <summary></summary>
+        public static IMongoDatabase logger_db;
+        /// <summary></summary>
+        public static IMongoCollection<ApplicationLogger> serverlogCollection;
+
+        /// <summary></summary>
+        public AuthHelper()
+        {
+            _client = MH.GetClient();
+            auth_db = _client.GetDatabase("Authentication");
+            authentication_collection = auth_db.GetCollection<BsonDocument>("Authentication");
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
+        }
+
         /// <summary>Get the access-token by username and password</summary>
         /// <param name="parameters"></param>
         /// <param name="_repo"></param>
@@ -41,7 +65,7 @@ namespace AuthorizedServer.Helper
                         Code = "999",
                         Message = "OK",
                         Content = UserInfo,
-                        Data = GetJwt(parameters.username, refresh_token, _settings, BsonSerializer.Deserialize<RegisterModel>(MongoHelper.CheckForDatas("UserName",parameters.username,null,null,"Authentication", "Authentication")).UserRole)
+                        Data = GetJwt(parameters.username, refresh_token, _settings, BsonSerializer.Deserialize<RegisterModel>(MongoHelper.CheckForDatas(authentication_collection, "UserName", parameters.username, null, null)).UserRole)
                     };
                 }
                 else
@@ -54,9 +78,9 @@ namespace AuthorizedServer.Helper
                     };
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthHelper", "DoPassword", ex.Message);
+                LoggerDataAccess.CreateLog("AuthHelper", "DoPassword", ex.Message, serverlogCollection);
                 return new ResponseData
                 {
                     Code = "400",
@@ -109,7 +133,7 @@ namespace AuthorizedServer.Helper
                     {
                         Code = "999",
                         Message = "OK",
-                        Data = GetJwt(parameters.client_id, refresh_token, _settings, BsonSerializer.Deserialize<RegisterModel>(MongoHelper.CheckForDatas("UserName", parameters.client_id, null, null, "Authentication", "Authentication")).UserRole)
+                        Data = GetJwt(parameters.client_id, refresh_token, _settings, BsonSerializer.Deserialize<RegisterModel>(MongoHelper.CheckForDatas(authentication_collection, "UserName", parameters.client_id, null, null)).UserRole)
                     };
                 }
                 else
@@ -124,7 +148,7 @@ namespace AuthorizedServer.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthHelper", "DoRefreshToken", ex.Message);
+                LoggerDataAccess.CreateLog("AuthHelper", "DoRefreshToken", ex.Message, serverlogCollection);
                 return new ResponseData
                 {
                     Code = "400",
@@ -139,7 +163,7 @@ namespace AuthorizedServer.Helper
         /// <param name="refresh_token"></param>
         /// <param name="_settings"></param>
         /// <param name="userRole"></param>
-        public string GetJwt(string client_id, string refresh_token, IOptions<Audience> _settings,string userRole)
+        public string GetJwt(string client_id, string refresh_token, IOptions<Audience> _settings, string userRole)
         {
             try
             {
@@ -172,7 +196,7 @@ namespace AuthorizedServer.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthHelper", "GetJwt", ex.Message);
+                LoggerDataAccess.CreateLog("AuthHelper", "GetJwt", ex.Message, serverlogCollection);
                 return null;
             }
         }

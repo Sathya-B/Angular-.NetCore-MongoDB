@@ -1,20 +1,18 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
-using WH = AuthorizedServer.Helper.MongoHelper;
+using MH = AuthorizedServer.Helper.MongoHelper;
 
 namespace AuthorizedServer.Logger
 {
     /// <summary>Data access for logger</summary>
     public class LoggerDataAccess
     {
-        /// <summary>Get Mongo Database</summary>
-        public static IMongoDatabase _db = WH._client.GetDatabase("ArthurCliveLogDB");
-
         /// <summary>Create log for server side error</summary>
         /// <param name="className"></param>
         /// <param name="methodName"></param>
         /// <param name="errorDescription"></param>
-        public static void CreateLog(string className, string methodName, string errorDescription)
+        /// <param name="serverlogCollection"></param>
+        public static void CreateLog(string className, string methodName, string errorDescription, IMongoCollection<ApplicationLogger> serverlogCollection)
         {
             ApplicationLogger logger =
                 new ApplicationLogger
@@ -24,8 +22,7 @@ namespace AuthorizedServer.Logger
                     Method = methodName,
                     Description = errorDescription
                 };
-            var collection = _db.GetCollection<ApplicationLogger>("ServerLog");
-            collection.InsertOneAsync(logger);
+            serverlogCollection.InsertOneAsync(logger);
         }
     }
 

@@ -8,11 +8,9 @@ namespace AuthorizedServer.Repositories
         /// <summary>Add token</summary>
         /// <param name="token"></param>
         Task<bool> AddToken(RToken token);
-
         /// <summary>Expire token</summary>
         /// <param name="token"></param>
         Task<bool> ExpireToken(RToken token);
-
         /// <summary>Get token</summary>
         /// <param name="refresh_token"></param>
         /// <param name="client_id"></param>

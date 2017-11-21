@@ -6,12 +6,30 @@ using System.Text;
 using System.Xml.Linq;
 using Arthur_Clive.Data;
 using Arthur_Clive.Logger;
+using MongoDB.Driver;
+using MH = Arthur_Clive.Helper.MongoHelper;
 
 namespace Arthur_Clive.Helper
 {
     /// <summary>Helper method for PayUMoney service</summary>
     public class PayUHelper
     {
+        /// <summary></summary>
+        public MongoClient _client;
+        /// <summary></summary>
+        public static IMongoDatabase logger_db;
+        /// <summary></summary>
+        public static IMongoCollection<ApplicationLogger> serverlogCollection;
+
+        /// <summary></summary>
+        public PayUHelper()
+        {
+            _client = MH.GetClient();
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
+        }
+
+
         /// <summary>Get hash value of random number</summary>
         /// <param name="text"></param>
         public static string Generatehash512(string text)
@@ -32,7 +50,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("PayUHelper", "Generatehash512", ex.Message);
+                LoggerDataAccess.CreateLog("PayUHelper", "Generatehash512", ex.Message, serverlogCollection);
                 return null;
             }
         }
@@ -62,7 +80,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("PayUHelper", "PreparePOSTForm", ex.Message);
+                LoggerDataAccess.CreateLog("PayUHelper", "PreparePOSTForm", ex.Message, serverlogCollection);
                 return null;
             }
         }
@@ -79,7 +97,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("PayUHelper", "GetTxnId", ex.Message);
+                LoggerDataAccess.CreateLog("PayUHelper", "GetTxnId", ex.Message, serverlogCollection);
                 return null;
             }
         }
@@ -105,7 +123,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("PayUHelper", "GetHashString", ex.Message);
+                LoggerDataAccess.CreateLog("PayUHelper", "GetHashString", ex.Message, serverlogCollection);
                 return null;
             }
         }
@@ -132,7 +150,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("PayUHelper", "GetReverseHashString", ex.Message);
+                LoggerDataAccess.CreateLog("PayUHelper", "GetReverseHashString", ex.Message, serverlogCollection);
                 return null;
             }
         }
@@ -181,7 +199,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("PayUHelper", "GetHashtableData", ex.Message);
+                LoggerDataAccess.CreateLog("PayUHelper", "GetHashtableData", ex.Message, serverlogCollection);
                 return null;
             }
         }

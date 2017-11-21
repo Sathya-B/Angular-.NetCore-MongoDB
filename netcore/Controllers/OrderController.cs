@@ -22,13 +22,50 @@ namespace Arthur_Clive.Controllers
     public class OrderController : Controller
     {
         /// <summary></summary>
-        public IMongoDatabase _db = MH._client.GetDatabase("UserInfo");
+        public MongoClient _client;
         /// <summary></summary>
-        public IMongoDatabase order_db = MH._client.GetDatabase("OrderDB");
+        public IMongoDatabase userinfo_db;
         /// <summary></summary>
-        public IMongoDatabase product_db = MH._client.GetDatabase("ProductDB");
+        public IMongoCollection<BsonDocument> userinfo_collection;
+        /// <summary></summary>
+        public IMongoCollection<Cart> cartCollection;
+        /// <summary></summary>
+        public IMongoDatabase order_db;
+        /// <summary></summary>
+        public IMongoCollection<BsonDocument> orderinfo_collection;
+        /// <summary></summary>
+        public IMongoDatabase product_db;
+        /// <summary></summary>
+        public IMongoCollection<BsonDocument> product_collection;
+        /// <summary></summary>
+        public IMongoDatabase auth_db;
+        /// <summary></summary>
+        public IMongoCollection<BsonDocument> authentication_collection;
         /// <summary></summary>
         public UpdateDefinition<BsonDocument> updateDefinition;
+        /// <summary></summary>
+        public IMongoDatabase logger_db;
+        /// <summary></summary>
+        public IMongoCollection<ApplicationLogger> serverlogCollection;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public OrderController()
+        {
+            _client = MH.GetClient();
+            userinfo_db = _client.GetDatabase("UserInfo");
+            userinfo_collection = userinfo_db.GetCollection<BsonDocument>("UserInfo");
+            cartCollection = userinfo_db.GetCollection<Cart>("Cart");
+            order_db = _client.GetDatabase("OrderDB");
+            orderinfo_collection = order_db.GetCollection<BsonDocument>("OrderInfo");
+            product_db = _client.GetDatabase("ProductDB");
+            product_collection = product_db.GetCollection<BsonDocument>("Product");
+            auth_db = _client.GetDatabase("Authentication");
+            authentication_collection = auth_db.GetCollection<BsonDocument>("Authentication");
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
+        }
 
         /// <summary>Order products added to the cart</summary>
         /// <remarks>This api is used to place an order</remarks>
@@ -47,11 +84,14 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                IAsyncCursor<Address> userCursor = await _db.GetCollection<Address>("UserInfo").FindAsync(Builders<Address>.Filter.Eq("UserName", username));
-                var users = userCursor.ToList();
+                List<Address> users = new List<Address>();
+                foreach (var user in MH.GetListOfObjects(userinfo_collection, "UserName", username, null, null).Result)
+                {
+                    users.Add(BsonSerializer.Deserialize<Address>(user));
+                }
                 if (users.Count > 0)
                 {
-                    IAsyncCursor<Cart> cartCursor = await _db.GetCollection<Cart>("Cart").FindAsync(Builders<Cart>.Filter.Eq("UserName", username));
+                    IAsyncCursor<Cart> cartCursor = await cartCollection.FindAsync(Builders<Cart>.Filter.Eq("UserName", username));
                     var cartDatas = cartCursor.ToList();
                     if (cartDatas.Count > 0)
                     {
@@ -75,37 +115,25 @@ namespace Arthur_Clive.Controllers
                         data.Address = addressList;
                         if (data.Address.Count == 0)
                         {
-                            return BadRequest(new ResponseData
-                            {
-                                Code = "404",
-                                Message = "No default address found",
-                                Data = null
-                            });
+                            return BadRequest(new ResponseData { Code = "404", Message = "No default address found" });
                         }
                         List<ProductDetails> productList = new List<ProductDetails>();
                         foreach (var cart in cartDatas)
                         {
-                            foreach (var product in MH.GetProducts(cart.ProductSKU, product_db).Result)
+                            var product = BsonSerializer.Deserialize<Product>(MH.GetSingleObject(product_collection, "ProductSKU", cart.ProductSKU, null, null).Result);
+                            if (product.ProductStock < cart.ProductQuantity)
                             {
-                                if (product.ProductStock < cart.ProductQuantity)
-                                {
-                                    return BadRequest(new ResponseData
-                                    {
-                                        Code = "403",
-                                        Message = "Order quantity is higher than the product stock.",
-                                        Data = null
-                                    });
-                                }
-                                ProductDetails productDetails = new ProductDetails();
-                                productDetails.ProductSKU = cart.ProductSKU;
-                                productDetails.Status = "Order Placed";
-                                productDetails.Reviewed = false;
-                                List<StatusCode> productStatus = new List<StatusCode>();
-                                productStatus.Add(new StatusCode { StatusId = 1, Date = DateTime.UtcNow, Description = "Order Placed" });
-                                productDetails.StatusCode = productStatus;
-                                productDetails.ProductInCart = cart;
-                                productList.Add(productDetails);
+                                return BadRequest(new ResponseData { Code = "403", Message = "Order quantity is higher than the product stock." });
                             }
+                            ProductDetails productDetails = new ProductDetails();
+                            productDetails.ProductSKU = cart.ProductSKU;
+                            productDetails.Status = "Order Placed";
+                            productDetails.Reviewed = false;
+                            List<StatusCode> productStatus = new List<StatusCode>();
+                            productStatus.Add(new StatusCode { StatusId = 1, Date = DateTime.UtcNow, Description = "Order Placed" });
+                            productDetails.StatusCode = productStatus;
+                            productDetails.ProductInCart = cart;
+                            productList.Add(productDetails);
                         }
                         data.ProductDetails = productList;
                         data.OrderStatus = "Order Placed";
@@ -116,62 +144,37 @@ namespace Arthur_Clive.Controllers
                             productInfoList.Add(cart.ProductSKU);
                         }
                         string productInfo = String.Join(":", productInfoList);
-                        RegisterModel userInfo = BsonSerializer.Deserialize<RegisterModel>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication").Result);
-                        Address addressInfo = BsonSerializer.Deserialize<Address>(MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "UserInfo", "UserInfo").Result);
+                        RegisterModel userInfo = BsonSerializer.Deserialize<RegisterModel>(MH.GetSingleObject(authentication_collection, "UserName", username, null, null).Result);
+                        Address addressInfo = BsonSerializer.Deserialize<Address>(MH.GetSingleObject(userinfo_collection, "UserName", username, null, null).Result);
                         PaymentModel paymentModel = new PaymentModel { FirstName = userInfo.FullName, UserName = username, LastName = "", ProductInfo = productInfo, Amount = data.TotalAmount.ToString(), Email = userInfo.Email, PhoneNumber = userInfo.PhoneNumber, AddressLine1 = addressInfo.AddressLines, AddressLine2 = addressInfo.Landmark, City = addressInfo.City, State = addressInfo.State, Country = userInfo.UserLocation, ZipCode = addressInfo.PinCode, OrderId = data.OrderId };
                         if (data.TotalAmount == 0)
                         {
-                            var updatePaymentMethod = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", paymentModel.OrderId), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("PaymentMethod", "Coupon"));
-                            var updatePaymentDetails = await MH.UpdatePaymentDetails(paymentModel.OrderId);
-                            var removecartItems = await MH.RemoveCartItems(paymentModel.OrderId, paymentModel.UserName, paymentModel.Email);
-                            var sendGift = GlobalHelper.SendGift(paymentModel.OrderId);
-                            return Ok(new ResponseData
-                            {
-                                Code = "201",
-                                Message = "Payment success",
-                                Data = null
-                            });
+                            var updatePaymentMethod = await MH.UpdateSingleObject(orderinfo_collection, "OrderId", paymentModel.OrderId, null, null, Builders<BsonDocument>.Update.Set("PaymentMethod", "Coupon"));
+                            var updatePaymentDetails = await MH.UpdatePaymentDetails(orderinfo_collection, paymentModel.OrderId);
+                            var removecartItems = await MH.RemoveCartItems(orderinfo_collection, cartCollection, product_collection, paymentModel.OrderId, paymentModel.UserName, paymentModel.Email);
+                            var sendGift = GlobalHelper.SendGift(paymentModel.OrderId, orderinfo_collection);
+                            return Ok(new ResponseData { Code = "201", Message = "Payment success" });
                         }
                         else
                         {
                             var hashtableData = PayUHelper.GetHashtableData(paymentModel);
-                            return Ok(new ResponseData
-                            {
-                                Code = "200",
-                                Message = "Order Placed",
-                                Data = hashtableData
-                            });
+                            return Ok(new ResponseData { Code = "200", Message = "Order Placed", Data = hashtableData });
                         }
                     }
                     else
                     {
-                        return BadRequest(new ResponseData
-                        {
-                            Code = "402",
-                            Message = "Cart not found",
-                            Data = null
-                        });
+                        return BadRequest(new ResponseData { Code = "402", Message = "Cart not found" });
                     }
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "401",
-                        Message = "UserInfo not found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "401", Message = "UserInfo not found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("OrderController", "PlaceOrder", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("OrderController", "PlaceOrder", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -186,7 +189,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var checkData = MH.CheckForDatas("OrderId", orderid, null, null, "OrderDB", "OrderInfo");
+                var checkData = MH.GetSingleObject(orderinfo_collection, "OrderId", orderid, null, null).Result;
                 if (checkData != null)
                 {
                     return Ok(new ResponseData
@@ -198,23 +201,13 @@ namespace Arthur_Clive.Controllers
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "No orders found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "No orders found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("OrderController", "GetOrdersOfUser", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("OrderController", "GetOrdersOfUser", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -230,7 +223,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var orderList = MH.GetListOfObjects("UserName", username, null, null, null, null, "OrderDB", "OrderInfo").Result;
+                var orderList = MH.GetListOfObjects(orderinfo_collection, "UserName", username, null, null).Result;
                 if (orderList != null)
                 {
                     List<OrderInfo> orders = new List<OrderInfo>();
@@ -238,32 +231,17 @@ namespace Arthur_Clive.Controllers
                     {
                         orders.Add(BsonSerializer.Deserialize<OrderInfo>(order));
                     }
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Success",
-                        Data = orders
-                    });
+                    return Ok(new ResponseData { Code = "200", Message = "Success", Data = orders });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "No orders found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "No orders found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("OrderController", "GetOrdersOfUser", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("OrderController", "GetOrdersOfUser", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -272,7 +250,7 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Returns the all the orders placed</response>
         /// <response code="404">No orders found</response> 
         /// <response code="400">Process ran into an exception</response> 
-        [Authorize("Level1Access")]
+        //[Authorize("Level1Access")]
         [HttpGet("viewallorders")]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public async Task<ActionResult> GetAllOrders()
@@ -283,65 +261,45 @@ namespace Arthur_Clive.Controllers
                 var orders = cursor.ToList();
                 if (orders != null)
                 {
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Success",
-                        Data = orders
-                    });
+                    return Ok(new ResponseData { Code = "200", Message = "Success", Data = orders });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "No orders found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "No orders found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("OrderController", "GetOrdersOfUser", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("OrderController", "GetOrdersOfUser", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
         /// <summary>Update order status</summary>
-        /// <param name="orderid">order status update details</param>
+        /// <param name="orderid">id of order</param>
         /// <param name="status">order status update details</param>
         /// <response code="200">Order status updated</response>
         /// <response code="401">Order status update failed</response> 
         /// <response code="402">Product details status update failed</response> 
         /// <response code="404">Order not found</response> 
         /// <response code="400">Process ran into an exception</response> 
-        [Authorize("Level1Access")]
+        //[Authorize("Level1Access")]
         [HttpPut("deliverystatus/update/{orderid}/{status}")]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult UpdateDeliveryStatus(int orderid, string status)
         {
             try
             {
-                var checkData = MH.CheckForDatas("OrderId", orderid, null, null, "OrderDB", "OrderInfo");
+                var checkData = MH.GetSingleObject(orderinfo_collection, "OrderId", orderid, null, null).Result;
                 if (checkData != null)
                 {
                     var orderDetails = BsonSerializer.Deserialize<OrderInfo>(checkData);
                     if (status != "Order Replaced" || status != "Order Refunded")
                     {
-                        var updateOrderStatus = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderid), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("OrderStatus", status)).Result;
+                        var updateOrderStatus = MH.UpdateSingleObject(orderinfo_collection, "OrderId", orderid, null, null, Builders<BsonDocument>.Update.Set("OrderStatus", status)).Result;
                         if (updateOrderStatus == false)
                         {
-                            return BadRequest(new ResponseData
-                            {
-                                Code = "401",
-                                Message = "Order status update failed",
-                                Data = null
-                            });
+                            return BadRequest(new ResponseData { Code = "401", Message = "Order status update failed" });
                         }
                     }
                     List<ProductDetails> productDetails = new List<ProductDetails>();
@@ -363,42 +321,22 @@ namespace Arthur_Clive.Controllers
                         product.StatusCode = statusList;
                         productDetails.Add(product);
                     }
-                    var updateProductDetails = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderid), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("ProductDetails", productDetails)).Result;
+                    var updateProductDetails = MH.UpdateSingleObject(orderinfo_collection, "OrderId", orderid, null, null, Builders<BsonDocument>.Update.Set("ProductDetails", productDetails)).Result;
                     if (updateProductDetails == false)
                     {
-                        return BadRequest(new ResponseData
-                        {
-                            Code = "402",
-                            Message = "Product details order status update failed",
-                            Data = null
-                        });
+                        return BadRequest(new ResponseData { Code = "402", Message = "Product details order status update failed" });
                     }
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Status updated",
-                        Data = null
-                    });
+                    return Ok(new ResponseData { Code = "200", Message = "Status updated" });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "Order not found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "Order not found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("OrderController", "UpdateDeliveryStatus", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("OrderController", "UpdateDeliveryStatus", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -420,11 +358,11 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var checkData = MH.CheckForDatas("OrderId", orderid, null, null, "OrderDB", "OrderInfo");
+                var checkData = MH.GetSingleObject(orderinfo_collection, "OrderId", orderid, null, null).Result;
                 if (checkData != null)
                 {
                     var orderDetails = BsonSerializer.Deserialize<OrderInfo>(checkData);
-                    if (MH.CheckForDatas("ProductSKU", productSKU, null, null, "ProductDB", "Product") != null)
+                    if (MH.CheckForDatas(product_collection, "ProductSKU", productSKU, null, null) != null)
                     {
                         List<ProductDetails> productDetails = new List<ProductDetails>();
                         foreach (var product in orderDetails.ProductDetails)
@@ -433,20 +371,14 @@ namespace Arthur_Clive.Controllers
                             {
                                 if (product.Status == "Order Delivered")
                                 {
-                                    return BadRequest(new ResponseData
-                                    {
-                                        Code = "401",
-                                        Message = "Cancel request cannot be processed as the product is delivered",
-                                        Data = null
-                                    });
+                                    return BadRequest(new ResponseData { Code = "401", Message = "Cancel request cannot be processed as the product is delivered" });
                                 }
                                 else if (product.Status == "Order Cancelled")
                                 {
                                     return BadRequest(new ResponseData
                                     {
                                         Code = "402",
-                                        Message = "Order already cancelled",
-                                        Data = null
+                                        Message = "Order already cancelled"
                                     });
                                 }
                                 else if (product.Status == "Order Replaced" || orderDetails.OrderStatus == "Order Refunded")
@@ -469,66 +401,36 @@ namespace Arthur_Clive.Controllers
                             }
                             productDetails.Add(product);
                         }
-                        var updateOrderStatus = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderid), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("OrderStatus", "Order Cancelled")).Result;
+                        var updateOrderStatus = MH.UpdateSingleObject(orderinfo_collection, "OrderId", orderid, null, null, Builders<BsonDocument>.Update.Set("OrderStatus", "Order Cancelled")).Result;
                         if (updateOrderStatus == false)
                         {
-                            return BadRequest(new ResponseData
-                            {
-                                Code = "405",
-                                Message = "Order status update failed",
-                                Data = null
-                            });
+                            return BadRequest(new ResponseData { Code = "405", Message = "Order status update failed" });
                         }
-                        var updateProductDetails = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderid), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("ProductDetails", productDetails)).Result;
+                        var updateProductDetails = MH.UpdateSingleObject(orderinfo_collection, "OrderId", orderid, null, null, Builders<BsonDocument>.Update.Set("ProductDetails", productDetails)).Result;
                         if (updateProductDetails == false)
                         {
-                            return BadRequest(new ResponseData
-                            {
-                                Code = "406",
-                                Message = "Order cancelled status update failed",
-                                Data = null
-                            });
+                            return BadRequest(new ResponseData { Code = "406", Message = "Order cancelled status update failed" });
                         }
                         //if(orderDetails.PaymentMethod != "COD")
                         //{
                         //Need to refund amount
                         //}
-                        return Ok(new ResponseData
-                        {
-                            Code = "200",
-                            Message = "Order cancelled",
-                            Data = null
-                        });
+                        return Ok(new ResponseData { Code = "200", Message = "Order cancelled" });
                     }
                     else
                     {
-                        return BadRequest(new ResponseData
-                        {
-                            Code = "407",
-                            Message = "Product not found",
-                            Data = null
-                        });
+                        return BadRequest(new ResponseData { Code = "407", Message = "Product not found" });
                     }
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "Order not found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "Order not found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("OrderController", "CancelOrder", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("OrderController", "CancelOrder", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -555,7 +457,7 @@ namespace Arthur_Clive.Controllers
             {
                 try
                 {
-                    var checkData = MH.CheckForDatas("OrderId", orderid, null, null, "OrderDB", "OrderInfo");
+                    var checkData = MH.GetSingleObject(orderinfo_collection, "OrderId", orderid, null, null).Result;
                     if (checkData != null)
                     {
                         var orderDetails = BsonSerializer.Deserialize<OrderInfo>(checkData);
@@ -574,15 +476,14 @@ namespace Arthur_Clive.Controllers
                                                 return BadRequest(new ResponseData
                                                 {
                                                     Code = "407",
-                                                    Message = "Return request cannot be processed as it has been more than 15 days from delivery",
-                                                    Data = null
+                                                    Message = "Return request cannot be processed as it has been more than 15 days from delivery"
                                                 });
                                             }
                                         }
                                     }
                                 }
                             }
-                            var checkProduct = MH.CheckForDatas("ProductSKU", productSKU, null, null, "ProductDB", "Product");
+                            var checkProduct = MH.CheckForDatas(product_collection, "ProductSKU", productSKU, null, null);
                             if (checkProduct != null)
                             {
                                 var productData = BsonSerializer.Deserialize<Product>(checkData);
@@ -605,35 +506,20 @@ namespace Arthur_Clive.Controllers
                                             }
                                             productDetails.Add(product);
                                         }
-                                        var updateProductDetails = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderid), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("ProductDetails", productDetails)).Result;
+                                        var updateProductDetails = MH.UpdateSingleObject(product_collection, "OrderId", orderid, null, null, Builders<BsonDocument>.Update.Set("ProductDetails", productDetails)).Result;
                                         if (updateProductDetails == false)
                                         {
-                                            return BadRequest(new ResponseData
-                                            {
-                                                Code = "408",
-                                                Message = "Product details status update failed",
-                                                Data = null
-                                            });
+                                            return BadRequest(new ResponseData { Code = "408", Message = "Product details status update failed" });
                                         }
                                         //if(orderDetails.PaymentMethod != "COD")
                                         //{
                                         //Need to refund amount
                                         //}
-                                        return Ok(new ResponseData
-                                        {
-                                            Code = "201",
-                                            Message = "Payment Refund Initiated",
-                                            Data = null
-                                        });
+                                        return Ok(new ResponseData { Code = "201", Message = "Payment Refund Initiated" });
                                     }
                                     else
                                     {
-                                        return BadRequest(new ResponseData
-                                        {
-                                            Code = "403",
-                                            Message = "Refund not applicable for this product",
-                                            Data = null
-                                        });
+                                        return BadRequest(new ResponseData { Code = "403", Message = "Refund not applicable for this product" });
                                     }
                                 }
                                 else
@@ -655,83 +541,43 @@ namespace Arthur_Clive.Controllers
                                             }
                                             productDetails.Add(product);
                                         }
-                                        var updateProductDetails = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderid), "OrderDB", "OrderInfo", Builders<BsonDocument>.Update.Set("ProductDetails", productDetails)).Result;
+                                        var updateProductDetails = MH.UpdateSingleObject(orderinfo_collection, "OrderId", orderid, null, null, Builders<BsonDocument>.Update.Set("ProductDetails", productDetails)).Result;
                                         if (updateProductDetails == false)
                                         {
-                                            return BadRequest(new ResponseData
-                                            {
-                                                Code = "408",
-                                                Message = "Product details status update failed",
-                                                Data = null
-                                            });
+                                            return BadRequest(new ResponseData { Code = "408", Message = "Product details status update failed" });
                                         }
-                                        return Ok(new ResponseData
-                                        {
-                                            Code = "202",
-                                            Message = "Product replacement initiated",
-                                            Data = null
-                                        });
+                                        return Ok(new ResponseData { Code = "202", Message = "Product replacement initiated" });
                                     }
                                     else
                                     {
-                                        return BadRequest(new ResponseData
-                                        {
-                                            Code = "405",
-                                            Message = "Replacement not applicable for this product",
-                                            Data = null
-                                        });
+                                        return BadRequest(new ResponseData { Code = "405", Message = "Replacement not applicable for this product" });
                                     }
                                 }
                             }
                             else
                             {
-                                return BadRequest(new ResponseData
-                                {
-                                    Code = "402",
-                                    Message = "Product not found",
-                                    Data = null
-                                });
+                                return BadRequest(new ResponseData { Code = "402", Message = "Product not found" });
                             }
                         }
                         else
                         {
-                            return BadRequest(new ResponseData
-                            {
-                                Code = "406",
-                                Message = "Return request cannot be processed as the product is not delivered",
-                                Data = null
-                            });
+                            return BadRequest(new ResponseData { Code = "406", Message = "Return request cannot be processed as the product is not delivered" });
                         }
                     }
                     else
                     {
-                        return BadRequest(new ResponseData
-                        {
-                            Code = "404",
-                            Message = "Order not found",
-                            Data = null
-                        });
+                        return BadRequest(new ResponseData { Code = "404", Message = "Order not found" });
                     }
                 }
                 catch (Exception ex)
                 {
-                    LoggerDataAccess.CreateLog("OrderController", "CancelOrder", ex.Message);
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "400",
-                        Message = "Failed",
-                        Data = ex.Message
-                    });
+                    LoggerDataAccess.CreateLog("OrderController", "CancelOrder", ex.Message, serverlogCollection);
+                    return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
                 }
             }
             else
             {
-                return BadRequest(new ResponseData
-                {
-                    Code = "401",
-                    Message = "Invalid request",
-                    Data = null
-                });
+                return BadRequest(new ResponseData { Code = "401", Message = "Invalid request" });
             }
         }
 

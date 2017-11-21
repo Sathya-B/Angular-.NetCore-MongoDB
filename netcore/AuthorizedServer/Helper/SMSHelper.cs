@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,12 +7,29 @@ using System.Xml.Linq;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using AuthorizedServer.Logger;
+using MongoDB.Driver;
+using MH = AuthorizedServer.Helper.MongoHelper;
 
 namespace AuthorizedServer.Helper
 {
     /// <summary>Helper for Amazon SNS service</summary>
     public class SMSHelper
     {
+        /// <summary>Client for MongoDB</summary>
+        public MongoClient _client;
+        /// <summary></summary>
+        public static IMongoDatabase logger_db;
+        /// <summary></summary>
+        public static IMongoCollection<ApplicationLogger> serverlogCollection;
+
+        /// <summary></summary>
+        public SMSHelper()
+        {
+            _client = MH.GetClient();
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
+        }
+
         /// <summary>Get amazon SNS service credentials from xml file</summary>
         /// <param name="key"></param>
         public static string GetCredentials(string key)
@@ -65,7 +81,7 @@ namespace AuthorizedServer.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("SMSHelper", "SendSMS", ex.Message);
+                LoggerDataAccess.CreateLog("SMSHelper", "SendSMS", ex.Message, serverlogCollection);
                 return "Failed";
             }
         }

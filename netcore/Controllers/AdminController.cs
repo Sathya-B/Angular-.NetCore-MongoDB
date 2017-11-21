@@ -22,9 +22,48 @@ namespace Arthur_Clive.Controllers
     public class AdminController : Controller
     {
         /// <summary></summary>
-        public IMongoDatabase _db = MH._client.GetDatabase("SubscribeDB");
+        public MongoClient _client;
         /// <summary></summary>
-        public IMongoDatabase user_db = MH._client.GetDatabase("UserInfo");
+        public IMongoDatabase subscribe_db;
+        /// <summary></summary>
+        public IMongoCollection<BsonDocument> subscribeduser_collection;
+        /// <summary></summary>
+        public IMongoCollection<Subscribe> subscribeduserCollection;
+        /// <summary></summary>
+        public IMongoDatabase userinfo_db;
+        /// <summary></summary>
+        public IMongoCollection<BsonDocument> userinfo_collection;
+        /// <summary></summary>
+        public IMongoDatabase auth_db;
+        /// <summary></summary>
+        public IMongoCollection<BsonDocument> authentication_collection;
+        /// <summary></summary>
+        public IMongoDatabase roles_db;
+        /// <summary></summary>
+        public IMongoCollection<BsonDocument> roles_collection;
+        /// <summary></summary>
+        public IMongoDatabase logger_db;
+        /// <summary></summary>
+        public IMongoCollection<ApplicationLogger> serverlogCollection;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public AdminController()
+        {
+            _client = MH.GetClient();
+            subscribe_db = _client.GetDatabase("SubscribeDB");
+            subscribeduser_collection = subscribe_db.GetCollection<BsonDocument>("SubscribedUsers");
+            subscribeduserCollection = subscribe_db.GetCollection<Subscribe>("SubscribedUsers");
+            userinfo_db = _client.GetDatabase("UserInfo");
+            userinfo_collection = userinfo_db.GetCollection<BsonDocument>("UserInfo");
+            auth_db = _client.GetDatabase("Authentication");
+            authentication_collection = auth_db.GetCollection<BsonDocument>("Authentication");
+            roles_db = _client.GetDatabase("RolesDB");
+            roles_collection = roles_db.GetCollection<BsonDocument>("Roles");
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
+        }
 
         /// <summary>Subscribe user</summary>
         /// <param name="emailid">Email of user who needs to be subscribed</param>
@@ -42,47 +81,31 @@ namespace Arthur_Clive.Controllers
             {
                 if (emailid != null)
                 {
-                    var checkUser = MH.CheckForDatas("Email", emailid, null, null, "SubscribeDB", "SubscribedUsers");
-                    if (checkUser == null)
+                    var checkUser = MH.CheckForDatas(subscribeduser_collection, "Email", emailid, null, null);
+                    if (checkUser == false)
                     {
-                        await _db.GetCollection<Subscribe>("SubscribedUsers").InsertOneAsync(new Subscribe { Email = emailid });
+                        await subscribeduserCollection.InsertOneAsync(new Subscribe { Email = emailid });
                         var sendEmail = EmailHelper.SendEmail_NewsLetterService(emailid);
-                        return Ok(new ResponseData
-                        {
-                            Code = "200",
-                            Message = "Subscribed Succesfully",
-                            Data = null
-                        });
+                        return Ok(new ResponseData { Code = "200", Message = "Subscribed Succesfully" });
+                    }
+                    else if (checkUser == false)
+                    {
+                        return BadRequest(new ResponseData { Code = "401", Message = "User Already Subscribed" });
                     }
                     else
                     {
-                        return BadRequest(new ResponseData
-                        {
-                            Code = "401",
-                            Message = "User Already Subscribed",
-                            Data = null
-                        });
+                        return BadRequest(new ResponseData { Code = "400", Message = "Failed" });
                     }
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "402",
-                        Message = "EmailId connot be empty",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "402", Message = "EmailId connot be empty" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "Subscribe", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("AdminContoller", "Subscribe", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -101,46 +124,30 @@ namespace Arthur_Clive.Controllers
             {
                 if (emailid != null)
                 {
-                    if (MH.CheckForDatas("Email", emailid, null, null, "SubscribeDB", "SubscribedUsers") != null)
+                    var checkUser = MH.CheckForDatas(subscribeduser_collection, "Email", emailid, null, null);
+                    if (checkUser == true)
                     {
-                        var filter = Builders<BsonDocument>.Filter.Eq("Email", emailid);
-                        MH.DeleteSingleObject(filter, "SubscribeDB", "SubscribedUsers");
-                        return Ok(new ResponseData
-                        {
-                            Code = "200",
-                            Message = "Unsubscribed Succesfully",
-                            Data = null
-                        });
+                        MH.DeleteSingleObject(subscribeduser_collection, "Email", emailid, null, null);
+                        return Ok(new ResponseData { Code = "200", Message = "Unsubscribed Succesfully" });
+                    }
+                    else if (checkUser == false)
+                    {
+                        return BadRequest(new ResponseData { Code = "404", Message = "No user found" });
                     }
                     else
                     {
-                        return BadRequest(new ResponseData
-                        {
-                            Code = "404",
-                            Message = "No user found",
-                            Data = null
-                        });
+                        return BadRequest(new ResponseData { Code = "400", Message = "Failed" });
                     }
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "402",
-                        Message = "UserName connot be empty",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "402", Message = "UserName connot be empty" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "Unsubscribe", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("AdminContoller", "Unsubscribe", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -156,7 +163,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                IAsyncCursor<Subscribe> cursor = await _db.GetCollection<Subscribe>("SubscribedUsers").FindAsync(FilterDefinition<Subscribe>.Empty);
+                IAsyncCursor<Subscribe> cursor = await subscribeduserCollection.FindAsync(FilterDefinition<Subscribe>.Empty);
                 var users = cursor.ToList();
                 if (users.Count > 0)
                 {
@@ -164,32 +171,17 @@ namespace Arthur_Clive.Controllers
                     {
                         await EmailHelper.SendEmail_ToSubscribedUsers(user.Email, user.Email, message);
                     }
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Email sent to all subscribed users",
-                        Data = null
-                    });
+                    return Ok(new ResponseData { Code = "200", Message = "Email sent to all subscribed users" });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "There are no subscribed users",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "There are no subscribed users" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "PublicPost", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("AdminContoller", "PublicPost", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -243,7 +235,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "UploadImageToS3", ex.Message);
+                LoggerDataAccess.CreateLog("AdminContoller", "UploadImageToS3", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -264,14 +256,14 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var getlist = MH.GetListOfObjects(null, null, null, null, null, null, "Authentication", "Authentication").Result;
+                var getlist = MH.GetListOfObjects(authentication_collection, null, null, null, null).Result;
                 if (getlist != null)
                 {
                     List<UserInfomation> userList = new List<UserInfomation>();
                     foreach (var user in getlist)
                     {
                         var userInfo = BsonSerializer.Deserialize<RegisterModel>(user);
-                        var billingAddressData = MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", userInfo.UserName) & Builders<BsonDocument>.Filter.Eq("BillingAddress", true), "UserInfo", "UserInfo").Result;
+                        var billingAddressData = MH.GetSingleObject(userinfo_collection, "UserName", userInfo.UserName, "BillingAddress", true).Result;
                         Address billingAddress = new Address();
                         if (billingAddressData != null)
                         {
@@ -281,7 +273,7 @@ namespace Arthur_Clive.Controllers
                         {
                             billingAddress = null;
                         }
-                        var shippingAddressData = MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", userInfo.UserName) & Builders<BsonDocument>.Filter.Eq("ShippingAddress", true), "UserInfo", "UserInfo").Result;
+                        var shippingAddressData = MH.GetSingleObject(userinfo_collection, "UserName", userInfo.UserName, "ShippingAddress", true).Result;
                         Address shippingAddress = new Address();
                         if (shippingAddressData != null)
                         {
@@ -301,32 +293,17 @@ namespace Arthur_Clive.Controllers
                         };
                         userList.Add(userInfomation);
                     }
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Success",
-                        Data = userList
-                    });
+                    return Ok(new ResponseData { Code = "200", Message = "Success", Data = userList });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "No users found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "No users found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "GetAllUsers", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("AdminContoller", "GetAllUsers", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -340,7 +317,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var getRoles = MH.GetListOfObjects(null, null, null, null, null, null, "RolesDB", "Roles").Result;
+                var getRoles = MH.GetListOfObjects(roles_collection, null, null, null, null).Result;
                 if (getRoles != null)
                 {
                     List<Roles> rolesList = new List<Roles>();
@@ -349,32 +326,17 @@ namespace Arthur_Clive.Controllers
                         var roleInfo = BsonSerializer.Deserialize<Roles>(role);
                         rolesList.Add(roleInfo);
                     }
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Success",
-                        Data = rolesList
-                    });
+                    return Ok(new ResponseData { Code = "200", Message = "Success", Data = rolesList });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "No roles found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "No roles found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "GetAllRoles", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("AdminContoller", "GetAllRoles", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -382,42 +344,27 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Returns details of role with matching role name added by the admin</response>   
         /// <response code="404">No role found with this name</response>   
         /// <response code="400">Process ran into an exception</response>
-        [HttpGet("roles/details/{rolename}")]
+        [HttpGet("roles/details/rolename:{rolename}")]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult GetRoleDetailByName(string rolename)
         {
             try
             {
-                var getRole = MH.GetSingleObject(Builders<BsonDocument>.Filter.Eq("RoleName", rolename), "RolesDB", "Roles").Result;
+                var getRole = MH.GetSingleObject(roles_collection, "RoleName", rolename, null, null).Result;
                 if (getRole != null)
                 {
                     var roleInfo = BsonSerializer.Deserialize<Roles>(getRole);
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Success",
-                        Data = roleInfo
-                    });
+                    return Ok(new ResponseData { Code = "200", Message = "Success", Data = roleInfo });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "No role found with specified role name",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "No role found with specified role name" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "GetRoleDetailByName", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("AdminContoller", "GetRoleDetailByName", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -425,13 +372,13 @@ namespace Arthur_Clive.Controllers
         /// <response code="200">Returns details of roles with matching level of access</response>   
         /// <response code="404">No role found having the specified level of access</response>   
         /// <response code="400">Process ran into an exception</response>
-        [HttpGet("roles/details/{levelofaccess}")]
+        [HttpGet("roles/details/levelofaccess:{levelofaccess}")]
         [ProducesResponseType(typeof(ResponseData), 200)]
         public ActionResult GetRolesByLevelOfAccess(string levelofaccess)
         {
             try
             {
-                var getRoles = MH.GetListOfObjects(null, null, null, null, null, null, "RolesDB", "Roles").Result;
+                var getRoles = MH.GetListOfObjects(roles_collection, null, null, null, null).Result;
                 if (getRoles != null)
                 {
                     List<Roles> rolesList = new List<Roles>();
@@ -444,32 +391,17 @@ namespace Arthur_Clive.Controllers
                             rolesList.Add(roleInfo);
                         }
                     }
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Success",
-                        Data = rolesList
-                    });
+                    return Ok(new ResponseData { Code = "200", Message = "Success", Data = rolesList });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "No roles found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "404", Message = "No roles found" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "GetRolesByLevelOfAccess", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("AdminContoller", "GetRolesByLevelOfAccess", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -486,44 +418,24 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                if (MH.CheckForDatas("RoleName", data.RoleName, null, null, "RolesDB", "Roles") != null)
+                if (MH.CheckForDatas(roles_collection, "RoleName", data.RoleName, null, null) == true)
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "401",
-                        Message = "Another role with same name is found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "401", Message = "Another role with same name is found" });
                 }
-                else if (MH.CheckForDatas("RoleID", data.RoleID, null, null, "RolesDB", "Roles") != null)
+                else if (MH.CheckForDatas(roles_collection, "RoleID", data.RoleID, null, null) == true)
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "402",
-                        Message = "Another role with same role id is found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "402", Message = "Another role with same role id is found" });
                 }
                 else
                 {
-                    await MH._client.GetDatabase("RolesDB").GetCollection<Roles>("Roles").InsertOneAsync(data);
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Role inserted successfully",
-                        Data = null
-                    });
+                    await roles_db.GetCollection<Roles>("Roles").InsertOneAsync(data);
+                    return Ok(new ResponseData { Code = "200", Message = "Role inserted successfully" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "InsertRole", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("AdminContoller", "InsertRole", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
 
@@ -539,36 +451,25 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                var checkuser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
-                if (checkuser != null)
+                var checkuser = MH.CheckForDatas(authentication_collection, "UserName", username, null, null);
+                if (checkuser == true)
                 {
-                    var updateRole = MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("UserRole", rolename));
-                    return Ok(new ResponseData
-                    {
-                        Code = "200",
-                        Message = "Role assigned to user",
-                        Data = null
-                    });
+                    var updateRole = MH.UpdateSingleObject(authentication_collection, "UserName", username, null, null, Builders<BsonDocument>.Update.Set("UserRole", rolename));
+                    return Ok(new ResponseData { Code = "200", Message = "Role assigned to user" });
+                }
+                else if (checkuser == false)
+                {
+                    return BadRequest(new ResponseData { Code = "404", Message = "User not found" });
                 }
                 else
                 {
-                    return BadRequest(new ResponseData
-                    {
-                        Code = "404",
-                        Message = "User not found",
-                        Data = null
-                    });
+                    return BadRequest(new ResponseData { Code = "400", Message = "Failed" });
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AdminContoller", "InsertRoles", ex.Message);
-                return BadRequest(new ResponseData
-                {
-                    Code = "400",
-                    Message = "Failed",
-                    Data = ex.Message
-                });
+                LoggerDataAccess.CreateLog("AdminContoller", "InsertRoles", ex.Message, serverlogCollection);
+                return BadRequest(new ResponseData { Code = "400", Message = "Failed", Data = ex.Message });
             }
         }
     }

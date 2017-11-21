@@ -15,12 +15,23 @@ namespace AuthorizedServer.Helper
     /// <summary>Helper for MongoDB operations</summary>
     public class MongoHelper
     {
-        /// <summary></summary>
-        public static IMongoDatabase _mongodb;
-        /// <summary></summary>
-        public static MongoClient _client = GetClient();
+        /// <summary>Client for MongoDB</summary>
+        public static MongoClient _client;
         /// <summary></summary>
         public static FilterDefinition<BsonDocument> filter;
+        /// <summary></summary>
+        public static IMongoDatabase logger_db;
+        /// <summary></summary>
+        public static IMongoCollection<ApplicationLogger> serverlogCollection;
+
+        /// <summary></summary>
+        public MongoHelper()
+        {
+            _client = GetClient();
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
+        }
+
         /// <summary>Get Mongo Client</summary>
         public static MongoClient GetClient()
         {
@@ -36,27 +47,39 @@ namespace AuthorizedServer.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("MongoHelper", "GetClient", ex.Message);
+                LoggerDataAccess.CreateLog("MongoHelper", "GetClient", ex.Message, serverlogCollection);
                 return null;
             }
         }
 
         /// <summary>Get single object from MongoDB</summary>
-        /// <param name="filter"></param>
-        /// <param name="dbName"></param>
-        /// <param name="collectionName"></param>
-        public static async Task<BsonDocument> GetSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName)
+        /// <param name="filterField1"></param>
+        /// <param name="filterField2"></param>
+        /// <param name="filterData1"></param>
+        /// <param name="filterData2"></param>
+        /// <param name="collection"></param>
+        public static async Task<BsonDocument> GetSingleObject(IMongoCollection<BsonDocument> collection, string filterField1, dynamic filterData1, string filterField2, dynamic filterData2)
         {
             try
             {
-                _mongodb = _client.GetDatabase(dbName);
-                var collection = _mongodb.GetCollection<BsonDocument>(collectionName);
+                if (filterField1 == null & filterField2 == null)
+                {
+                    filter = FilterDefinition<BsonDocument>.Empty;
+                }
+                else if (filterField1 != null & filterField2 == null)
+                {
+                    filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1);
+                }
+                else if (filterField1 != null & filterField2 != null)
+                {
+                    filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2);
+                }
                 IAsyncCursor<BsonDocument> cursor = await collection.FindAsync(filter);
                 return cursor.FirstOrDefault();
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("MongoHelper", "GetSingleObject", ex.Message);
+                LoggerDataAccess.CreateLog("MongoHelper", "GetSingleObject", ex.Message, serverlogCollection);
                 return null;
             }
         }
@@ -64,64 +87,64 @@ namespace AuthorizedServer.Helper
         /// <summary>Get list of objects from MongoDB</summary>
         /// <param name="filterField1"></param>
         /// <param name="filterField2"></param>
-        /// <param name="filterField3"></param>
         /// <param name="filterData1"></param>
         /// <param name="filterData2"></param>
-        /// <param name="filterData3"></param>
-        /// <param name="dbName"></param>
-        /// <param name="collectionName"></param>
-        public static async Task<List<BsonDocument>> GetListOfObjects(string filterField1, dynamic filterData1, string filterField2, dynamic filterData2, string filterField3, dynamic filterData3, string dbName, string collectionName)
+        /// <param name="collection"></param>
+        public static async Task<List<BsonDocument>> GetListOfObjects(IMongoCollection<BsonDocument> collection, string filterField1, dynamic filterData1, string filterField2, dynamic filterData2)
         {
             try
             {
-                _mongodb = MH._client.GetDatabase(dbName);
-                var collection = _mongodb.GetCollection<BsonDocument>(collectionName);
-                if (filterField1 == null & filterField2 == null & filterField3 == null)
+                if (filterField1 == null & filterField2 == null)
                 {
                     filter = FilterDefinition<BsonDocument>.Empty;
                 }
-                else if (filterField1 != null & filterField2 == null & filterField3 == null)
+                else if (filterField1 != null & filterField2 == null)
                 {
                     filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1);
                 }
-                else if (filterField1 != null & filterField2 != null & filterField3 == null)
+                else if (filterField1 != null & filterField2 != null)
                 {
                     filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2);
-                }
-                else if (filterField1 != null & filterField2 != null & filterField3 != null)
-                {
-                    filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2) & Builders<BsonDocument>.Filter.Eq(filterField3, filterData3);
                 }
                 IAsyncCursor<BsonDocument> cursor = await collection.FindAsync(filter);
                 return cursor.ToList();
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("MongoHelper", "GetListOfObjects", ex.Message);
+                LoggerDataAccess.CreateLog("MongoHelper", "GetListOfObjects", ex.Message, serverlogCollection);
                 return null;
             }
         }
 
-        /// <summary>
-        /// Update single object in MongoDB
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="dbName"></param>
-        /// <param name="collectionName"></param>
+        /// <summary>Update single object in MongoDB</summary>
+        /// <param name="filterField1"></param>
+        /// <param name="filterField2"></param>
+        /// <param name="filterData1"></param>
+        /// <param name="filterData2"></param>
+        /// <param name="collection"></param>
         /// <param name="update"></param>
-        /// <returns></returns>
-        public static async Task<bool?> UpdateSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName, UpdateDefinition<BsonDocument> update)
+        public static async Task<bool?> UpdateSingleObject(IMongoCollection<BsonDocument> collection, string filterField1, dynamic filterData1, string filterField2, dynamic filterData2, UpdateDefinition<BsonDocument> update)
         {
             try
             {
-                _mongodb = _client.GetDatabase(dbName);
-                var collection = _mongodb.GetCollection<BsonDocument>(collectionName);
+                if (filterField1 == null & filterField2 == null)
+                {
+                    filter = FilterDefinition<BsonDocument>.Empty;
+                }
+                else if (filterField1 != null & filterField2 == null)
+                {
+                    filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1);
+                }
+                else if (filterField1 != null & filterField2 != null)
+                {
+                    filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2);
+                }
                 var cursor = await collection.UpdateOneAsync(filter, update);
                 return cursor.ModifiedCount > 0;
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("MongoHelper", "UpdateSingleObject", ex.Message);
+                LoggerDataAccess.CreateLog("MongoHelper", "UpdateSingleObject", ex.Message, serverlogCollection);
                 return null;
             }
         }
@@ -133,10 +156,9 @@ namespace AuthorizedServer.Helper
         /// <param name="filterData1"></param>
         /// <param name="filterField2"></param>
         /// <param name="filterData2"></param>
-        /// <param name="dbName"></param>
-        /// <param name="collectionName"></param>
+        /// <param name="collection"></param>
         /// <returns></returns>
-        public static BsonDocument CheckForDatas(string filterField1, string filterData1, string filterField2, string filterData2, string dbName, string collectionName)
+        public static BsonDocument CheckForDatas(IMongoCollection<BsonDocument> collection, string filterField1, string filterData1, string filterField2, string filterData2)
         {
             try
             {
@@ -149,58 +171,86 @@ namespace AuthorizedServer.Helper
                 {
                     filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2);
                 }
-                return GetSingleObject(filter, dbName, collectionName).Result;
+                return GetSingleObject(collection, filterField1, filterData1, filterField2, filterData2).Result;
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("MongoHelper", "CheckForDatas", ex.Message);
+                LoggerDataAccess.CreateLog("MongoHelper", "CheckForDatas", ex.Message, serverlogCollection);
                 return null;
             }
         }
 
         /// <summary>To record invalid login attempts</summary>
-        /// <param name="filter"></param>
-        public static string RecordLoginAttempts(FilterDefinition<BsonDocument> filter)
+        /// <param name="filterField1"></param>
+        /// <param name="filterField2"></param>
+        /// <param name="filterData1"></param>
+        /// <param name="filterData2"></param>
+        /// <param name="collection"></param>
+        public static string RecordLoginAttempts(IMongoCollection<BsonDocument> collection, string filterField1, dynamic filterData1, string filterField2, dynamic filterData2)
         {
             try
             {
-                var verifyUser = BsonSerializer.Deserialize<RegisterModel>(MH.GetSingleObject(filter, "Authentication", "Authentication").Result);
+                if (filterField1 == null & filterField2 == null)
+                {
+                    filter = FilterDefinition<BsonDocument>.Empty;
+                }
+                else if (filterField1 != null & filterField2 == null)
+                {
+                    filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1);
+                }
+                else if (filterField1 != null & filterField2 != null)
+                {
+                    filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2);
+                }
+                var verifyUser = BsonSerializer.Deserialize<RegisterModel>(MH.GetSingleObject(collection, filterField1, filterData1, filterField2, filterData2).Result);
                 if (verifyUser.WrongAttemptCount < 10)
                 {
                     var update = Builders<BsonDocument>.Update.Set("WrongAttemptCount", verifyUser.WrongAttemptCount + 1);
-                    var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
+                    var result = MH.UpdateSingleObject(collection, filterField1, filterData1, filterField2, filterData2, update).Result;
                     return "Login Attempt Recorded";
                 }
                 else
                 {
                     var update = Builders<BsonDocument>.Update.Set("Status", "Revoked");
-                    var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
+                    var result = MH.UpdateSingleObject(collection, filterField1, filterData1, filterField2, filterData2, update).Result;
                     return "Account Blocked";
                 }
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("MongoHelper", "RecordLoginAttempts", ex.Message);
+                LoggerDataAccess.CreateLog("MongoHelper", "RecordLoginAttempts", ex.Message, serverlogCollection);
                 return "Failed";
             }
         }
 
         /// <summary>Delete single object from MongoDB</summary>
-        /// <param name="filter"></param>
-        /// <param name="dbName"></param>
-        /// <param name="collectionName"></param>
-        public static bool? DeleteSingleObject(FilterDefinition<BsonDocument> filter, string dbName, string collectionName)
+        /// <param name="filterField1"></param>
+        /// <param name="filterField2"></param>
+        /// <param name="filterData1"></param>
+        /// <param name="filterData2"></param>
+        /// <param name="collection"></param>
+        public static bool? DeleteSingleObject(IMongoCollection<BsonDocument> collection, string filterField1, dynamic filterData1, string filterField2, dynamic filterData2)
         {
             try
             {
-                var data = GetSingleObject(filter, dbName, collectionName).Result;
-                var collection = _mongodb.GetCollection<BsonDocument>(collectionName);
-                var response = collection.DeleteOneAsync(data);
+                if (filterField1 == null & filterField2 == null)
+                {
+                    filter = FilterDefinition<BsonDocument>.Empty;
+                }
+                else if (filterField1 != null & filterField2 == null)
+                {
+                    filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1);
+                }
+                else if (filterField1 != null & filterField2 != null)
+                {
+                    filter = Builders<BsonDocument>.Filter.Eq(filterField1, filterData1) & Builders<BsonDocument>.Filter.Eq(filterField2, filterData2);
+                }
+                var response = collection.DeleteOneAsync(filter);
                 return response.Result.DeletedCount > 0;
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("MongoHelper", "DeleteSingleObject", ex.Message);
+                LoggerDataAccess.CreateLog("MongoHelper", "DeleteSingleObject", ex.Message, serverlogCollection);
                 return null;
             }
         }

@@ -4,12 +4,28 @@ using System.Linq;
 using System.Xml.Linq;
 using AuthorizedServer.Logger;
 using MongoDB.Driver;
+using MH = AuthorizedServer.Helper.MongoHelper;
 
 namespace AuthorizedServer.Helper
 {
     /// <summary>Global helper for authorized controller </summary>
     public class GlobalHelper
     {
+        /// <summary>Client for MongoDB</summary>
+        public MongoClient _client;
+        /// <summary></summary>
+        public static IMongoDatabase logger_db;
+        /// <summary></summary>
+        public static IMongoCollection<ApplicationLogger> serverlogCollection;
+
+        /// <summary></summary>
+        public GlobalHelper()
+        {
+            _client = MH.GetClient();
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
+        }
+
         /// <summary>Get current directory of project</summary>
         public static string GetCurrentDir()
         {
@@ -27,7 +43,7 @@ namespace AuthorizedServer.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("GlobalHelper", "ReadXML", ex.Message);
+                LoggerDataAccess.CreateLog("GlobalHelper", "ReadXML", ex.Message, serverlogCollection);
                 return null;
             }
         }
@@ -42,7 +58,7 @@ namespace AuthorizedServer.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("GlobalHelper", "GetIpConfig", ex.Message);
+                LoggerDataAccess.CreateLog("GlobalHelper", "GetIpConfig", ex.Message, serverlogCollection);
                 return null;
             }
         }

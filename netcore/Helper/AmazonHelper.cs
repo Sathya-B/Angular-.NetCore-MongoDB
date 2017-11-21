@@ -6,12 +6,29 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Arthur_Clive.Logger;
 using Microsoft.AspNetCore.Http;
+using MongoDB.Driver;
+using MH = Arthur_Clive.Helper.MongoHelper;
 
 namespace Arthur_Clive.Helper
 {
     /// <summary>Helper method for Amazon S3</summary>
     public class AmazonHelper
     {
+        /// <summary></summary>
+        public MongoClient _client;
+        /// <summary></summary>
+        public static IMongoDatabase logger_db;
+        /// <summary></summary>
+        public static IMongoCollection<ApplicationLogger> serverlogCollection;
+
+        /// <summary></summary>
+        public AmazonHelper()
+        {
+            _client = MH.GetClient();
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
+        }
+
         /// <summary>Amazon s3 client</summary>
         public static IAmazonS3 s3Client;
 
@@ -44,7 +61,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                Logger.LoggerDataAccess.CreateLog("AmazonHelper", "GetAmazonS3Object", ex.Message);
+                Logger.LoggerDataAccess.CreateLog("AmazonHelper", "GetAmazonS3Object", ex.Message, serverlogCollection);
                 return "";
             }
         }
@@ -84,7 +101,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AmazonHelper", "UploadImageToS3", ex.Message);
+                LoggerDataAccess.CreateLog("AmazonHelper", "UploadImageToS3", ex.Message, serverlogCollection);
                 return false;
             }
         }

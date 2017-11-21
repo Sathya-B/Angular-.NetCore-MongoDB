@@ -22,6 +22,12 @@ namespace AuthorizedServer.Controllers
     [Route("api/[controller]")]
     public class AuthController : Controller
     {
+        /// <summary>Client for MongoDB</summary>
+        public MongoClient _client;
+        /// <summary></summary>
+        public IMongoDatabase auth_db;
+        /// <summary></summary>
+        public IMongoCollection<BsonDocument> authentication_collection;
         /// <summary></summary>
         public AuthHelper authHelper = new AuthHelper();
         /// <summary></summary>
@@ -29,17 +35,24 @@ namespace AuthorizedServer.Controllers
         /// <summary></summary>
         private IRTokenRepository _repo;
         /// <summary></summary>
-        public IMongoDatabase _db = MH._client.GetDatabase("Authentication");
-        /// <summary></summary>
         public PasswordHasher<VerificationModel> smsHasher = new PasswordHasher<VerificationModel>();
         /// <summary></summary>
         public PasswordHasher<RegisterModel> passwordHasher = new PasswordHasher<RegisterModel>();
+        /// <summary></summary>
+        public IMongoDatabase logger_db;
+        /// <summary></summary>
+        public IMongoCollection<ApplicationLogger> serverlogCollection;
 
         /// <summary></summary>
         /// <param name="settings"></param>
         /// <param name="repo"></param>
         public AuthController(IOptions<Audience> settings, IRTokenRepository repo)
         {
+            _client = MH.GetClient();
+            auth_db = _client.GetDatabase("Authentication");
+            authentication_collection = auth_db.GetCollection<BsonDocument>("Authentication");
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
             this._settings = settings;
             this._repo = repo;
         }
@@ -69,7 +82,7 @@ namespace AuthorizedServer.Controllers
                 {
                     userName = data.Email;
                 }
-                checkUser = MH.CheckForDatas("UserName", userName, null, null, "Authentication", "Authentication");
+                checkUser = MH.CheckForDatas(authentication_collection, "UserName", userName, null, null);
                 if (checkUser == null)
                 {
                     if (data.UserLocation != null)
@@ -96,7 +109,7 @@ namespace AuthorizedServer.Controllers
                         }
                         data.VerificationCode = smsHasher.HashPassword(smsModel, OTP);
                         data.Status = "Registered";
-                        var authCollection = _db.GetCollection<RegisterModel>("Authentication");
+                        var authCollection = auth_db.GetCollection<RegisterModel>("Authentication");
                         await authCollection.InsertOneAsync(data);
                         return Ok(new ResponseData
                         {
@@ -127,7 +140,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "Register", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "Register", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -154,7 +167,7 @@ namespace AuthorizedServer.Controllers
         {
             try
             {
-                var checkUser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
+                var checkUser = MH.CheckForDatas(authentication_collection, "UserName", username, null, null);
                 if (checkUser != null)
                 {
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(checkUser);
@@ -164,8 +177,7 @@ namespace AuthorizedServer.Controllers
                         if (smsHasher.VerifyHashedPassword(smsModel, verifyUser.VerificationCode, otp).ToString() == "Success")
                         {
                             var update = Builders<BsonDocument>.Update.Set("Status", "Verified");
-                            var filter = Builders<BsonDocument>.Filter.Eq("UserName", username);
-                            var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
+                            var result = MH.UpdateSingleObject(authentication_collection, "UserName", username, null, null, update).Result;
                             Parameters parameters = new Parameters { username = username, fullname = verifyUser.FullName };
                             return Ok(Json(authHelper.DoPassword(parameters, _repo, _settings)));
                         }
@@ -201,7 +213,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "RegisterVerification", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "RegisterVerification", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -229,7 +241,7 @@ namespace AuthorizedServer.Controllers
             try
             {
                 BsonDocument checkUser;
-                checkUser = MH.CheckForDatas("UserName", user.UserName, null, null, "Authentication", "Authentication");
+                checkUser = MH.CheckForDatas(authentication_collection, "UserName", user.UserName, null, null);
                 if (checkUser != null)
                 {
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(checkUser);
@@ -243,8 +255,7 @@ namespace AuthorizedServer.Controllers
                         }
                         else
                         {
-                            var filter = Builders<BsonDocument>.Filter.Eq("UserName", user.UserName);
-                            string response = MongoHelper.RecordLoginAttempts(filter);
+                            string response = MH.RecordLoginAttempts(authentication_collection, "UserName", user.UserName, null, null);
                             if (response != "Failed")
                                 return BadRequest(new ResponseData
                                 {
@@ -285,7 +296,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "Login", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "Login", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -309,9 +320,8 @@ namespace AuthorizedServer.Controllers
             try
             {
                 string OTP;
-                var checkUser = MH.CheckForDatas("UserName", data.UserName, null, null, "Authentication", "Authentication");
-                var filter = Builders<BsonDocument>.Filter.Eq("UserName", data.UserName);
-                var user = MH.GetSingleObject(filter, "Authentication", "Authentication").Result;
+                var checkUser = MH.CheckForDatas(authentication_collection, "UserName", data.UserName, null, null);
+                var user = MH.GetSingleObject(authentication_collection, "UserName", data.UserName, null, null).Result;
                 if (user != null)
                 {
                     var userData = BsonSerializer.Deserialize<RegisterModel>(user);
@@ -332,7 +342,7 @@ namespace AuthorizedServer.Controllers
                     }
                     var update = Builders<BsonDocument>.Update.Set("Status", "Not Verified").Set("OTPExp", DateTime.UtcNow.AddMinutes(2))
                                                               .Set("VerificationCode", smsHasher.HashPassword(smsModel, OTP));
-                    var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
+                    var result = MH.UpdateSingleObject(authentication_collection, "UserName", data.UserName, null, null, update).Result;
                     return Ok(new ResponseData
                     {
                         Code = "200",
@@ -352,7 +362,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "ForgetPassword", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "ForgetPassword", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -377,8 +387,7 @@ namespace AuthorizedServer.Controllers
         {
             try
             {
-                var filter = Builders<BsonDocument>.Filter.Eq("UserName", username);
-                var user = MH.GetSingleObject(filter, "Authentication", "Authentication").Result;
+                var user = MH.GetSingleObject(authentication_collection, "UserName", username, null, null).Result;
                 if (user != null)
                 {
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(user);
@@ -388,7 +397,7 @@ namespace AuthorizedServer.Controllers
                         if (smsHasher.VerifyHashedPassword(model, verifyUser.VerificationCode, otp).ToString() == "Success")
                         {
                             var update = Builders<BsonDocument>.Update.Set("Status", "Verified");
-                            var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
+                            var result = MH.UpdateSingleObject(authentication_collection, "UserName", username, null, null, update).Result;
                             Parameters parameters = new Parameters { username = username, fullname = verifyUser.FullName };
                             var response = authHelper.DoPassword(parameters, _repo, _settings);
                             response.Code = "201";
@@ -427,7 +436,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "ForgotPasswordVerification", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "ForgotPasswordVerification", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -451,15 +460,14 @@ namespace AuthorizedServer.Controllers
         {
             try
             {
-                var filter = Builders<BsonDocument>.Filter.Eq("UserName", data.UserName);
-                var user = MH.GetSingleObject(filter, "Authentication", "Authentication").Result;
+                var user = MH.GetSingleObject(authentication_collection, "UserName", data.UserName, null, null).Result;
                 if (user != null)
                 {
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(user);
                     if (verifyUser.Status == "Verified")
                     {
                         RegisterModel registerModel = new RegisterModel { UserName = data.UserName, Password = data.Password };
-                        var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("Password", passwordHasher.HashPassword(registerModel, data.Password))).Result;
+                        var result = MH.UpdateSingleObject(authentication_collection, "UserName", data.UserName, null, null, Builders<BsonDocument>.Update.Set("Password", passwordHasher.HashPassword(registerModel, data.Password))).Result;
                         return Ok(new ResponseData
                         {
                             Code = "200",
@@ -489,7 +497,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "ChangePassword", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "ChangePassword", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -515,8 +523,7 @@ namespace AuthorizedServer.Controllers
         {
             try
             {
-                var filter = Builders<BsonDocument>.Filter.Eq("UserName", data.UserName);
-                var user = MH.GetSingleObject(filter, "Authentication", "Authentication").Result;
+                var user = MH.GetSingleObject(authentication_collection, "UserName", data.UserName, null, null).Result;
                 if (user != null)
                 {
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(user);
@@ -524,7 +531,7 @@ namespace AuthorizedServer.Controllers
                     if (passwordHasher.VerifyHashedPassword(registerModel, verifyUser.Password, data.OldPassword).ToString() == "Success")
                     {
                         var update = Builders<BsonDocument>.Update.Set("Password", passwordHasher.HashPassword(verifyUser, data.NewPassword));
-                        var result = MH.UpdateSingleObject(filter, "Authentication", "Authentication", update).Result;
+                        var result = MH.UpdateSingleObject(authentication_collection, "UserName", data.UserName, null, null, update).Result;
                         return Ok(new ResponseData
                         {
                             Code = "200",
@@ -535,7 +542,7 @@ namespace AuthorizedServer.Controllers
                     }
                     else
                     {
-                        string response = MongoHelper.RecordLoginAttempts(filter);
+                        string response = MongoHelper.RecordLoginAttempts(authentication_collection, "UserName", data.UserName, null, null);
                         if (response != "Failed")
                             return BadRequest(new ResponseData
                             {
@@ -566,7 +573,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "ChangePasswordWhenLoggedIn", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "ChangePasswordWhenLoggedIn", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -590,15 +597,14 @@ namespace AuthorizedServer.Controllers
         {
             try
             {
-                var filter = Builders<BsonDocument>.Filter.Eq("PhoneNumber", data.UserName);
-                var user = MH.GetSingleObject(filter, "Authentication", "Authentication").Result;
+                var user = MH.GetSingleObject(authentication_collection, "PhoneNumber", data.UserName, null, null).Result;
                 if (user != null)
                 {
                     var verifyUser = BsonSerializer.Deserialize<RegisterModel>(user);
                     RegisterModel registerModel = new RegisterModel { UserName = data.UserName, Password = data.Password };
                     if (passwordHasher.VerifyHashedPassword(registerModel, verifyUser.Password, data.Password).ToString() == "Success")
                     {
-                        var authCollection = _db.GetCollection<RegisterModel>("Authentication");
+                        var authCollection = auth_db.GetCollection<RegisterModel>("Authentication");
                         var response = authCollection.DeleteOneAsync(user);
                         return Ok(new ResponseData
                         {
@@ -629,7 +635,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "DeactivateAccount", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "DeactivateAccount", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -681,7 +687,7 @@ namespace AuthorizedServer.Controllers
                         var result = BsonSerializer.Deserialize<GoogleVerificationModel>(textResult);
                         if (result.sub == data.ID)
                         {
-                            var checkUser = MH.CheckForDatas("UserName", result.email, null, null, "Authentication", "Authentication");
+                            var checkUser = MH.CheckForDatas(authentication_collection, "UserName", result.email, null, null);
                             if (checkUser == null)
                             {
                                 RegisterModel registerModel = new RegisterModel
@@ -693,7 +699,7 @@ namespace AuthorizedServer.Controllers
                                     Status = "Verified",
                                     Email = result.email
                                 };
-                                var authCollection = _db.GetCollection<RegisterModel>("Authentication");
+                                var authCollection = auth_db.GetCollection<RegisterModel>("Authentication");
                                 await authCollection.InsertOneAsync(registerModel);
                             }
                             Parameters parameters = new Parameters { username = result.email, fullname = result.name };
@@ -722,7 +728,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "GoogleLogin", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "GoogleLogin", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -774,7 +780,7 @@ namespace AuthorizedServer.Controllers
                         var result = Newtonsoft.Json.JsonConvert.DeserializeObject<FacebookVerificationModel>(textResult);
                         if (result.id == data.ID)
                         {
-                            var checkUser = MH.CheckForDatas("SocialId", data.ID, null, null, "Authentication", "Authentication");
+                            var checkUser = MH.CheckForDatas(authentication_collection, "SocialId", data.ID, null, null);
                             if (checkUser == null)
                             {
                                 RegisterModel registerModel = new RegisterModel
@@ -786,7 +792,7 @@ namespace AuthorizedServer.Controllers
                                     Status = "Verified",
                                     Email = data.Email
                                 };
-                                var authCollection = _db.GetCollection<RegisterModel>("Authentication");
+                                var authCollection = auth_db.GetCollection<RegisterModel>("Authentication");
                                 await authCollection.InsertOneAsync(registerModel);
                             }
                             Parameters parameters = new Parameters { username = result.id, fullname = result.name };
@@ -815,7 +821,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "FaceBookLogin", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "FaceBookLogin", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -864,7 +870,7 @@ namespace AuthorizedServer.Controllers
                     else
                     {
                         var result = Newtonsoft.Json.JsonConvert.DeserializeObject<FacebookVerificationModel>(textResult);
-                        var checkUser = MH.CheckForDatas("SocialId", result.id, null, null, "Authentication", "Authentication");
+                        var checkUser = MH.CheckForDatas(authentication_collection, "SocialId", result.id, null, null);
                         if (checkUser == null)
                         {
                             return Ok(new ResponseData
@@ -894,7 +900,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "GoogleLogin", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "GoogleLogin", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -916,7 +922,7 @@ namespace AuthorizedServer.Controllers
         {
             try
             {
-                var checkUser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
+                var checkUser = MH.CheckForDatas(authentication_collection, "UserName", username, null, null);
                 if (checkUser != null)
                 {
                     var userModel = BsonSerializer.Deserialize<RegisterModel>(checkUser);
@@ -932,7 +938,7 @@ namespace AuthorizedServer.Controllers
                             DialCode = userModel.DialCode,
                             PhoneNumber = userModel.PhoneNumber
                         }
-                });
+                    });
                 }
                 else
                 {
@@ -946,7 +952,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "GetUserInfo", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "GetUserInfo", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -967,16 +973,16 @@ namespace AuthorizedServer.Controllers
         [HttpPut("updateuserinfo/fullname/{username}")]
         [SwaggerRequestExample(typeof(FullNameUpdateModel), typeof(UpdateFullNameDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> UpdateFullName([FromBody]FullNameUpdateModel data,string username)
+        public async Task<ActionResult> UpdateFullName([FromBody]FullNameUpdateModel data, string username)
         {
             try
             {
-                var checkUser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
+                var checkUser = MH.CheckForDatas(authentication_collection, "UserName", username, null, null);
                 if (checkUser != null)
                 {
                     if (data.FullName != null)
                     {
-                        var update = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("FullName", data.FullName));
+                        var update = await MH.UpdateSingleObject(authentication_collection, "UserName", username, null, null, Builders<BsonDocument>.Update.Set("FullName", data.FullName));
                         if (update == true)
                         {
                             return Ok(new ResponseData
@@ -1018,7 +1024,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "UpdateFullName", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "UpdateFullName", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -1043,18 +1049,18 @@ namespace AuthorizedServer.Controllers
         {
             try
             {
-                var checkUser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
+                var checkUser = MH.CheckForDatas(authentication_collection, "UserName", username, null, null);
                 if (checkUser != null)
                 {
                     if (data.DialCode != null)
                     {
                         if (data.PhoneNumber != null)
                         {
-                            var updateDialCode = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("DialCode", data.DialCode));
-                            var updatePhoneNumber = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("PhoneNumber", data.PhoneNumber));
-                            if(username == BsonSerializer.Deserialize<RegisterModel>(checkUser).PhoneNumber)
+                            var updateDialCode = await MH.UpdateSingleObject(authentication_collection, "UserName", username, null, null, Builders<BsonDocument>.Update.Set("DialCode", data.DialCode));
+                            var updatePhoneNumber = await MH.UpdateSingleObject(authentication_collection, "UserName", username, null, null, Builders<BsonDocument>.Update.Set("PhoneNumber", data.PhoneNumber));
+                            if (username == BsonSerializer.Deserialize<RegisterModel>(checkUser).PhoneNumber)
                             {
-                                var updateUserName = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("UserName", data.PhoneNumber));
+                                var updateUserName = await MH.UpdateSingleObject(authentication_collection, "UserName", username, null, null, Builders<BsonDocument>.Update.Set("UserName", data.PhoneNumber));
                             }
                             return Ok(new ResponseData
                             {
@@ -1095,7 +1101,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "UpdatePhoneNumber", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "UpdatePhoneNumber", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -1116,19 +1122,19 @@ namespace AuthorizedServer.Controllers
         [HttpPut("updateuserinfo/email/{username}")]
         [SwaggerRequestExample(typeof(EmailUpdateModel), typeof(UpdateEmailDetails))]
         [ProducesResponseType(typeof(ResponseData), 200)]
-        public async Task<ActionResult> UpdateEmailId([FromBody]EmailUpdateModel data,string username)
+        public async Task<ActionResult> UpdateEmailId([FromBody]EmailUpdateModel data, string username)
         {
             try
             {
-                var checkUser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
+                var checkUser = MH.CheckForDatas(authentication_collection, "UserName", username, null, null);
                 if (checkUser != null)
                 {
                     if (data.Email != null)
                     {
-                        var update = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("Email", data.Email));
+                        var update = await MH.UpdateSingleObject(authentication_collection, "UserName", username, null, null, Builders<BsonDocument>.Update.Set("Email", data.Email));
                         if (username == BsonSerializer.Deserialize<RegisterModel>(checkUser).Email)
                         {
-                            var updateUserName = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", Builders<BsonDocument>.Update.Set("UserName", data.Email));
+                            var updateUserName = await MH.UpdateSingleObject(authentication_collection, "UserName", username, null, null, Builders<BsonDocument>.Update.Set("UserName", data.Email));
                         }
                         if (update == true)
                         {
@@ -1171,7 +1177,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "UpdateEmailId", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "UpdateEmailId", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",
@@ -1180,7 +1186,6 @@ namespace AuthorizedServer.Controllers
                 });
             }
         }
-
         /// <summary>Update user's fullname</summary>
         /// <param name="data">Update data for password</param>
         /// <param name="username">UserName of user whoes password needs to be changed</param>
@@ -1198,7 +1203,7 @@ namespace AuthorizedServer.Controllers
         {
             try
             {
-                var checkUser = MH.CheckForDatas("UserName", username, null, null, "Authentication", "Authentication");
+                var checkUser = MH.CheckForDatas(authentication_collection, "UserName", username, null, null);
                 if (checkUser != null)
                 {
                     var userData = BsonSerializer.Deserialize<RegisterModel>(checkUser);
@@ -1228,7 +1233,7 @@ namespace AuthorizedServer.Controllers
                             if (passwordHasher.VerifyHashedPassword(registerModel, userData.Password, data.CurrentPassword).ToString() == "Success")
                             {
                                 var updateData = Builders<BsonDocument>.Update.Set("Password", passwordHasher.HashPassword(userData, data.NewPassword));
-                                var updatePassword = await MH.UpdateSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", username), "Authentication", "Authentication", updateData);
+                                var updatePassword = await MH.UpdateSingleObject(authentication_collection, "UserName", username, null, null, updateData);
                                 if (updatePassword == false)
                                 {
                                     return BadRequest(new ResponseData
@@ -1272,7 +1277,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("AuthController", "UpdateFullName", ex.Message);
+                LoggerDataAccess.CreateLog("AuthController", "UpdateFullName", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

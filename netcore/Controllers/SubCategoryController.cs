@@ -17,7 +17,25 @@ namespace Arthur_Clive.Controllers
     public class SubCategoryController : Controller
     {
         /// <summary></summary>
-        public IMongoDatabase _db = MH._client.GetDatabase("ProductDB");
+        public MongoClient _client;
+        /// <summary></summary>
+        public IMongoDatabase product_db;
+        /// <summary></summary>
+        public IMongoCollection<Product> product_collection;
+        /// <summary></summary>
+        public IMongoDatabase logger_db;
+        /// <summary></summary>
+        public IMongoCollection<ApplicationLogger> serverlogCollection;
+
+        /// <summary></summary>
+        public SubCategoryController()
+        {
+            _client = MH.GetClient();
+            product_db = _client.GetDatabase("ProductDB");
+            product_collection = product_db.GetCollection<Product>("Product");
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
+        }
 
         /// <summary>Get the product that matches the filters</summary>
         /// <param name="productFor">Whom is the product for</param>
@@ -32,7 +50,7 @@ namespace Arthur_Clive.Controllers
         {
             try
             {
-                IAsyncCursor<Product> cursor = await _db.GetCollection<Product>("Product").FindAsync(Builders<Product>.Filter.Eq("ProductFor", productFor) & Builders<Product>.Filter.Eq("ProductType", productType));
+                IAsyncCursor<Product> cursor = await product_collection.FindAsync(Builders<Product>.Filter.Eq("ProductFor", productFor) & Builders<Product>.Filter.Eq("ProductType", productType));
                 var products = cursor.ToList();
                 if (products.Count > 0)
                 {
@@ -62,7 +80,7 @@ namespace Arthur_Clive.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("SubCategoryController", "Get", ex.Message);
+                LoggerDataAccess.CreateLog("SubCategoryController", "Get", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

@@ -5,7 +5,9 @@ using AuthorizedServer.Repositories;
 using AuthorizedServer.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 using Swashbuckle.AspNetCore.Examples;
+using MH = AuthorizedServer.Helper.MongoHelper;
 
 namespace AuthorizedServer.Controllers
 {
@@ -13,18 +15,27 @@ namespace AuthorizedServer.Controllers
     [Route("api/token")]
     public class TokenController : Controller
     {
+        /// <summary>Client for MongoDB</summary>
+        public MongoClient _client;
         /// <summary></summary>
         public AuthHelper authHelper = new AuthHelper();
         /// <summary></summary>
         private IOptions<Audience> _settings;
         /// <summary></summary>
         private IRTokenRepository _repo;
+        /// <summary></summary>
+        public IMongoDatabase logger_db;
+        /// <summary></summary>
+        public IMongoCollection<ApplicationLogger> serverlogCollection;
 
         /// <summary></summary>
         /// <param name="settings"></param>
         /// <param name="repo"></param>
         public TokenController(IOptions<Audience> settings, IRTokenRepository repo)
         {
+            _client = MH.GetClient();
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
             this._settings = settings;
             this._repo = repo;
         }
@@ -74,7 +85,7 @@ namespace AuthorizedServer.Controllers
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("TokenController", "Auth", ex.Message);
+                LoggerDataAccess.CreateLog("TokenController", "Auth", ex.Message, serverlogCollection);
                 return BadRequest(new ResponseData
                 {
                     Code = "400",

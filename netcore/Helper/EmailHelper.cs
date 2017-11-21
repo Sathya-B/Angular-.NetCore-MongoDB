@@ -11,12 +11,42 @@ using Arthur_Clive.Logger;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using MH = Arthur_Clive.Helper.MongoHelper;
 
 namespace Arthur_Clive.Helper
 {
     /// <summary>Helper method for Amazon SES service</summary>
     public class EmailHelper
     {
+        /// <summary></summary>
+        public static MongoClient _client;
+        /// <summary></summary>
+        public static IMongoDatabase order_db;
+        /// <summary></summary>
+        public static IMongoCollection<BsonDocument> orderinfo_collection;
+        /// <summary></summary>
+        public static IMongoDatabase auth_db;
+        /// <summary></summary>
+        public static IMongoCollection<BsonDocument> authentication_collection;
+        /// <summary></summary>
+        public static IMongoDatabase logger_db;
+        /// <summary></summary>
+        public static IMongoCollection<ApplicationLogger> serverlogCollection;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public EmailHelper()
+        {
+            _client = MH.GetClient();
+            order_db = _client.GetDatabase("SubscribeDB");
+            orderinfo_collection = order_db.GetCollection<BsonDocument>("OrderInfo");
+            auth_db = _client.GetDatabase("Authentication");
+            authentication_collection = auth_db.GetCollection<BsonDocument>("Authentication");
+            logger_db = _client.GetDatabase("ArthurCliveLogDB");
+            serverlogCollection = logger_db.GetCollection<ApplicationLogger>("ServerLog");
+        }
+
         /// <summary>Get Amazon SES credentials from xml file</summary>
         /// <param name="key"></param>
         public static string GetCredentials(string key)
@@ -29,7 +59,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("EmailHelper", "GetCredentials", ex.Message);
+                LoggerDataAccess.CreateLog("EmailHelper", "GetCredentials", ex.Message, serverlogCollection);
                 return "Failed";
             }
         }
@@ -64,7 +94,7 @@ namespace Arthur_Clive.Helper
                 }
                 catch (Exception ex)
                 {
-                    LoggerDataAccess.CreateLog("EmailHelper", "SendEmail_ToSubscribedUsers", ex.Message);
+                    LoggerDataAccess.CreateLog("EmailHelper", "SendEmail_ToSubscribedUsers", ex.Message, serverlogCollection);
                     return "Failed";
                 }
             }
@@ -92,7 +122,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody_SendMessageToSubscribedUsers", ex.Message);
+                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody_SendMessageToSubscribedUsers", ex.Message, serverlogCollection);
                 return "Failed";
             }
         }
@@ -126,7 +156,7 @@ namespace Arthur_Clive.Helper
                 }
                 catch (Exception ex)
                 {
-                    LoggerDataAccess.CreateLog("EmailHelper", "SendEmail", ex.Message);
+                    LoggerDataAccess.CreateLog("EmailHelper", "SendEmail", ex.Message, serverlogCollection);
                     return "Failed";
                 }
             }
@@ -158,7 +188,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody_ErrorReport", ex.Message);
+                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody_ErrorReport", ex.Message, serverlogCollection);
                 return "Failed";
             }
         }
@@ -171,7 +201,7 @@ namespace Arthur_Clive.Helper
             try
             {
                 var productArray = productInfo.Split(":");
-                var checkOrder = MongoHelper.GetSingleObject(Builders<BsonDocument>.Filter.Eq("OrderId", orderId), "OrderDB", "OrderInfo").Result;
+                var checkOrder = MH.GetSingleObject(orderinfo_collection, "OrderId", orderId, null, null).Result;
                 if (checkOrder != null)
                 {
                     var orderInfo = BsonSerializer.Deserialize<OrderInfo>(checkOrder);
@@ -195,8 +225,8 @@ namespace Arthur_Clive.Helper
                                         ExpiryTime = DateTime.UtcNow.AddYears(10)
                                     };
                                     //Insert coupon to db
-                                    await MongoHelper._client.GetDatabase("CouponDB").GetCollection<Coupon>("Coupon").InsertOneAsync(coupon);
-                                    var user = MongoHelper.GetSingleObject(Builders<BsonDocument>.Filter.Eq("UserName", orderInfo.UserName), "Authentication", "Authentication").Result;
+                                    await MH._client.GetDatabase("CouponDB").GetCollection<Coupon>("Coupon").InsertOneAsync(coupon);
+                                    var user = MH.GetSingleObject(authentication_collection, "UserName", orderInfo.UserName, null, null).Result;
                                     if (user == null)
                                     {
                                         return "User not found";
@@ -233,7 +263,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("EmailHelper", "SendGiftCard", ex.Message);
+                LoggerDataAccess.CreateLog("EmailHelper", "SendGiftCard", ex.Message, serverlogCollection);
                 return "Failed";
             }
         }
@@ -269,7 +299,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody_SendGiftCard", ex.Message);
+                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody_SendGiftCard", ex.Message, serverlogCollection);
                 return "Failed";
             }
         }
@@ -302,7 +332,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("EmailHelper", "SendEmail_NewsLetterService", ex.Message);
+                LoggerDataAccess.CreateLog("EmailHelper", "SendEmail_NewsLetterService", ex.Message, serverlogCollection);
                 return "Failed";
             }
         }
@@ -323,7 +353,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody_NewsLetterService", ex.Message);
+                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody_NewsLetterService", ex.Message, serverlogCollection);
                 return "Failed";
             }
         }
@@ -331,12 +361,13 @@ namespace Arthur_Clive.Helper
         /// <summary>Send email to user who subscribes for news letter service</summary>
         /// <param name="emailReceiver"></param>
         /// <param name="orderId"></param>
-        public static async Task<string> SendEmail_ProductDetails(string emailReceiver, long orderId)
+        /// <param name="orderinfo_collection"></param>
+        public static async Task<string> SendEmail_ProductDetails(string emailReceiver, long orderId, IMongoCollection<BsonDocument> orderinfo_collection)
         {
             try
             {
                 string emailSender = GlobalHelper.ReadXML().Elements("email").Where(x => x.Element("current").Value.Equals("Yes")).Descendants("emailsender").First().Value;
-                var orderInfo = BsonSerializer.Deserialize<OrderInfo>(MongoHelper.CheckForDatas("OrderId", orderId, null, null, "OrderDB", "OrderInfo"));
+                var orderInfo = BsonSerializer.Deserialize<OrderInfo>(MH.GetSingleObject(orderinfo_collection, "OrderId", orderId, null, null).Result);
                 foreach (var product in orderInfo.ProductDetails)
                 {
                     Address billingAddress = new Address();
@@ -374,7 +405,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("EmailHelper", "SendEmail_ProductDetails", ex.Message);
+                LoggerDataAccess.CreateLog("EmailHelper", "SendEmail_ProductDetails", ex.Message, serverlogCollection);
                 return "Failed";
             }
         }
@@ -438,7 +469,7 @@ namespace Arthur_Clive.Helper
             }
             catch (Exception ex)
             {
-                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody_ProductDetails", ex.Message);
+                LoggerDataAccess.CreateLog("EmailHelper", "CreateEmailBody_ProductDetails", ex.Message, serverlogCollection);
                 return "Failed";
             }
         }
